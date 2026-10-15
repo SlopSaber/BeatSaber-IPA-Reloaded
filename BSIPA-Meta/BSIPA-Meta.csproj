@@ -6,10 +6,19 @@
     <Configurations>Debug;Release;Verbose;Verbose_Release</Configurations>
     <PackageAction>Assemble</PackageAction>
     <InnerTargets>Assemble</InnerTargets>
+    <Platform Condition="'$(Platform)' == '' Or '$(Platform)' == 'AnyCPU'">x64</Platform>
   </PropertyGroup>
 
   <PropertyGroup>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <OutputPath>$(MSBuildThisFileDirectory)bin\$(Platform)\$(Configuration)\net472\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <PackageZip>$(MSBuildThisFileDirectory)bin\$(Platform)\$(Configuration)\BSIPA.zip</PackageZip>
+    <DoorstopVersion>4.5.0</DoorstopVersion>
+    <DoorstopCache>$(MSBuildThisFileDirectory)obj\doorstop\$(DoorstopVersion)\</DoorstopCache>
+    <DoorstopArchive>$(DoorstopCache)doorstop_win_release_$(DoorstopVersion).zip</DoorstopArchive>
+    <DoorstopSourceArchive>$(DoorstopCache)doorstop-source-$(DoorstopVersion).zip</DoorstopSourceArchive>
+    <DoorstopArchiveHash>7BB953E8D883C8BDE76CED96F6D0E45660AD6E0151880D8AB5856BF4F532B147</DoorstopArchiveHash>
+    <DoorstopSourceHash>7F0C963104AA08BF5FEFEF8FF85E7FECD8306838F5AF3101487D9DB4E9188D63</DoorstopSourceHash>
 
     <IsVerbose>false</IsVerbose>
     <IsVerbose Condition="'$(Configuration)' == 'Verbose' Or '$(Configuration)' == 'Verbose_Release'">true</IsVerbose>
@@ -18,11 +27,8 @@
     <NoVerboseConfig Condition="'$(IsVerbose)' == 'true' And '$(Configuration)' == 'Verbose'">Debug</NoVerboseConfig>
     <NoVerboseConfig Condition="'$(IsVerbose)' == 'true' And '$(Configuration)' == 'Verbose_Release'">Release</NoVerboseConfig>
 
-    <ProxyConfig>Release</ProxyConfig>
-    <ProxyConfig Condition="'$(IsVerbose)' == 'true'">Verbose_Release</ProxyConfig>
-
-    <ProxyPlatform>Win32</ProxyPlatform>
-    <ProxyPlatform Condition="'$(Platform)' == 'x64'">x64</ProxyPlatform>
+    <InjectorOutputPath>$(MSBuildThisFileDirectory)..\IPA.Injector\bin\$(NoVerboseConfig)\net472\</InjectorOutputPath>
+    <PackageExcludes Condition="'$(NoVerboseConfig)' == 'Release'">$(InjectorOutputPath)**\*.pdb</PackageExcludes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,23 +48,50 @@
     <ItemGroup>
       <Files Include="$(OutputPath)**\*" />
     </ItemGroup>
-    <Delete Files="@(Files)" />
+    <Delete Files="@(Files);$(PackageZip)" />
   </Target>
 
-  <Target Name="Assemble" AfterTargets="Build" Returns="$(OutputPath)">
+  <Target Name="PrepareDoorstop">
+    <Error Condition="'$(Platform)' != 'x64' And '$(Platform)' != 'x86'" Text="Windows packages require Platform=x64 or Platform=x86." />
+    <MakeDir Directories="$(DoorstopCache)" />
+    <DownloadFile Condition="!Exists('$(DoorstopArchive)')"
+                  SourceUrl="https://github.com/NeighTools/UnityDoorstop/releases/download/v$(DoorstopVersion)/doorstop_win_release_$(DoorstopVersion).zip"
+                  DestinationFolder="$(DoorstopCache)" DestinationFileName="doorstop_win_release_$(DoorstopVersion).zip" />
+    <DownloadFile Condition="!Exists('$(DoorstopSourceArchive)')"
+                  SourceUrl="https://codeload.github.com/NeighTools/UnityDoorstop/zip/refs/tags/v$(DoorstopVersion)"
+                  DestinationFolder="$(DoorstopCache)" DestinationFileName="doorstop-source-$(DoorstopVersion).zip" />
+    <GetFileHash Files="$(DoorstopArchive)" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="DoorstopBinaryHash" />
+    </GetFileHash>
+    <GetFileHash Files="$(DoorstopSourceArchive)" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="DoorstopSourceHashItem" />
+    </GetFileHash>
+    <Error Condition="'%(DoorstopBinaryHash.FileHash)' != '$(DoorstopArchiveHash)'" Text="Doorstop binary archive SHA-256 does not match the pinned release." />
+    <Error Condition="'%(DoorstopSourceHashItem.FileHash)' != '$(DoorstopSourceHash)'" Text="Doorstop source archive SHA-256 does not match the pinned release." />
+    <Unzip SourceFiles="$(DoorstopArchive)" DestinationFolder="$(DoorstopCache)windows" />
+    <Unzip SourceFiles="$(DoorstopSourceArchive)" DestinationFolder="$(DoorstopCache)source" />
+  </Target>
+
+  <Target Name="Assemble" AfterTargets="Build" DependsOnTargets="PrepareDoorstop" Returns="$(OutputPath)">
     <Message Text="Packing..." Importance="High" />
     <Message Text="Results will be put in $(OutputPath)" Importance="High" />
+    <Error Condition="!Exists('$(InjectorOutputPath)Data\Managed\IPA.Injector.dll') Or !Exists('$(InjectorOutputPath)Data\Managed\IPA.Loader.dll')"
+           Text="The injector and loader output must exist before packaging." />
     <ItemGroup>
-      <InputDlls Include="$(SolutionDir)IPA.Injector\bin\$(NoVerboseConfig)\net472\**\*" Exclude="$(SolutionDir)IPA.Injector\bin\$(NoVerboseConfig)\net472\Libraries\**\*" />
+      <PreviousPackageFiles Include="$(OutputPath)**\*" />
+      <ManagedFiles Include="$(InjectorOutputPath)Data\Managed\**\*" Exclude="$(PackageExcludes)" />
+      <LibraryFiles Include="$(InjectorOutputPath)Libs\**\*" Exclude="$(PackageExcludes)" />
     </ItemGroup>
-    <Copy SourceFiles="@(InputDlls)" DestinationFolder="$(OutputPath)IPA\%(RecursiveDir)" />
-    <ItemGroup>
-      <BadFiles Include="$(OutputPath)*.dll" />
-      <BadFiles Include="$(OutputPath)*.pdb" Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Verbose_Release'" />
-      <BadFiles Include="$(OutputPath)IPA\*.pdb" Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Verbose_Release'" />
-    </ItemGroup>
-    <Delete Files="@(BadFiles)" />
-    <RemoveDir Directories="$(OutputPath)Libraries\" />
+    <Delete Files="@(PreviousPackageFiles)" />
+    <RemoveDir Directories="$(OutputPath)Libraries" />
+    <Copy SourceFiles="@(ManagedFiles)" DestinationFolder="$(OutputPath)IPA\Data\Managed\%(RecursiveDir)" />
+    <Copy SourceFiles="@(LibraryFiles)" DestinationFolder="$(OutputPath)Libs\%(RecursiveDir)" />
+    <Copy SourceFiles="$(DoorstopCache)windows\$(Platform)\winhttp.dll" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)doorstop_config.ini" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="$(DoorstopCache)source\UnityDoorstop-$(DoorstopVersion)\LICENSE" DestinationFolder="$(OutputPath)IPA\ThirdParty\Doorstop" />
+    <Copy SourceFiles="$(DoorstopSourceArchive)" DestinationFolder="$(OutputPath)IPA\ThirdParty\Doorstop" />
+    <ZipDirectory SourceDirectory="$(OutputPath)" DestinationFile="$(PackageZip)" Overwrite="true" />
+    <Message Text="Package: $(PackageZip)" Importance="High" />
   </Target>
 
 </Project>

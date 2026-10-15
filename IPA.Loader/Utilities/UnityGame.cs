@@ -181,8 +181,19 @@ namespace IPA.Utilities
             get
             {
                 if (_installRoot == null)
-                    _installRoot = Path.GetFullPath(
-                        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", ".."));
+                {
+                    var processPath = Environment.GetEnvironmentVariable("DOORSTOP_PROCESS_PATH");
+                    if (!string.IsNullOrEmpty(processPath))
+                        _installRoot = Path.GetDirectoryName(Path.GetFullPath(processPath));
+                    else
+                    {
+                        var managedDirectory = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!);
+                        var root = managedDirectory.Parent?.Parent;
+                        if (managedDirectory.Name == "Managed" && managedDirectory.Parent?.Name == "Data" && root?.Name == "IPA")
+                            root = root.Parent;
+                        _installRoot = root?.FullName ?? throw new DirectoryNotFoundException("Cannot locate the game installation from IPA.Loader.");
+                    }
+                }
                 return _installRoot;
             }
         }

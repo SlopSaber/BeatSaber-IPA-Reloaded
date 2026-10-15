@@ -46,3 +46,21 @@ dotnet build IPA.Injector/IPA.Injector.csproj -c Release -p:GameDirectory="D:/BS
 property the projects use `Refs`. Compilation verifies reference compatibility;
 startup, plugin lifecycle and native dependency compatibility require running the
 result in each supported game version.
+
+Build the complete Windows package with the packaging project:
+
+```powershell
+dotnet build BSIPA-Meta/BSIPA-Meta.csproj -c Release -p:Platform=x64 -p:GameDirectory="D:/BSManager/BSInstances/1.45.2"
+```
+
+The extracted layout is in `BSIPA-Meta/bin/x64/Release/net472`; the corresponding
+archive is `BSIPA-Meta/bin/x64/Release/BSIPA.zip`. Its root contains `IPA`, `Libs`,
+`doorstop_config.ini` and `winhttp.dll`. Use `Platform=x86` for a 32-bit package.
+Release packages exclude PDB files. The injector project alone produces managed
+components and does not create this installable layout.
+
+Packaging downloads the official [Unity Doorstop 4.5.0](https://github.com/NeighTools/UnityDoorstop/releases/tag/v4.5.0) Windows release and source
+archive, verifies both pinned SHA-256 values, and caches them under `BSIPA-Meta/obj`.
+Its configuration invokes `Doorstop.Entrypoint.Start` in `IPA.Injector.dll`.
+The Doorstop license and source archive accompany the binary under
+`IPA/ThirdParty/Doorstop`. Package generation does not install or launch the game.
