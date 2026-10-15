@@ -71,6 +71,7 @@ namespace IPA.Data
                     bool supported = current.Files.ContainsKey(name) || (name == "settings.ini" && current.Ini)
                         || name == "LocalLeaderboards.dat" || name == "LocalDailyLeaderboards.dat" || name == "ControllerProfiles.dat" || name == "AvatarData.dat";
                     if (!supported) continue;
+                    Logger.Default.Debug($"Reconciling native save {name}.");
                     string eraPath = EraPath(name);
                     if (File.Exists(path)) RecordWrite(path); // Reconcile a save left by a failed master-store write.
                     else if (File.Exists(eraPath)) File.Copy(eraPath, path);
@@ -302,6 +303,13 @@ namespace IPA.Data
             return id == null ? null : id + "|" + (obj["difficulty"] ?? obj["_difficulty"]) + "|" + (obj["beatmapCharacteristicName"] ?? obj["_gameplayMode"]);
         }
 
+        private static void IndexPosition(Dictionary<string, SortedSet<int>> positions, string identity, int index)
+        {
+            if (identity == null) return;
+            if (!positions.TryGetValue(identity, out var matches)) positions[identity] = matches = new SortedSet<int>();
+            matches.Add(index);
+        }
+
         private static JToken Merge(JToken old, JToken incoming, bool scores, string key = "", JToken baseline = null)
         {
             if (old is JObject previous && incoming is JObject next)
@@ -313,13 +321,54 @@ namespace IPA.Data
             if (scores && old is JArray oldArray && incoming is JArray newArray)
             {
                 var result = (JArray)oldArray.DeepClone();
+                var positions = new Dictionary<string, SortedSet<int>>(StringComparer.Ordinal);
+                var identities = new List<string>(result.Count);
+                for (int index = 0; index < result.Count; index++)
+                {
+                    string identity = Identity(result[index]);
+                    identities.Add(identity);
+                    IndexPosition(positions, identity, index);
+                }
+                var baselineArray = baseline as JArray;
+                var priorItems = new Dictionary<string, JToken>(StringComparer.Ordinal);
+                foreach (var value in baselineArray ?? new JArray())
+                {
+                    string identity = Identity(value);
+                    if (identity != null && !priorItems.ContainsKey(identity)) priorItems.Add(identity, value);
+                }
                 for (int index = 0; index < newArray.Count; index++)
                 {
                     JToken value = newArray[index]; string identity = Identity(value);
-                    int found = identity == null ? index < result.Count ? index : -1 : Enumerable.Range(0, result.Count).Where(i => Identity(result[i]) == identity).DefaultIfEmpty(-1).First();
-                    var baselineArray = baseline as JArray;
-                    JToken priorItem = identity == null ? baselineArray?.ElementAtOrDefault(index) : baselineArray?.FirstOrDefault(v => Identity(v) == identity);
-                    if (found >= 0) result[found] = Merge(result[found], value, true, baseline: priorItem); else result.Add(value.DeepClone());
+                    int found = identity == null ? index < result.Count ? index : -1
+                        : positions.TryGetValue(identity, out var matches) ? matches.Min : -1;
+                    JToken priorItem = identity == null
+                        ? baselineArray != null && index < baselineArray.Count ? baselineArray[index] : null
+                        : priorItems.TryGetValue(identity, out var prior) ? prior : null;
+                    if (found >= 0)
+                    {
+                        string previousIdentity = identities[found];
+                        result[found] = Merge(result[found], value, true, baseline: priorItem);
+                        string updatedIdentity = Identity(result[found]);
+                        if (!string.Equals(previousIdentity, updatedIdentity, StringComparison.Ordinal))
+                        {
+                            // Preserve first-match behavior for duplicate IDs, including
+                            // positional replacements that change a record's identity.
+                            if (previousIdentity != null)
+                            {
+                                var previousMatches = positions[previousIdentity];
+                                previousMatches.Remove(found);
+                                if (previousMatches.Count == 0) positions.Remove(previousIdentity);
+                            }
+                            IndexPosition(positions, updatedIdentity, found);
+                            identities[found] = updatedIdentity;
+                        }
+                    }
+                    else
+                    {
+                        result.Add(value.DeepClone());
+                        identities.Add(identity);
+                        IndexPosition(positions, identity, result.Count - 1);
+                    }
                 }
                 return result;
             }

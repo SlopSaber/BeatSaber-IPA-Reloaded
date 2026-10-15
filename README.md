@@ -148,6 +148,11 @@ indices refer to different preset assets. Shared writes are locked and atomic;
 score maxima survive default/reset saves, and play-count deltas merge across
 concurrent sessions. Concurrent copies of the same game version get separate
 native sessions. Unknown mod save files remain in the native version directory.
+Score-array reconciliation indexes record identities and baselines instead of
+repeatedly scanning the entire array for each record. Large libraries therefore
+avoid quadratic startup searches while retaining first-match duplicate handling,
+record order, score maxima and play-count delta rules. Debug logs identify each
+native save as startup reconciles it.
 
 Game/mod PlayerPrefs calls use `Shared/PlayerPrefs.json`. Existing registry
 values are imported lazily on first read; subsequent writes and deletions go to
