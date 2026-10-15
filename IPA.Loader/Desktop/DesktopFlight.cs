@@ -37,6 +37,7 @@ namespace IPA.Desktop
         private CursorLockMode originalLock;
         private bool originalCursor;
         private bool stopping;
+        private bool applicationQuitting;
         private bool focusedLastFrame;
         private MethodInfo autoTracking;
         private Behaviour pauseTarget;
@@ -289,6 +290,7 @@ namespace IPA.Desktop
             catch (Exception error) { Logger.Default.Debug($"FPFC automatic XR tracking control unavailable: {error.Message}"); autoTracking = null; }
         }
 
+        private void OnApplicationQuit() { applicationQuitting = true; }
         private void OnDisable() { Shutdown(); }
         private void OnDestroy() { Shutdown(); }
         private void Shutdown()
@@ -296,11 +298,16 @@ namespace IPA.Desktop
             if (stopping || Input == null) return;
             stopping = true;
             SceneManager.sceneLoaded -= SceneLoaded;
-            RestoreCamera();
-            foreach (var pointer in pointers) if (pointer != null) { pointer.enabled = false; Destroy(pointer); }
-            foreach (var saved in disabled) if (saved.Key != null) saved.Key.enabled = saved.Value;
-            foreach (var saved in hidden) if (saved.Key != null) saved.Key.enabled = saved.Value;
-            foreach (var restore in restoreMembers) restore();
+            // At quit, native pointer/controller dependencies may already be destroyed.
+            // Restore gameplay ownership only when disabling FPFC during a live session.
+            if (!applicationQuitting)
+            {
+                RestoreCamera();
+                foreach (var pointer in pointers) if (pointer != null) { pointer.enabled = false; Destroy(pointer); }
+                foreach (var saved in disabled) if (saved.Key != null) saved.Key.enabled = saved.Value;
+                foreach (var saved in hidden) if (saved.Key != null) saved.Key.enabled = saved.Value;
+                foreach (var restore in restoreMembers) restore();
+            }
             Cursor.lockState = originalLock;
             Cursor.visible = originalCursor;
             if (Instance == this) Instance = null;

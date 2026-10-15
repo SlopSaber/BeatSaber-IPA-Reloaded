@@ -195,6 +195,13 @@ recover their owning data source before a mod refreshes them. Old IPA plugins
 that discard a newly created file stream close that stream before continuing;
 this prevents first-run configuration reads from failing with a sharing
 violation. Plugin binaries remain unchanged; preparation uses cached copies.
+IllusionPlugin and IllusionInjector references use the same translation during
+dependency loading as during plugin discovery, including when a dependency
+loads first. The legacy CustomColors resource arrays are initialized before
+their first update if no scene-change callback has populated them yet. Missing
+optional localized resource assemblies log at debug level; declared missing
+dependencies retain their errors. FPFC does not re-enable native VR pointers
+during application shutdown.
 
 Legacy mouse axes retain their configured scaling and receive
 `FPFCLookSensitivity` once, with no extra backend multiplier. In the inspected

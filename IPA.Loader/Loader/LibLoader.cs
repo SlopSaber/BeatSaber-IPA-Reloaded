@@ -151,9 +151,10 @@ namespace IPA.Loader
         {
             var asmName = new AssemblyName(e.Name);
             string? requester = e.RequestingAssembly == null || e.RequestingAssembly.IsDynamic ? null : e.RequestingAssembly.Location;
-            bool optionalSerializerProbe = asmName.Name.EndsWith(".XmlSerializers", StringComparison.Ordinal)
+            bool optionalProbe = (asmName.Name.EndsWith(".XmlSerializers", StringComparison.Ordinal)
+                    || (asmName.Name.EndsWith(".resources", StringComparison.Ordinal) && !string.IsNullOrEmpty(asmName.CultureName)))
                 && (e.RequestingAssembly == null || !e.RequestingAssembly.GetReferencedAssemblies().Any(reference => reference.Name == asmName.Name));
-            return LoadLibrary(asmName, requester, optionalSerializerProbe);
+            return LoadLibrary(asmName, requester, optionalProbe);
         }
 
         internal static string? FindLibraryPath(AssemblyName requested, string? requester = null)
@@ -178,7 +179,7 @@ namespace IPA.Loader
                 .ThenBy(candidate => candidate.Path, StringComparer.OrdinalIgnoreCase).Select(candidate => candidate.Path).FirstOrDefault();
         }
 
-        internal static Assembly? LoadLibrary(AssemblyName asmName, string? requester = null, bool optionalSerializerProbe = false)
+        internal static Assembly? LoadLibrary(AssemblyName asmName, string? requester = null, bool optionalProbe = false)
         {
             Log(Logger.Level.Debug, $"Resolving library {asmName}");
 
@@ -201,7 +202,7 @@ namespace IPA.Loader
                 return LoadSafe(library, requester);
             }
 
-            if (optionalSerializerProbe) Log(Logger.Level.Debug, $"Optional XML serializer assembly {asmName} was not found.");
+            if (optionalProbe) Log(Logger.Level.Debug, $"Optional {(asmName.Name.EndsWith(".resources", StringComparison.Ordinal) ? "satellite resource" : "XML serializer")} assembly {asmName} was not found.");
             else Log(Logger.Level.Critical, $"No library {asmName} found");
 
             return null;

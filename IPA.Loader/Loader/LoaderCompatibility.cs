@@ -213,8 +213,8 @@ namespace IPA.Loader
                 else profile = null;
                 key = file + "|" + profile?.Version;
                 if (PreparedFiles.TryGetValue(key, out prepared)) return prepared;
-                bool compatibilityChanged = IPA.Compat3.Runtime.Rewrite(module, profile);
-                compatibilityChanged |= LegacyPluginRewriter.Rewrite(module);
+                bool compatibilityChanged = LegacyPluginRewriter.Rewrite(module);
+                compatibilityChanged |= IPA.Compat3.Runtime.Rewrite(module, profile);
                 bool dataRoutingChanged = IPA.Data.SaveDataRewriter.Rewrite(module);
                 if (!compatibilityChanged && !dataRoutingChanged)
                 {

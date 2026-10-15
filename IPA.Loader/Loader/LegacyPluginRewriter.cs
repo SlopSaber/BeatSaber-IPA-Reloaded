@@ -9,8 +9,32 @@ namespace IPA.Loader
     {
         internal static bool Rewrite(ModuleDefinition module)
         {
-            if (!module.AssemblyReferences.Any(reference => reference.Name == "IllusionPlugin" || reference.Name == "IllusionInjector")) return false;
-            bool changed = false;
+            var oldReferences = module.AssemblyReferences.Where(reference => reference.Name == "IllusionPlugin" || reference.Name == "IllusionInjector").ToArray();
+            if (oldReferences.Length == 0) return false;
+            // Dependency resolution can load a DLL before plugin discovery. Both paths
+            // must prepare the same type identities before the CLR caches the assembly.
+            foreach (var type in module.GetTypeReferences().Where(type => type.Scope is AssemblyNameReference scope && oldReferences.Contains(scope)))
+            {
+                string mapped = type.FullName switch
+                {
+                    "IllusionPlugin.IPlugin" or "IllusionPlugin.IEnhancedPlugin" => "IPA.Old",
+                    "IllusionPlugin.IniFile" or "IllusionPlugin.IModPrefs" or "IllusionPlugin.ModPrefs" => "IPA.Config",
+                    "IllusionPlugin.Utils.ReflectionUtil" => "IPA.Utilities",
+                    "IllusionPlugin.Logging.Logger" or "IllusionPlugin.Logging.LogPrinter" => "IPA.Logging",
+                    "IllusionInjector.Logging.UnityLogInterceptor" or "IllusionInjector.Logging.StandardLogger" => "IPA.Logging",
+                    "IllusionInjector.PluginManager" or "IllusionInjector.PluginComponent" => "IPA.Loader",
+                    "IllusionInjector.CompositeBSPlugin" or "IllusionInjector.CompositeIPAPlugin" => "IPA.Loader.Composite",
+                    "IllusionInjector.Updating.SelfPlugin" => "IPA.Updating",
+                    "IllusionInjector.Updating.Backup.BackupUnit" => "IPA.Updating.Backup",
+                    _ when type.Namespace == "IllusionInjector.Utilities" => "IPA.Utilities",
+                    _ when type.Namespace == "IllusionInjector.Logging.Printers" => "IPA.Logging.Printers",
+                    _ => null
+                };
+                if (mapped != null) type.Namespace = mapped;
+            }
+            foreach (var reference in oldReferences) reference.Name = "IPA.Loader";
+            bool changed = true;
+            InitializeCustomColors(module);
             foreach (var method in module.GetTypes().SelectMany(type => type.Methods).Where(method => method.HasBody))
             {
                 var instructions = method.Body.Instructions;
@@ -32,6 +56,25 @@ namespace IPA.Loader
                 }
             }
             return changed;
+        }
+
+        private static void InitializeCustomColors(ModuleDefinition module)
+        {
+            var type = module.Types.FirstOrDefault(type => type.FullName == "CustomColors.Plugin");
+            var update = type?.Methods.FirstOrDefault(method => method.Name == "OnUpdate" && method.HasBody && !method.IsStatic && method.Parameters.Count == 0);
+            var initialize = type?.Methods.FirstOrDefault(method => method.Name == "GetObjects" && method.HasBody && !method.IsStatic && method.Parameters.Count == 0 && method.ReturnType.FullName == "System.Void");
+            var colors = type?.Fields.FirstOrDefault(field => field.Name == "_scriptableColors" && field.FieldType is ArrayType && !field.IsStatic);
+            var lights = type?.Fields.FirstOrDefault(field => field.Name == "_prePassLights" && field.FieldType is ArrayType && !field.IsStatic);
+            if (update == null || initialize == null || colors == null || lights == null || update.Body.Instructions.Count == 0) return;
+            var il = update.Body.GetILProcessor();
+            var start = update.Body.Instructions[0];
+            var load = il.Create(OpCodes.Ldarg_0);
+            // The original mod discovers resources only on activeSceneChanged;
+            // its first Update can precede that event after subscribing at startup.
+            foreach (var instruction in new[] {
+                il.Create(OpCodes.Ldarg_0), il.Create(OpCodes.Ldfld, colors), il.Create(OpCodes.Brfalse, load),
+                il.Create(OpCodes.Ldarg_0), il.Create(OpCodes.Ldfld, lights), il.Create(OpCodes.Brtrue, start),
+                load, il.Create(OpCodes.Call, initialize) }) il.InsertBefore(start, instruction);
         }
     }
 }
