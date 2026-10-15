@@ -78,6 +78,9 @@ namespace IPA.Injector
                 GameVersionEarly.Load();
                 SelfConfig.Instance.CheckVersionBoundary();
 
+                var legacyGameProfile = LoaderCompatibility.LegacyGameAssemblyProfile();
+                if (legacyGameProfile != null) LegacyGameAssemblyPatcher.Apply(legacyGameProfile);
+
                 // updates backup
                 InstallBootstrapPatch();
 
@@ -132,7 +135,7 @@ namespace IPA.Injector
             var gameName = dataDir.Substring(0, dataDir.Length - 5);
 
             Logging.Logger.Injector.Debug("Finding backup");
-            var backupPath = Path.Combine(Environment.CurrentDirectory, "IPA", "Backups", gameName);
+            var backupPath = Path.Combine(UnityGame.InstallPath, "IPA", "Backups", gameName);
             var bkp = BackupManager.FindLatestBackup(backupPath);
             if (bkp == null)
                 Logging.Logger.Injector.Debug("No existing bootstrap backup; a backup will be created before modifying the engine assembly.");

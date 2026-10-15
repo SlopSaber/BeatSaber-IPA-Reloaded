@@ -107,6 +107,42 @@ namespace IPA.Loader
         internal static Compatibility.CompatibilityProfile ProfileForPath(string path)
             => path != null && ProfilesByPath.TryGetValue(OriginalPath(path), out var profile) ? profile : null;
 
+        internal static Compatibility.CompatibilityProfile LegacyGameAssemblyProfile()
+        {
+            Compatibility.CompatibilityProfile selected = null;
+            foreach (string file in ModFiles.PluginFiles)
+            {
+                try
+                {
+                    using var module = ModuleDefinition.ReadModule(file);
+                    var target = GetTargetVersion(module);
+                    Compatibility.CompatibilityProfile profile = null;
+                    if (target != null)
+                    {
+                        ValidateTarget(target);
+                        profile = ResolveAssemblyProfile(file, module, null);
+                    }
+                    if (profile == null && module.GetTypes().Any(type => !type.IsAbstract && !type.IsInterface
+                        && type.Interfaces.Any(implemented => implemented.InterfaceType.FullName == "IPA.Old.IPlugin"
+                            || implemented.InterfaceType.FullName == "IPA.Old.IEnhancedPlugin"
+                            || implemented.InterfaceType.FullName == "IllusionPlugin.IPlugin"
+                            || implemented.InterfaceType.FullName == "IllusionPlugin.IEnhancedPlugin"
+                            || implemented.InterfaceType.FullName == "IPA.IBeatSaberPlugin"
+                            || implemented.InterfaceType.FullName == "IPA.IEnhancedBeatSaberPlugin")))
+                        profile = Compatibility.CompatibilityProfiles.Releases.First(candidate => candidate.Version.Major == 3);
+                    if (profile?.RequiresGameAssemblyPatches == true
+                        && (selected == null || profile.Version.CompareTo(selected.Version) > 0)) selected = profile;
+                }
+                catch (BadImageFormatException) { }
+                catch (Exception error)
+                {
+                    // Normal metadata loading reports invalid plugins; one probe must not abort bootstrap.
+                    Logger.Loader.Debug($"Cannot infer legacy game patches from '{Path.GetFileName(file)}': {error.Message}");
+                }
+            }
+            return selected;
+        }
+
         internal static System.Version GetTargetVersion(ModuleDefinition module)
             => module.AssemblyReferences.FirstOrDefault(reference => reference.Name == "IPA.Loader")?.Version;
 

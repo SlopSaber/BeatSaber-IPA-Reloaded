@@ -14,6 +14,8 @@ namespace IPA.Loader.Compatibility
     {
         private static readonly Version JsonFeaturesVersion = new("4.1.0");
         private static readonly Version OptionalGameVersion = new("4.2.1");
+        private static readonly Version NoVirtualizationVersion = new("4.3.0");
+        private static readonly Version FixedVirtualizationVersion = new("4.1.6");
 
         [JsonConstructor]
         public CompatibilityProfile(string version) => Version = new Version(version);
@@ -22,6 +24,8 @@ namespace IPA.Loader.Compatibility
         internal bool UsesLegacyFeatures => Version.CompareTo(JsonFeaturesVersion) < 0;
         internal bool AllowsNullId => Version.Major < 5;
         internal bool RequiresGameVersion => Version.CompareTo(OptionalGameVersion) < 0;
+        internal bool RequiresGameAssemblyPatches => Version.CompareTo(NoVirtualizationVersion) < 0;
+        internal bool RequiresInParameterModifiers => Version.CompareTo(FixedVirtualizationVersion) >= 0;
     }
 
     internal static class CompatibilityProfiles
@@ -73,9 +77,11 @@ namespace IPA.Loader.Compatibility
         internal static Version MinimumBinaryVersion(ModuleDefinition module, TypeDefinition entryType = null)
         {
             if (module == null) return null;
-            if (entryType != null && entryType.Methods.Any(method => method.ReturnType.FullName == "System.Threading.Tasks.Task"
-                && method.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == "IPA.OnEnableAttribute"
-                    || attribute.AttributeType.FullName == "IPA.OnDisableAttribute"))) return new Version("4.3.3");
+            if ((entryType == null ? Types(module.Types) : new[] { entryType }).SelectMany(type => type.Methods)
+                .Any(method => method.ReturnType.FullName == "System.Threading.Tasks.Task"
+                    && method.CustomAttributes.Any(attribute => IsLoaderType(attribute.AttributeType)
+                        && (attribute.AttributeType.FullName == "IPA.OnEnableAttribute"
+                            || attribute.AttributeType.FullName == "IPA.OnDisableAttribute")))) return new Version("4.3.3");
             var methods = module.GetMemberReferences().OfType<MethodReference>().Where(method => IsLoaderType(method.DeclaringType)).ToArray();
             if (methods.Any(method => method.DeclaringType.FullName == "IPA.Utilities.Async.UnityMainThreadTaskScheduler"
                 && method.Name == "get_Default" && method.ReturnType.FullName == "IPA.Utilities.Async.UnityMainThreadTaskScheduler"))

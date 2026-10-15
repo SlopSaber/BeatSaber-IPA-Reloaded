@@ -49,6 +49,27 @@ Static inspection of the 1.11.1 plugin binaries found two missing non-generic lo
 
 The supplied log separately reports absent INIFileParser, BeatSaverSharp, ChatCore, DynamicOpenVR and its action file. An IniParser manifest is metadata, not the assembly that BS Utils requires. These missing dependencies must be installed; profile selection does not supply them. CameraPlus and ScoreSaber null-reference traces do not establish a loader API cause and remain unverified runtime issues.
 
+## Follow-up log: 2026.10.14.19.05.56
+
+This log confirms the restored API signatures and legacy ID fallback progressed past initialization. It exposes a further historical contract: BSIPA before 4.3.0 modified game assemblies to support inherited fields, public reflection and virtual methods. The [4.0.5 virtualizer](https://github.com/nike4613/BeatSaber-IPA-Reloaded/blob/4.0.5/IPA.Injector/Virtualizer.cs) made eligible instance methods public/virtual and private fields protected; the [4.1.6-era implementation](https://github.com/nike4613/BeatSaber-IPA-Reloaded/blob/4.2.1/IPA.Injector/Virtualizer.cs) also handled nested types and `in` modifiers. [4.3.0 removed this mechanism](https://github.com/nike4613/BeatSaber-IPA-Reloaded/releases/tag/4.3.0).
+
+| Log evidence | Confirmed cause | Compatibility change |
+| --- | --- | --- |
+| BSML field access failure at line 758 | `HMUI.ScrollView._viewport` is private; BSML accesses it from a derived component. | Restore protected field access. |
+| SongCore level-pack failure at line 1171 | `BeatmapLevelPackCollectionSO._allBeatmapLevelPacks` is private; SongCore accesses it from its derived collection. | Restore protected field access. |
+| SongBrowser method access failure at line 1585 | `LevelCollectionTableView.HandleDidSelectRowEvent` is private. | Restore public virtual instance methods. |
+| Versus null Harmony target at line 585 | Its IL uses public instance reflection for private `LevelFilteringNavigationController.InitializeIfNeeded`. | Restore the public method surface. |
+| PP Helper null Harmony target at line 669 | Its IL uses public reflection for private `GameplayModifiersPanelController.RefreshTotalMultiplierAndRankUI`, plus protected `Awake`. | Restore the public method surface. |
+| Serializer critical messages at lines 855 and 858 | The generated `SongBrowser.XmlSerializers` assembly is an optional framework probe; settings loading subsequently succeeds. | Keep normal lookup, then log optional probe failure at debug level. Explicit binary references remain critical. |
+
+Static inspection of the installed game metadata and plugin IL confirms the five access/reflection causes. The [framework serializer implementation](https://github.com/microsoft/referencesource/blob/main/System.Xml/System/Xml/Serialization/Compilation.cs) explicitly tolerates failure to load a guessed serializer assembly.
+
+Before the bootstrap hook is installed, the loader examines plugin profiles and selects the newest profile that still requires legacy game patches. Newer-only installations do not request these changes. It patches configured game assemblies and the historical Assembly-CSharp fallback on disk, with a unique backup in `IPA/Backups/LegacyCompatibility`. Backups use the installation root rather than the launcher's working directory. Only changed assemblies are written, using a completed temporary file and atomic replacement. Loaded assemblies are reported rather than replaced. Value types, interfaces and static class layouts do not acquire virtual instance slots. The 4.1.6 modifier/final-method rules are enabled only for those later legacy profiles.
+
+These changes do not execute game code during the build. They apply on the next full startup with the updated package. Restore originals from the logged backup directory to undo persistent game assembly changes.
+
+The log also contains unavailable remote endpoints, a missing DynamicOpenVR action file, user/configuration messages and later mod null-reference failures. These are not evidence of further loader API failures. Some scene/song failures may be downstream of the confirmed access errors; their outcome needs a fresh game log after installing this build.
+
 ## Coverage limits
 
 Recorded release versions are selection points, not 84 separate complete historical runtimes. Releases sharing the same relevant contract share adapters. The four untagged distributions are identified below; their API boundary is inferred from their release family rather than claimed as a source-complete audit. Existing fixes and security checks remain in the current loader. Removed game APIs, arbitrary Harmony differences, native runtime issues, historical bugs and missing third-party assets are not emulated.

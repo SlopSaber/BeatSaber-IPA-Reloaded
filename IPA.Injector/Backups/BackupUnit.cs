@@ -21,7 +21,7 @@ namespace IPA.Injector.Backups
         {
         }
 
-        private BackupUnit(string dir, string name)
+        internal BackupUnit(string dir, string name)
         {
             Name = name;
             _backupPath = new DirectoryInfo(Path.Combine(dir, Name));
@@ -68,7 +68,7 @@ namespace IPA.Injector.Backups
         /// <param name="file"></param>
         public void Add(FileInfo file)
         {
-            var relativePath = Utilities.Utils.GetRelativePath(file.FullName, Environment.CurrentDirectory);
+            var relativePath = Utilities.Utils.GetRelativePath(file.FullName, UnityGame.InstallPath);
             var backupPath = new FileInfo(Path.Combine(_backupPath.FullName, relativePath));
             
             // Copy over

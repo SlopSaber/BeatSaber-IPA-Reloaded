@@ -131,7 +131,9 @@ namespace IPA.Loader
         {
             var asmName = new AssemblyName(e.Name);
             string? requester = e.RequestingAssembly == null || e.RequestingAssembly.IsDynamic ? null : e.RequestingAssembly.Location;
-            return LoadLibrary(asmName, requester);
+            bool optionalSerializerProbe = asmName.Name.EndsWith(".XmlSerializers", StringComparison.Ordinal)
+                && (e.RequestingAssembly == null || !e.RequestingAssembly.GetReferencedAssemblies().Any(reference => reference.Name == asmName.Name));
+            return LoadLibrary(asmName, requester, optionalSerializerProbe);
         }
 
         internal static string? FindLibraryPath(AssemblyName requested, string? requester = null)
@@ -151,7 +153,7 @@ namespace IPA.Loader
                 .ThenBy(candidate => candidate.Path, StringComparer.OrdinalIgnoreCase).Select(candidate => candidate.Path).FirstOrDefault();
         }
 
-        internal static Assembly? LoadLibrary(AssemblyName asmName, string? requester = null)
+        internal static Assembly? LoadLibrary(AssemblyName asmName, string? requester = null, bool optionalSerializerProbe = false)
         {
             Log(Logger.Level.Debug, $"Resolving library {asmName}");
 
@@ -174,7 +176,8 @@ namespace IPA.Loader
                 return LoadSafe(library, requester);
             }
 
-            Log(Logger.Level.Critical, $"No library {asmName} found");
+            if (optionalSerializerProbe) Log(Logger.Level.Debug, $"Optional XML serializer assembly {asmName} was not found.");
+            else Log(Logger.Level.Critical, $"No library {asmName} found");
 
             return null;
         }

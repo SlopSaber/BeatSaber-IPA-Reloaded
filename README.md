@@ -42,6 +42,19 @@ name; current profiles require a non-null ID. Profiles before 4.2.1 require a
 manifest game version. Cache paths include the selected profile, and dependent
 libraries use their own recorded profile or the requesting plugin's context.
 
+When a discovered plugin selects a profile before 4.3.0, startup also restores
+legacy game assembly access before those assemblies load. Eligible instance
+methods become public and virtual; private fields become protected. The game
+assemblies come from `GameAssemblies`, with `Assembly-CSharp.dll` as a fallback.
+Original files are backed up under `IPA/Backups/LegacyCompatibility/<backup-id>`
+with game-relative paths. Already-patched files are left alone. A game assembly
+loaded too early is reported and requires a full game restart. Profiles from
+4.3.0 onward do not request these patches. Changes persist in the game files;
+restore the saved originals to undo them.
+
+Missing optional XML serializer assemblies are logged at debug level. Explicit
+assembly dependencies still report missing libraries as errors.
+
 A known IPA binary without `dependsOn.BSIPA` gets an inferred loader dependency.
 A profile uses shared adapters at verified API boundaries; it does not execute
 a complete historical loader. See [the compatibility research](docs/articles/compatibility.md)
