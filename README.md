@@ -3,8 +3,9 @@
 [ALL DOCUMENTATION HAS MOVED HERE](https://nike4613.github.io/BeatSaber-IPA-Reloaded/)
 
 The v5 branch retains legacy IPA/BSIPA interfaces, configuration adapters and
-SemVer facades. Compatibility copies use the game's `Plugins/.cache/Compatibility`
-directory; original plugin DLLs remain unchanged. Managed and native dependencies
+SemVer facades. Compatibility copies use the game's `Mods/.compatibility`
+directory, including its `Legacy` subfolder for old IPA plugins. This directory
+is excluded from mod discovery; original plugin DLLs remain unchanged. Managed and native dependencies
 can use either `Libs` or `IPA/Libs`. Harmony 1 is packaged separately from Harmony 2
 and receives its separate assembly identity when loaded through the compatibility
 cache. These adapters do not guarantee compatibility with every historical mod
@@ -73,24 +74,33 @@ isolated historical loader behavior.
 
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
-`--no-fpfc` disables IPA flight. Controls: WASD move, Q/E descend/ascend, Shift
-moves three times faster, Ctrl moves at quarter speed, C releases/captures the
-cursor, right click captures it, and Escape pauses a running level. Movement
-uses unscaled time, so flight also works while paused. `FPFCMoveSpeed` (default
-1.5 metres/second) and `FPFCLookSensitivity` (default 0.2 degrees/pixel) tune it.
-Text fields suppress flight keys. Losing focus releases the cursor and cancels
-pending UI clicks/drags; recapture requires C or right click in the game.
+`--no-fpfc` disables IPA flight. Controls: WASD move, Q descends, E ascends,
+Shift moves three times faster, and Ctrl moves at quarter speed. Vertical flight
+uses twice the normal movement speed (3 metres/second by default). Escape
+pauses a running level or dismisses the selected text field without releasing
+the cursor. Movement uses unscaled time, so flight also works while paused.
+`FPFCMoveSpeed` (default 1.5 metres/second) and `FPFCLookSensitivity` (default 0.2)
+tune movement and look. Text fields suppress flight and look controls while
+keeping the cursor locked.
+Camera binding preserves the game's world spawn pose. A 1.6 m fallback applies
+only at world ground level, so standing-height parent rigs are not counted twice.
+
+FPFC locks and hides the cursor whenever the game is focused and a camera is
+active. UI clicks require captured input; the pointer always follows the centre
+camera ray rather than a free screen cursor. Losing focus releases capture and
+cancels pending clicks/drags. Refocusing restores capture automatically, ignoring
+the transition click and mouse-warp delta.
 
 A single camera-aligned pointer uses the game's existing world and curved UI
-raycasters. Left click, dragging and scrolling work in menus and pause screens;
-C also allows ordinary screen-position mouse input. The laser and hit dot use
-the running game's native menu prefabs, including their materials and newer
-laser fading. Controller hilts stay hidden during FPFC. The visible beam starts
-slightly below/right of the camera and ends at the same hit as the input ray;
-there is no overlay crosshair. Native/SiraUtil camera controllers, tracking and
-duplicate pointer visuals yield to IPA while active. Their prior states are
-restored when the component shuts down. The input adapter supports legacy Unity Input and the
-new Input System without bundling either engine module.
+raycasters. Left click, dragging and scrolling work in menus and pause screens.
+The laser and hit dot use the running game's native menu prefabs, including their
+materials and newer laser fading. Controller hilts stay hidden during FPFC. The
+beam begins at the camera's exact position and shares the UI input ray; there is
+no controller offset or overlay crosshair. Native/SiraUtil camera controllers,
+tracking and duplicate pointer visuals yield to IPA while active. Their prior
+states are restored when the component shuts down. The input adapter supports
+legacy Unity Input and the new Input System without bundling either engine
+module.
 
 Legacy mouse axes retain their configured scaling and receive
 `FPFCLookSensitivity` once, with no extra backend multiplier. In the inspected

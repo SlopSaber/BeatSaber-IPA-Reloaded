@@ -352,10 +352,10 @@ namespace IPA.Loader
                 .Concat(PluginLoader.ignoredPlugins.SelectMany(m => m.Key.AssociatedFiles.Select(f => f.FullName))), StringComparer.OrdinalIgnoreCase);
             var disabledPaths = new HashSet<string>(DisabledPlugins.Select(m => m.File.FullName), StringComparer.OrdinalIgnoreCase);
 
-            //Copy plugins to .cache
+            // Keep prepared legacy plugins outside mod discovery.
             string[] originalPlugins = ModFiles.PluginFiles.ToArray();
 
-            string cacheDir = Path.Combine(pluginDirectory, ".cache", "Legacy", typeof(PluginManager).Module.ModuleVersionId.ToString("N"));
+            string cacheDir = Path.Combine(UnityGame.CompatibilityCachePath, "Legacy", typeof(PluginManager).Module.ModuleVersionId.ToString("N"));
             var copiedPlugins = new List<string>();
             bool exists = Directory.Exists(cacheDir);
 

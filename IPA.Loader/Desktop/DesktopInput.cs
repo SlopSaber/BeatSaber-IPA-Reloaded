@@ -21,7 +21,6 @@ namespace IPA.Desktop
         private readonly Func<int, bool> mouseDown;
         private readonly Func<int, bool> mouseUp;
         private readonly Func<string, float> axis;
-        private readonly Func<Vector3> position;
         private readonly Func<Vector2> scroll;
         private readonly Dictionary<string, PropertyInfo> properties = new();
         private readonly Dictionary<Type, MethodInfo> readers = new();
@@ -58,7 +57,6 @@ namespace IPA.Desktop
                 mouseDown = Bind<int, bool>(legacy, "GetMouseButtonDown");
                 mouseUp = Bind<int, bool>(legacy, "GetMouseButtonUp");
                 axis = Bind<string, float>(legacy, "GetAxisRaw");
-                position = (Func<Vector3>)Delegate.CreateDelegate(typeof(Func<Vector3>), legacy.GetProperty("mousePosition").GetGetMethod());
                 scroll = (Func<Vector2>)Delegate.CreateDelegate(typeof(Func<Vector2>), legacy.GetProperty("mouseScrollDelta").GetGetMethod());
             }
             if (legacy == null && mouseType == null) throw new NotSupportedException("No desktop input backend was found.");
@@ -117,7 +115,6 @@ namespace IPA.Desktop
             return (edge == 1 ? mouseDown : edge == -1 ? mouseUp : mouse)?.Invoke(button) ?? false;
         }
 
-        internal Vector2 Position => Current(mouseType) is object device ? Vector(Property(device, "position")) : (Vector2)(position?.Invoke() ?? Vector3.zero);
         internal Vector2 Scroll => Current(mouseType) is object device ? Vector(Property(device, "scroll")) / 120f : scroll?.Invoke() ?? Vector2.zero;
         internal Vector2 Look => Current(mouseType) is object device ? Vector(Property(device, "delta"))
             : new Vector2(axis?.Invoke("MouseX") ?? 0f, axis?.Invoke("MouseY") ?? 0f);

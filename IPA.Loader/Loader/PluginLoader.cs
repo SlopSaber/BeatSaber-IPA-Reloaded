@@ -54,7 +54,7 @@ namespace IPA.Loader
         {
             string pluginDir = UnityGame.PluginsPath;
 
-            if (SelfConfig.YeetMods_ && UnityGame.IsGameVersionBoundary)
+            if (SelfConfig.YeetMods_ && UnityGame.IsGameVersionBoundary && Directory.Exists(pluginDir))
             {
                 var oldPluginsName = Path.Combine(UnityGame.InstallPath, $"Old {UnityGame.OldVersion} Plugins");
                 var newPluginsName = Path.Combine(UnityGame.InstallPath, $"Old {UnityGame.GameVersion} Plugins");

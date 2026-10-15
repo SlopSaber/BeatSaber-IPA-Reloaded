@@ -232,6 +232,7 @@ namespace IPA.Utilities
         public static string PluginsPath => Path.Combine(InstallPath, "Plugins");
         /// <summary>Gets the root for organized mod packages, including the Core folder.</summary>
         public static string ModsPath => Path.Combine(InstallPath, "Mods");
+        internal static string CompatibilityCachePath => Path.Combine(ModsPath, ".compatibility");
         /// <summary>
         /// The path to the `UserData` folder.
         /// </summary>

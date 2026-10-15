@@ -81,9 +81,8 @@ namespace IPA.Desktop
             if (root == null) return;
             bool hasHit = hit.gameObject != null && Finite(hit.worldPosition);
             Vector3 target = hasHit ? hit.worldPosition : ray.GetPoint(defaultLength);
-            // Keep the dot on the input ray. Offset only the visible beam so it remains visible
-            // without a controller hilt covering the centre of the view.
-            Vector3 origin = camera.transform.TransformPoint(new Vector3(0.15f, -0.1f, 0.15f));
+            // Share the camera's exact world-space origin with UI hit detection.
+            Vector3 origin = ray.origin;
             Vector3 direction = target - origin;
             float length = direction.magnitude;
             if (!Finite(target) || length < 0.001f) { Hide(); return; }

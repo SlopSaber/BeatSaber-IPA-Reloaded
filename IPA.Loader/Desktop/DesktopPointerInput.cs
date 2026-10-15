@@ -10,7 +10,6 @@ namespace IPA.Desktop
         private Vector2 dragMotion;
         private GameObject lastClick;
         private float lastClickTime;
-        private Vector2 lastScreenPosition;
         private DesktopPointerVisuals visuals;
 
         internal void BindVisuals(Behaviour source)
@@ -19,7 +18,7 @@ namespace IPA.Desktop
         }
 
         public override bool IsModuleSupported() => Flight != null && Flight.Ready;
-        public override bool ShouldActivateModule() => IsModuleSupported() && Application.isFocused;
+        public override bool ShouldActivateModule() => IsModuleSupported() && Flight.Captured;
 
         public override void UpdateModule()
         {
@@ -29,19 +28,18 @@ namespace IPA.Desktop
 
         public override void Process()
         {
-            if (!ShouldActivateModule()) { CancelPointer(); return; }
+            if (!ShouldActivateModule() || !Flight.CanInteract) { CancelPointer(); return; }
             ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, GetBaseEventData(), ExecuteEvents.updateSelectedHandler);
             if (pointer == null) GetPointerData(-1, out pointer, true);
             Vector2 previousPosition = pointer.position;
             Vector2 screen = Flight.PointerPosition;
-            Vector2 mouseMotion = Flight.Captured ? Flight.MouseMotion : screen - lastScreenPosition;
-            lastScreenPosition = screen;
+            Vector2 mouseMotion = Flight.MouseMotion;
             pointer.position = screen;
             pointer.scrollDelta = Flight.Input.Scroll;
             pointer.button = PointerEventData.InputButton.Left;
 
             // The game's VR raycasters read this seed as a world ray, including curved canvases.
-            Ray ray = Flight.Camera.ScreenPointToRay(screen);
+            Ray ray = new(Flight.Camera.transform.position, Flight.Camera.transform.forward);
             pointer.pointerCurrentRaycast = new RaycastResult { worldPosition = ray.origin, worldNormal = ray.direction };
             eventSystem.RaycastAll(pointer, m_RaycastResultCache);
             pointer.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
@@ -117,7 +115,7 @@ namespace IPA.Desktop
         public override void DeactivateModule() { CancelPointer(); base.DeactivateModule(); }
         private void LateUpdate()
         {
-            if (EventSystem.current != eventSystem || !ShouldActivateModule()) visuals?.Hide();
+            if (EventSystem.current != eventSystem || !ShouldActivateModule() || !Flight.CanInteract) visuals?.Hide();
         }
         protected override void OnDisable()
         {

@@ -37,7 +37,8 @@ namespace IPA.Loader
                 foreach (string child in children.OrderByDescending(path => path, StringComparer.OrdinalIgnoreCase))
                 {
                     string name = Path.GetFileName(child);
-                    if (name.Equals(".cache", StringComparison.OrdinalIgnoreCase) || name.Equals(".git", StringComparison.OrdinalIgnoreCase)
+                    if (name.Equals(".cache", StringComparison.OrdinalIgnoreCase) || name.Equals(".compatibility", StringComparison.OrdinalIgnoreCase)
+                        || name.Equals(".git", StringComparison.OrdinalIgnoreCase)
                         || (!includeNative && name.Equals("Native", StringComparison.OrdinalIgnoreCase))) continue;
                     if (Environment.OSVersion.Platform != PlatformID.Win32NT && (File.GetAttributes(child) & FileAttributes.ReparsePoint) != 0) continue;
                     pending.Push(child);

@@ -17,9 +17,10 @@ namespace IPA.Desktop
         internal DesktopInput Input { get; private set; }
         internal Camera Camera { get; private set; }
         internal bool Ready => !stopping && Camera != null && Camera.isActiveAndEnabled;
-        internal bool Captured { get; private set; } = true;
+        internal bool Captured => Ready && Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
+        internal bool CanInteract { get; private set; }
         internal Vector2 MouseMotion { get; private set; }
-        internal Vector2 PointerPosition => Captured && Ready ? Camera.pixelRect.center : Input.Position;
+        internal Vector2 PointerPosition => Camera.pixelRect.center;
         private readonly Dictionary<Behaviour, bool> disabled = new();
         private readonly List<DesktopPointerInput> pointers = new();
         private readonly List<KeyValuePair<Renderer, bool>> hidden = new();
@@ -36,6 +37,7 @@ namespace IPA.Desktop
         private CursorLockMode originalLock;
         private bool originalCursor;
         private bool stopping;
+        private bool focusedLastFrame;
         private MethodInfo autoTracking;
         private Behaviour pauseTarget;
         private MethodInfo pauseMethod;
@@ -66,7 +68,7 @@ namespace IPA.Desktop
             originalCursor = Cursor.visible;
             SceneManager.sceneLoaded += SceneLoaded;
             DesktopGameHooks.Install();
-            Logger.Default.Info("IPA FPFC enabled: WASD fly, Q/E down/up, Shift faster, Ctrl slower, C release/capture cursor, Escape pause.");
+            Logger.Default.Info("IPA FPFC enabled: WASD fly, Q/E down/up at double speed, Shift faster, Ctrl slower, Escape pause. Mouse stays captured while focused.");
         }
 
         private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; }
@@ -92,7 +94,8 @@ namespace IPA.Desktop
                     originalRotation = Camera.transform.localRotation;
                     originalStereo = Camera.stereoTargetEye;
                     position = Camera.transform.position;
-                    if (Mathf.Abs(Camera.transform.localPosition.y) < 0.1f) position += Vector3.up * 1.6f;
+                    // A parent rig can already supply standing height while local camera Y is zero.
+                    if (Mathf.Abs(position.y) < 0.1f) position.y = 1.6f;
                     Vector3 angles = Camera.transform.eulerAngles;
                     yaw = angles.y;
                     pitch = Mathf.DeltaAngle(0f, angles.x);
@@ -191,12 +194,13 @@ namespace IPA.Desktop
         {
             if (Input == null) return;
             if (dirty || !Ready || Time.unscaledTime >= nextScan) Scan();
+            // Ignore the focus/capture transition click and any cursor-warp look delta.
+            CanInteract = focusedLastFrame && Captured;
+            ApplyCapture();
             MouseMotion = Vector2.zero;
             bool editing = Ready && EditingText();
             if (Ready && Application.isFocused)
             {
-                if (!editing && Input.Key("c", true)) Captured = !Captured;
-                if (!editing && Input.Mouse(1, 1)) Captured = true;
                 if (Input.Key("escape", true))
                 {
                     if (editing) EventSystem.current.SetSelectedGameObject(null);
@@ -204,27 +208,33 @@ namespace IPA.Desktop
                 }
                 if (Captured && !editing)
                 {
-                    MouseMotion = Input.Look;
+                    if (CanInteract) MouseMotion = Input.Look;
                     float sensitivity = Positive(SelfConfig.Instance.FPFCLookSensitivity, 0.2f);
                     yaw += MouseMotion.x * sensitivity;
                     pitch = Mathf.Clamp(pitch - MouseMotion.y * sensitivity, -89f, 89f);
                     rotation = Quaternion.Euler(pitch, yaw, 0f);
                     Vector3 movement = new((Input.Key("d") ? 1 : 0) - (Input.Key("a") ? 1 : 0),
-                        (Input.Key("e") ? 1 : 0) - (Input.Key("q") ? 1 : 0), (Input.Key("w") ? 1 : 0) - (Input.Key("s") ? 1 : 0));
+                        (Input.Key("e") ? 1 : 0) - (Input.Key("q") ? 1 : 0),
+                        (Input.Key("w") ? 1 : 0) - (Input.Key("s") ? 1 : 0));
                     float speed = Positive(SelfConfig.Instance.FPFCMoveSpeed, 1.5f);
                     if (Input.Key("left shift") || Input.Key("right shift")) speed *= 3f;
                     if (Input.Key("left ctrl") || Input.Key("right ctrl")) speed *= 0.25f;
                     movement = Vector3.ClampMagnitude(movement, 1f);
-                    position += (rotation * new Vector3(movement.x, 0f, movement.z) + Vector3.up * movement.y) * speed * Mathf.Min(Time.unscaledDeltaTime, 0.1f);
+                    position += (rotation * new Vector3(movement.x, 0f, movement.z) + Vector3.up * (movement.y * 2f)) * speed * Mathf.Min(Time.unscaledDeltaTime, 0.1f);
                 }
             }
             ApplyPose();
-            Cursor.lockState = Ready && Application.isFocused && Captured && !editing ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = Cursor.lockState != CursorLockMode.Locked;
+            focusedLastFrame = Ready && Application.isFocused;
         }
 
         private static float Positive(float value, float fallback) => value > 0f && !float.IsInfinity(value) ? value : fallback;
-        private void LateUpdate() { ApplyPose(); }
+        private void LateUpdate() { ApplyPose(); if (Input != null && !stopping) ApplyCapture(); }
+        private void ApplyCapture()
+        {
+            bool capture = Ready && Application.isFocused;
+            Cursor.lockState = capture ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !capture;
+        }
         private void ApplyPose()
         {
             if (!Ready) return;
@@ -233,8 +243,9 @@ namespace IPA.Desktop
         }
         private void OnApplicationFocus(bool focused)
         {
+            focusedLastFrame = false;
+            CanInteract = false;
             if (focused) return;
-            Captured = false;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             foreach (var pointer in pointers) if (pointer != null) pointer.CancelPointer();
@@ -242,7 +253,7 @@ namespace IPA.Desktop
 
         private void Pause()
         {
-            if (pauseTarget == null) { dirty = true; Captured = false; return; }
+            if (pauseTarget == null) { dirty = true; return; }
             bool paused = pausedField?.GetValue(pauseTarget) is bool flag ? flag
                 : pauseProperty?.CanRead == true && pauseProperty.GetValue(pauseTarget, null) is bool state && state;
             if (!paused)

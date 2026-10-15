@@ -222,7 +222,7 @@ namespace IPA.Loader
                 using var hash = SHA256.Create();
                 string digest = BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "");
                 string source = BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(file.ToUpperInvariant()))).Replace("-", "");
-                string directory = Path.Combine(IPA.Utilities.UnityGame.PluginsPath, ".cache", "Compatibility",
+                string directory = Path.Combine(IPA.Utilities.UnityGame.CompatibilityCachePath,
                     typeof(LoaderCompatibility).Module.ModuleVersionId.ToString("N"), profile?.Version.ToString() ?? "binary", source, digest);
                 Directory.CreateDirectory(directory);
                 prepared = Path.Combine(directory, Path.GetFileName(file));
