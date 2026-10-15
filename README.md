@@ -86,7 +86,9 @@ informational/assembly version; retain a manifest for different package IDs,
 versions or declared dependencies. Library DLLs are not treated as plugins.
 Legacy library-path getters in prepared mods target `Mods/Libraries`.
 
-The package includes 65 historical DLL providers from upstream BSIPA 3/4 tags
+Historical dependencies use `IPA/CoreLibraries/Versions/<BSIPA-version>`;
+NuGet and upstream provenance stays in the index. The package includes 65
+historical DLL providers from upstream BSIPA 3/4 tags
 and runtime NuGet dependencies. `CoreLibraryIndex.json` records source releases,
 package versions and content hashes; `provider-releases.tsv` supplies bootstrap
 routing without requiring a JSON library to load itself. Resolution prefers
@@ -101,6 +103,11 @@ separate paths; original manifests and mod/loader PDB files are archived under
 retryable duplicates until a later launch. Linked source trees are left alone.
 Set `TidyUp` to `false` to stop automatic cleanup; legacy Libs/Plugins paths
 remain readable. Normal package builds use the committed historical archive.
+The source archive stores duplicate binaries once; packaging materializes each
+BSIPA release folder. Old NuGet/Upstream core layouts move to the TidyUp backup
+after the replacement release layout is complete. File-less library manifests
+can associate their DLLs by assembly identity, title or namespace; legacy plugin
+entry points remain discoverable as plugins.
 Regenerate it after restoring packages, with upstream tag history present:
 `python tools/build_core_libraries.py`; runtime projects, transitive packages,
 licenses and package metadata are included, while Unity and development tools
@@ -204,10 +211,17 @@ dotnet build BSIPA-Meta/BSIPA-Meta.csproj -c Release -p:Platform=x64 -p:GameDire
 ```
 
 The extracted layout is in `BSIPA-Meta/bin/x64/Release/net472`; the corresponding
-archive is `BSIPA-Meta/bin/x64/Release/BSIPA.zip`. Its root contains `IPA`, `Libs`,
+archive is `BSIPA-Meta/bin/x64/Release/BSIPA.zip`. Its root contains `IPA`,
 `doorstop_config.ini` and `winhttp.dll`. Use `Platform=x86` for a 32-bit package.
 Release packages exclude PDB files. The injector project alone produces managed
 components and does not create this installable layout.
+
+One managed build supplies the runtime compatibility profiles for all supported
+game versions. `GameDirectory` supplies compilation references; it does not
+select a version-specific package. Normal builds retain compiler diagnostics and
+skip the full static analyzer pass. Use `-p:RunAnalyzersDuringBuild=true` for that
+pass, which CI enables. Package copies and archive extraction are incremental;
+an unchanged build keeps the existing ZIP.
 
 Packaging downloads the official [Unity Doorstop 4.5.0](https://github.com/NeighTools/UnityDoorstop/releases/tag/v4.5.0) Windows release and source
 archive, verifies both pinned SHA-256 values, and caches them under `BSIPA-Meta/obj`.

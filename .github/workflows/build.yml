@@ -17,13 +17,9 @@ permissions: read-all
 jobs:
   build:
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: ["x86", "x64"]
     env:
       Configuration: Release
-      Platform: ${{ matrix.platform }}
+      Platform: x64
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
@@ -41,12 +37,14 @@ jobs:
         run: |
             dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} `
             --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Atlas-Rhythm/index.json"
-      - name: Clear Nuget Cache
-        run: dotnet nuget locals all --clear
-      - name: Restore
-        run: msbuild -t:Restore -m
-      - name: Build
-        run: msbuild -t:Build -m
+      - name: Cache packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/packages.config', 'Common.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - name: Build universal package
+        run: msbuild BSIPA-Meta/BSIPA-Meta.csproj -restore -t:Build -m -p:Configuration=Release -p:Platform=x64 -p:RunAnalyzersDuringBuild=true
       - name: Upload net472
         uses: actions/upload-artifact@v4
         with:

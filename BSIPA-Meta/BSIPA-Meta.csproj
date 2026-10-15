@@ -13,6 +13,9 @@
     <OutputPath>$(MSBuildThisFileDirectory)bin\$(Platform)\$(Configuration)\net472\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <PackageZip>$(MSBuildThisFileDirectory)bin\$(Platform)\$(Configuration)\BSIPA.zip</PackageZip>
+    <HistoricalArchive>$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.zip</HistoricalArchive>
+    <HistoricalCache>$(MSBuildThisFileDirectory)obj\historical\</HistoricalCache>
+    <PackageInputList>$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)\package-inputs.txt</PackageInputList>
     <DoorstopVersion>4.5.0</DoorstopVersion>
     <DoorstopCache>$(MSBuildThisFileDirectory)obj\doorstop\$(DoorstopVersion)\</DoorstopCache>
     <DoorstopArchive>$(DoorstopCache)doorstop_win_release_$(DoorstopVersion).zip</DoorstopArchive>
@@ -31,13 +34,15 @@
     <PackageExcludes Condition="'$(NoVerboseConfig)' == 'Release'">$(InjectorOutputPath)**\*.pdb</PackageExcludes>
   </PropertyGroup>
 
+  <Import Project="..\CoreLibraries\HistoricalLibraries.props" />
+
   <ItemGroup>
-    <ProjectReference Include="..\IPA.Injector\IPA.Injector.csproj" ReferenceOutputAssembly="false">
+    <ProjectReference Include="..\IPA.Injector\IPA.Injector.csproj" ReferenceOutputAssembly="false" Private="false">
       <SetConfiguration>Configuration=$(NoVerboseConfig)</SetConfiguration>
       <SetPlatform>Platform=AnyCPU</SetPlatform>
       <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
     </ProjectReference>
-    <ProjectReference Include="..\IPA.Loader\IPA.Loader.csproj" ReferenceOutputAssembly="false">
+    <ProjectReference Include="..\IPA.Loader\IPA.Loader.csproj" ReferenceOutputAssembly="false" Private="false">
       <SetConfiguration>Configuration=$(NoVerboseConfig)</SetConfiguration>
       <SetPlatform>Platform=AnyCPU</SetPlatform>
       <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
@@ -51,7 +56,8 @@
     <Delete Files="@(Files);$(PackageZip)" />
   </Target>
 
-  <Target Name="PrepareDoorstop">
+  <Target Name="PrepareDoorstop" Inputs="$(DoorstopArchive);$(DoorstopSourceArchive);$(MSBuildProjectFullPath)"
+          Outputs="$(DoorstopCache)ready.stamp;$(DoorstopCache)windows\$(Platform)\winhttp.dll;$(DoorstopCache)source\UnityDoorstop-$(DoorstopVersion)\LICENSE">
     <Error Condition="'$(Platform)' != 'x64' And '$(Platform)' != 'x86'" Text="Windows packages require Platform=x64 or Platform=x86." />
     <MakeDir Directories="$(DoorstopCache)" />
     <DownloadFile Condition="!Exists('$(DoorstopArchive)')"
@@ -70,35 +76,63 @@
     <Error Condition="'%(DoorstopSourceHashItem.FileHash)' != '$(DoorstopSourceHash)'" Text="Doorstop source archive SHA-256 does not match the pinned release." />
     <Unzip SourceFiles="$(DoorstopArchive)" DestinationFolder="$(DoorstopCache)windows" />
     <Unzip SourceFiles="$(DoorstopSourceArchive)" DestinationFolder="$(DoorstopCache)source" />
+    <Touch Files="$(DoorstopCache)ready.stamp;$(DoorstopCache)windows\$(Platform)\winhttp.dll;$(DoorstopCache)source\UnityDoorstop-$(DoorstopVersion)\LICENSE" AlwaysCreate="true" />
   </Target>
 
-  <Target Name="Assemble" AfterTargets="Build" DependsOnTargets="PrepareDoorstop" Returns="$(OutputPath)">
-    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.zip.sha256">
+  <Target Name="CheckHistoricalCache">
+    <ItemGroup>
+      <HistoricalCacheFile Include="@(HistoricalLibrary->'$(HistoricalCache)%(Source)')" />
+      <MissingHistoricalFiles Include="@(HistoricalCacheFile)" Condition="!Exists('%(HistoricalCacheFile.Identity)')" />
+    </ItemGroup>
+    <Delete Files="$(HistoricalCache)ready.stamp" Condition="'@(MissingHistoricalFiles)' != ''" />
+  </Target>
+
+  <Target Name="PrepareHistoricalLibraries" DependsOnTargets="CheckHistoricalCache"
+          Inputs="$(HistoricalArchive);$(HistoricalArchive).sha256;$(MSBuildProjectFullPath);$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.props"
+          Outputs="$(HistoricalCache)ready.stamp">
+    <ReadLinesFromFile File="$(HistoricalArchive).sha256">
       <Output TaskParameter="Lines" ItemName="HistoricalLibraryDigest" />
     </ReadLinesFromFile>
-    <GetFileHash Files="$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.zip" Algorithm="SHA256">
+    <GetFileHash Files="$(HistoricalArchive)" Algorithm="SHA256">
       <Output TaskParameter="Items" ItemName="HistoricalLibraryArchive" />
     </GetFileHash>
     <Error Condition="'%(HistoricalLibraryArchive.FileHash)' != '@(HistoricalLibraryDigest)'" Text="Historical core library archive SHA-256 does not match its recorded digest." />
-    <Message Text="Packing..." Importance="High" />
-    <Message Text="Results will be put in $(OutputPath)" Importance="High" />
+    <Unzip SourceFiles="$(HistoricalArchive)" DestinationFolder="$(HistoricalCache)" />
+    <Touch Files="$(HistoricalCache)ready.stamp" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="GatherPackageInputs" DependsOnTargets="PrepareDoorstop;PrepareHistoricalLibraries">
     <Error Condition="!Exists('$(InjectorOutputPath)Data\Managed\IPA.Injector.dll') Or !Exists('$(InjectorOutputPath)Data\Managed\IPA.Loader.dll')"
            Text="The injector and loader output must exist before packaging." />
     <ItemGroup>
-      <PreviousPackageFiles Include="$(OutputPath)**\*" />
       <ManagedFiles Include="$(InjectorOutputPath)Data\Managed\**\*" Exclude="$(PackageExcludes)" />
       <LibraryFiles Include="$(InjectorOutputPath)Libs\**\*" Exclude="$(PackageExcludes)" />
+      <PackageFile Include="@(ManagedFiles)">
+        <TargetPath>IPA\Data\Managed\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      </PackageFile>
+      <PackageFile Include="@(LibraryFiles)">
+        <TargetPath>IPA\CoreLibraries\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+      </PackageFile>
+      <PackageFile Include="@(HistoricalLibrary->'$(HistoricalCache)%(Source)')" />
+      <PackageFile Include="$(DoorstopCache)windows\$(Platform)\winhttp.dll"><TargetPath>winhttp.dll</TargetPath></PackageFile>
+      <PackageFile Include="$(MSBuildThisFileDirectory)doorstop_config.ini"><TargetPath>doorstop_config.ini</TargetPath></PackageFile>
+      <PackageFile Include="$(DoorstopCache)source\UnityDoorstop-$(DoorstopVersion)\LICENSE"><TargetPath>IPA\ThirdParty\Doorstop\LICENSE</TargetPath></PackageFile>
+      <PackageFile Include="$(DoorstopSourceArchive)"><TargetPath>IPA\ThirdParty\Doorstop\doorstop-source-$(DoorstopVersion).zip</TargetPath></PackageFile>
+      <ExpectedPackageFiles Include="@(PackageFile->'$(OutputPath)%(TargetPath)')" />
+      <ObsoletePackageFiles Include="$(OutputPath)**\*" Exclude="@(ExpectedPackageFiles->'%(FullPath)')" />
+      <MissingPackageFiles Include="@(ExpectedPackageFiles)" Condition="!Exists('%(ExpectedPackageFiles.FullPath)')" />
     </ItemGroup>
-    <Delete Files="@(PreviousPackageFiles)" />
-    <RemoveDir Directories="$(OutputPath)Libraries" />
-    <RemoveDir Directories="$(OutputPath)Libs" />
-    <Copy SourceFiles="@(ManagedFiles)" DestinationFolder="$(OutputPath)IPA\Data\Managed\%(RecursiveDir)" />
-    <Copy SourceFiles="@(LibraryFiles)" DestinationFolder="$(OutputPath)IPA\CoreLibraries\%(RecursiveDir)" />
-    <Unzip SourceFiles="$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.zip" DestinationFolder="$(OutputPath)IPA\CoreLibraries" />
-    <Copy SourceFiles="$(DoorstopCache)windows\$(Platform)\winhttp.dll" DestinationFolder="$(OutputPath)" />
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)doorstop_config.ini" DestinationFolder="$(OutputPath)" />
-    <Copy SourceFiles="$(DoorstopCache)source\UnityDoorstop-$(DoorstopVersion)\LICENSE" DestinationFolder="$(OutputPath)IPA\ThirdParty\Doorstop" />
-    <Copy SourceFiles="$(DoorstopSourceArchive)" DestinationFolder="$(OutputPath)IPA\ThirdParty\Doorstop" />
+    <MakeDir Directories="$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)" />
+    <WriteLinesToFile File="$(PackageInputList)" Lines="@(PackageFile->'%(Identity)|%(TargetPath)')" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <Touch Files="$(PackageInputList)" Condition="'@(MissingPackageFiles)' != '' Or '@(ObsoletePackageFiles)' != ''" />
+  </Target>
+
+  <Target Name="Assemble" AfterTargets="Build" DependsOnTargets="GatherPackageInputs" Returns="$(OutputPath)"
+          Inputs="@(PackageFile);$(PackageInputList);$(MSBuildProjectFullPath)" Outputs="$(PackageZip)">
+    <Message Text="Packing $(PackageZip)" Importance="High" />
+    <Delete Files="@(ObsoletePackageFiles)" />
+    <RemoveDir Directories="$(OutputPath)Libraries;$(OutputPath)Libs;$(OutputPath)IPA\CoreLibraries\Versions\NuGet;$(OutputPath)IPA\CoreLibraries\Versions\Upstream" />
+    <Copy SourceFiles="@(PackageFile)" DestinationFiles="@(PackageFile->'$(OutputPath)%(TargetPath)')" SkipUnchangedFiles="true" />
     <ZipDirectory SourceDirectory="$(OutputPath)" DestinationFile="$(PackageZip)" Overwrite="true" />
     <Message Text="Package: $(PackageZip)" Importance="High" />
   </Target>

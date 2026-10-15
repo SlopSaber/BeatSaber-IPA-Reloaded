@@ -68,7 +68,7 @@ namespace IPA.Loader
             string original = Path.GetFullPath(Path.Combine(UnityGame.InstallPath, relative));
             if (File.Exists(original) || Path.IsPathRooted(relative)) return original;
             string directory = owner.File.DirectoryName ?? UnityGame.InstallPath;
-            var candidates = new List<string> { Path.Combine(directory, relative) };
+            var candidates = new List<string> { Path.Combine(directory, relative), Path.Combine(UnityGame.ModsPath, relative) };
             var components = relative.Split(Path.DirectorySeparatorChar);
             bool library = components[0].Equals("Libs", StringComparison.OrdinalIgnoreCase)
                 || (components.Length > 1 && components[0].Equals("IPA", StringComparison.OrdinalIgnoreCase) && components[1].Equals("Libs", StringComparison.OrdinalIgnoreCase));
@@ -77,6 +77,8 @@ namespace IPA.Loader
                 string tail = string.Join(Path.DirectorySeparatorChar.ToString(), components.Skip(components[0].Equals("IPA", StringComparison.OrdinalIgnoreCase) ? 2 : 1));
                 candidates.Add(Path.Combine(directory, tail));
                 candidates.Add(Path.Combine(directory, "Libs", tail));
+                candidates.Add(Path.Combine(UnityGame.CoreLibraryPath, tail));
+                candidates.Add(Path.Combine(UnityGame.ModLibrariesPath, tail));
                 candidates.Add(Path.Combine(UnityGame.InstallPath, "Libs", tail));
                 candidates.Add(Path.Combine(UnityGame.InstallPath, "IPA", "Libs", tail));
             }
@@ -84,6 +86,14 @@ namespace IPA.Loader
                 candidates.Add(Path.Combine(directory, string.Join(Path.DirectorySeparatorChar.ToString(), components.Skip(1))));
             string? existing = candidates.FirstOrDefault(File.Exists);
             if (existing != null) return Path.GetFullPath(existing);
+            if (library && Path.GetExtension(relative).Equals(".dll", StringComparison.OrdinalIgnoreCase))
+            {
+                var identity = new System.Reflection.AssemblyName(Path.GetFileNameWithoutExtension(relative));
+                if (owner.IsBare && System.Version.TryParse(owner.HVersion.ToString().Split('-', '+')[0], out var declaredVersion))
+                    identity.Version = new System.Version(declaredVersion.Major, declaredVersion.Minor, Math.Max(0, declaredVersion.Build), Math.Max(0, declaredVersion.Revision));
+                string? resolved = LibLoader.FindLibraryPath(identity, owner.File?.FullName);
+                if (resolved != null) return resolved;
+            }
             if (library || components[0].Equals("Plugins", StringComparison.OrdinalIgnoreCase) || components[0].Equals("Mods", StringComparison.OrdinalIgnoreCase))
             {
                 var roots = Roots.Concat(new[] { UnityGame.CoreLibraryPath, UnityGame.ModLibrariesPath, Path.Combine(UnityGame.InstallPath, "Libs"), Path.Combine(UnityGame.InstallPath, "IPA", "Libs") });

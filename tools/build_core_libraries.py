@@ -91,6 +91,7 @@ def main():
     # Runtime transitive packages are kept as separate providers as well.
     pending = list(references)
     done = set()
+    dependency_graph = collections.defaultdict(set)
     while pending:
         package, version = pending.pop(0)
         if (package, version) in done:
@@ -128,20 +129,73 @@ def main():
             if not match:
                 continue
             key = dependency_name, match.group()
+            dependency_graph[(package, version)].add(key)
             references[key].update(references[(package, version)])
             if key not in done:
                 pending.append(key)
+    changed = True
+    while changed:
+        changed = False
+        for parent, children in dependency_graph.items():
+            for child in children:
+                before = len(references[child])
+                references[child].update(references[parent])
+                changed |= len(references[child]) != before
     for provider in providers:
         if "package" in provider:
             provider["releases"] = sorted(references[(provider["package"], provider["packageVersion"])])
-    assets["CoreLibraryIndex.json"] = (json.dumps({"format": 1, "coreAssemblyNames": sorted(names), "providers": providers}, indent=2) + "\n").encode()
+    unique_providers = len(providers)
+    # Physical layout follows the loader release a mod targets. Package origins
+    # remain in the index, rather than forming user-facing directory names.
+    source_assets = assets
+    assets = {path.replace("Versions/NuGet/", "Licenses/").replace("/Licenses/", "/"): data
+              for path, data in source_assets.items() if path not in {p["path"] for p in providers}}
+    by_release = collections.defaultdict(list)
+    for provider in providers:
+        for release in provider["releases"]:
+            by_release[release].append(provider)
+    arranged = []
+    for release, provided in sorted(by_release.items()):
+        used = {}
+        def priority(provider):
+            version = tuple(int(n) for n in re.findall(r"\d+", provider.get("packageVersion", "0"))[:4])
+            return bool(provider.get("package")), version, provider["path"]
+        for provider in sorted(provided, key=priority, reverse=True):
+            filename = pathlib.PurePosixPath(provider["path"]).name
+            digest = provider["sha256"]
+            if (filename, digest) in used:
+                continue
+            destination = f"Versions/{release}/{filename}"
+            if any(key[0] == filename for key in used):
+                stem = pathlib.PurePosixPath(filename).stem
+                destination = f"Versions/{release}/{stem}.{digest[:8]}.dll"
+            used[(filename, digest)] = destination
+            assets[destination] = source_assets[provider["path"]]
+            record = dict(provider, path=destination, releases=[release])
+            arranged.append(record)
+    providers = arranged
+    assets["CoreLibraryIndex.json"] = (json.dumps({"format": 2, "uniqueProviders": unique_providers, "coreAssemblyNames": sorted(names), "providers": providers}, indent=2) + "\n").encode()
     assets["provider-releases.tsv"] = "".join(provider["path"] + "\t" + ",".join(provider["releases"]) + "\n" for provider in providers).encode()
     license_source = git("show", "4.3.7:LICENSE")
     assets["Historical-LICENSE.txt"] = license_source.encode()
+    # Store each binary once in git. MSBuild materializes the release folders
+    # using this generated item map when it creates the distributable package.
+    packed = {}
+    project = ET.Element("Project")
+    items = ET.SubElement(project, "ItemGroup")
+    for path, data in sorted(assets.items()):
+        source = "Objects/" + hashlib.sha256(data).hexdigest() + ".dll" if path.endswith(".dll") else path
+        packed[source] = data
+        item = ET.SubElement(items, "HistoricalLibrary", Include=path)
+        ET.SubElement(item, "Source").text = source
+        ET.SubElement(item, "TargetPath").text = "IPA/CoreLibraries/" + path
+    ET.indent(project)
+    props_path = output.with_suffix(".props")
+    ET.ElementTree(project).write(props_path, encoding="utf-8", xml_declaration=True)
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_suffix(".tmp")
     with zipfile.ZipFile(temporary, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for path, data in sorted(assets.items()):
+        for path, data in sorted(packed.items()):
             info = zipfile.ZipInfo(path, (2026, 10, 14, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             archive.writestr(info, data)

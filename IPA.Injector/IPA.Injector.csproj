@@ -32,11 +32,11 @@
   <ItemGroup>
     <Content Include="..\Libs\Microsoft.CSharp.dll">
       <Link>Libraries\Mono\Microsoft.CSharp.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Libs\netstandard.dll">
       <Link>Libraries\Mono\netstandard.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
@@ -51,24 +51,21 @@
     <ItemGroup>
       <XmlFiles Include="%(ReferenceCopyLocalPaths.RelativeDir)%(ReferenceCopyLocalPaths.Filename).xml" Condition="Exists('%(ReferenceCopyLocalPaths.RelativeDir)%(ReferenceCopyLocalPaths.Filename).xml')" />
     </ItemGroup>
-    <Copy SourceFiles="@(XmlFiles)" DestinationFolder="$(OutputPath)" />
+    <Copy SourceFiles="@(XmlFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
 
     <Message Text="Relocating" Importance="normal" />
     <ItemGroup>
       <SystemFiles Include="$(OutputPath)IPA.Injector.*" />
       <SystemFiles Include="$(OutputPath)IPA.Loader.*" />
-      <OldLibFiles Include="$(OutputPath)Libs\**\*" />
     </ItemGroup>
-    <Move SourceFiles="@(SystemFiles)" DestinationFolder="$(OutputPath)Data\Managed" />
-
-    <Delete Files="@(OldLibFiles)" />
-    <RemoveDir Directories="$(OutputPath)Libs" />
+    <Copy SourceFiles="@(SystemFiles)" DestinationFolder="$(OutputPath)Data\Managed" SkipUnchangedFiles="true" />
     <ItemGroup>
-      <LibFiles Include="$(OutputPath)**\*" Exclude="$(OutputPath)Data\**\*;$(OutputPath)Libs\**\*" />
+      <LibFiles Include="$(OutputPath)*.dll;$(OutputPath)*.xml;$(OutputPath)*.pdb;$(OutputPath)Libraries\Mono\*.dll" Exclude="@(SystemFiles)" />
+      <ExpectedLibFiles Include="@(LibFiles->'$(OutputPath)Libs\%(Filename)%(Extension)')" />
+      <ObsoleteLibFiles Include="$(OutputPath)Libs\**\*" Exclude="@(ExpectedLibFiles)" />
     </ItemGroup>
-    <Move SourceFiles="@(LibFiles)" DestinationFolder="$(OutputPath)Libs\" />
-    <RemoveDir Directories="$(OutputPath)Libraries\Included" />
-    <RemoveDir Directories="$(OutputPath)Libraries" />
+    <Delete Files="@(ObsoleteLibFiles)" />
+    <Copy SourceFiles="@(LibFiles)" DestinationFolder="$(OutputPath)Libs\" SkipUnchangedFiles="true" />
   </Target>
 
   <Import Project="..\Common.targets" />

@@ -290,7 +290,14 @@ namespace IPA.Loader
                         if (candidate is not Newtonsoft.Json.Linq.JObject data || data["name"] == null || data["version"] == null
                             || data["id"] == null || data["author"] == null || data["description"] == null) continue;
                     }
-                    var manifestObj = JsonConvert.DeserializeObject<PluginManifest>(manifestText);
+                    var manifestData = Newtonsoft.Json.Linq.JObject.Parse(manifestText);
+                    if (!(manifestData["files"] is Newtonsoft.Json.Linq.JArray declaredFiles) || declaredFiles.Count == 0)
+                    {
+                        var libraryRoots = ModFiles.Roots.Concat(new[] { UnityGame.ModLibrariesPath, Path.Combine(UnityGame.InstallPath, "Libs"), Path.Combine(UnityGame.InstallPath, "IPA", "Libs") });
+                        string[] inferred = LibraryManifestFiles.Find(manifestData, ModFiles.Files(libraryRoots, "*.dll"));
+                        if (inferred.Length > 0) manifestData["files"] = new Newtonsoft.Json.Linq.JArray(inferred.Select(file => Utils.GetRelativePath(file, UnityGame.InstallPath).Replace('\\', '/')));
+                    }
+                    var manifestObj = JsonConvert.DeserializeObject<PluginManifest>(manifestData.ToString());
                     if (manifestObj is null)
                     {
                         Logger.Loader.Error($"Bare manifest {Path.GetFileName(manifest)} deserialized to null");

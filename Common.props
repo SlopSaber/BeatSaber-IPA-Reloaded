@@ -10,6 +10,8 @@
     <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
+    <!-- Compiler diagnostics always run; CI opts into the full analyzer pass. -->
+    <RunAnalyzersDuringBuild Condition="'$(RunAnalyzersDuringBuild)' == ''">false</RunAnalyzersDuringBuild>
   </PropertyGroup>
 
   <ItemGroup>

@@ -11,9 +11,24 @@ namespace IPA.Desktop
         private GameObject lastClick;
         private float lastClickTime;
         private DesktopPointerVisuals visuals;
+        private static DesktopPointerInput currentPointer;
+
+        internal static bool TryGetWorldPosition(out Vector3 position)
+        {
+            var active = currentPointer;
+            if (active != null && active.Flight != null && active.Flight.Captured && active.Flight.CanInteract)
+            {
+                position = active.pointer != null && active.pointer.pointerCurrentRaycast.gameObject != null
+                    ? active.pointer.pointerCurrentRaycast.worldPosition
+                    : active.Flight.Camera.transform.position + active.Flight.Camera.transform.forward * 10f;
+                return true;
+            }
+            position = default; return false;
+        }
 
         internal void BindVisuals(Behaviour source)
         {
+            DesktopGameHooks.BindPointer(source);
             if (visuals == null || !visuals.IsAlive) visuals = DesktopPointerVisuals.Create(source);
         }
 
@@ -43,6 +58,7 @@ namespace IPA.Desktop
             pointer.pointerCurrentRaycast = new RaycastResult { worldPosition = ray.origin, worldNormal = ray.direction };
             eventSystem.RaycastAll(pointer, m_RaycastResultCache);
             pointer.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
+            currentPointer = this;
             m_RaycastResultCache.Clear();
             // VR UI uses the hit's canvas projection for sliders and curved surfaces.
             if (pointer.pointerCurrentRaycast.module != null && pointer.pointerCurrentRaycast.module.GetType().Name == "VRGraphicRaycaster")
@@ -119,6 +135,7 @@ namespace IPA.Desktop
         }
         protected override void OnDisable()
         {
+            if (currentPointer == this) currentPointer = null;
             CancelPointer();
             visuals?.Dispose();
             visuals = null;

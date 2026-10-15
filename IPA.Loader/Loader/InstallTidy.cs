@@ -32,9 +32,21 @@ namespace IPA.Loader
             Directory.CreateDirectory(Path.Combine(UnityGame.ModsPath, "Core"));
             Directory.CreateDirectory(UnityGame.ModLibrariesPath);
             Directory.CreateDirectory(UnityGame.CoreLibraryPath);
-            var coreNames = new HashSet<string>(typeof(InstallTidy).Assembly.GetReferencedAssemblies().Select(a => a.Name), StringComparer.OrdinalIgnoreCase);
             string index = Path.Combine(UnityGame.CoreLibraryPath, "CoreLibraryIndex.json");
             JObject catalog = File.Exists(index) ? JObject.Parse(File.ReadAllText(index)) : new JObject();
+            bool releaseLayoutComplete = ((int?)catalog["format"] ?? 1) >= 2
+                && (catalog["providers"] as JArray ?? new JArray()).OfType<JObject>().All(provider => File.Exists(Path.Combine(UnityGame.CoreLibraryPath, (string)provider["path"])));
+            foreach (string layout in releaseLayoutComplete ? new[] { "NuGet", "Upstream" } : Array.Empty<string>())
+            {
+                string oldLayout = Path.Combine(UnityGame.CoreLibraryPath, "Versions", layout);
+                foreach (string file in Walk(oldLayout))
+                {
+                    try { MoveVerified(file, Path.Combine(Backup, "CoreLibraries", Relative(file, UnityGame.CoreLibraryPath))); }
+                    catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { Logger.Loader.Warn($"Old core-library layout cleanup deferred: {error.Message}"); }
+                }
+                RemoveEmpty(oldLayout);
+            }
+            var coreNames = new HashSet<string>(typeof(InstallTidy).Assembly.GetReferencedAssemblies().Select(a => a.Name), StringComparer.OrdinalIgnoreCase);
             foreach (string name in (JArray)catalog["coreAssemblyNames"] ?? new JArray()) coreNames.Add(name);
             foreach (JObject provider in (catalog["providers"] as JArray ?? new JArray()).OfType<JObject>())
             {
@@ -46,6 +58,9 @@ namespace IPA.Loader
             var oldLibraries = new[] { Path.Combine(Install, "Libs"), Path.Combine(Install, "IPA", "Libs") };
             var roots = new[] { UnityGame.PluginsPath, UnityGame.ModsPath }.Concat(oldLibraries).ToArray();
             var files = roots.SelectMany(Walk).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+            var describedLibraries = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            // Plan manifests first, so file-less legacy descriptors can identify their DLLs by metadata.
+            files = files.OrderBy(file => file.EndsWith(".manifest", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".manifest.json", StringComparison.OrdinalIgnoreCase) ? 0 : 1).ToArray();
             var moves = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var descriptors = new List<Descriptor>();
             var coreIds = new HashSet<string>(SelfConfig.Instance.CoreMods, StringComparer.OrdinalIgnoreCase);
@@ -60,12 +75,17 @@ namespace IPA.Loader
                     try
                     {
                         var data = JObject.Parse(File.ReadAllText(file));
-                        if (data["id"] == null || data["version"] == null || !(data["files"] is JArray references)) continue;
+                        if (data["id"] == null || data["version"] == null) continue;
+                        var references = data["files"] as JArray ?? new JArray();
+                        if (references.Count == 0)
+                            foreach (string library in LibraryManifestFiles.Find(data, files)) references.Add(Relative(library, Install).Replace('\\', '/'));
+                        data["files"] = references;
                         var descriptor = new Descriptor { Source = file, Manifest = data };
                         foreach (var entry in references.Where(p => p.Type == JTokenType.String))
                         {
                             string reference = ((string)entry).Replace('/', Path.DirectorySeparatorChar);
                             descriptor.References[(string)entry] = ResolveOriginal(file, reference);
+                            describedLibraries.Add(descriptor.References[(string)entry]);
                         }
                         descriptors.Add(descriptor);
                         if (!Inside(file, UnityGame.ModLibrariesPath)) moves[file] = Path.Combine(UnityGame.ModLibrariesPath, Segment((string)data["id"]), Segment((string)data["version"]), Path.GetFileName(file));
@@ -83,7 +103,7 @@ namespace IPA.Loader
                         {
                             if (!Inside(file, Path.Combine(UnityGame.ModsPath, "Core"))) moves[file] = Path.Combine(UnityGame.ModsPath, "Core", Path.GetFileName(file));
                         }
-                        else if (oldLibrary)
+                        else if (oldLibrary || describedLibraries.Contains(file) && id == null && !LibraryManifestFiles.HasLegacyEntry(file))
                         {
                             string libraryRoot = coreNames.Contains(identity.Name) ? UnityGame.CoreLibraryPath : UnityGame.ModLibrariesPath;
                             moves[file] = Path.Combine(libraryRoot, "Versions", Segment(identity.Name), identity.Version.ToString(), Digest(file).Substring(0, 12), Path.GetFileName(file));
@@ -169,7 +189,13 @@ namespace IPA.Loader
             string rooted = Path.GetFullPath(Path.Combine(Install, reference));
             if (File.Exists(rooted) || Path.IsPathRooted(reference)) return rooted;
             string nearby = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(owner), reference));
-            return File.Exists(nearby) ? nearby : rooted;
+            if (File.Exists(nearby)) return nearby;
+            if (Path.GetExtension(reference).Equals(".dll", StringComparison.OrdinalIgnoreCase))
+            {
+                string library = LibLoader.FindLibraryPath(new AssemblyName(Path.GetFileNameWithoutExtension(reference)), owner);
+                if (library != null) return library;
+            }
+            return rooted;
         }
         private static void UpdateEmbeddedManifest(string original, string path, Dictionary<string, string> moves)
         {
