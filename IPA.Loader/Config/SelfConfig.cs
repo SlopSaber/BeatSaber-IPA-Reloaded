@@ -139,6 +139,10 @@ namespace IPA.Config
 
         public virtual bool ResetGameAssembliesOnVersionChange { get; set; } = true;
 
+        public virtual bool EnableFPFC { get; set; } = false;
+        public virtual float FPFCMoveSpeed { get; set; } = 1.5f;
+        public virtual float FPFCLookSensitivity { get; set; } = 0.2f;
+
         // LINE: ignore
         [NonNullable, UseConverter(typeof(CollectionConverter<string, HashSet<string?>>))]
         public virtual HashSet<string> GameAssemblies { get; set; } = GetDefaultGameAssemblies();

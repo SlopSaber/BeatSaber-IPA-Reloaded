@@ -32,6 +32,9 @@ namespace IPA.Loader
                 UnityGame.SetMainThread();
                 UnityGame.EnsureRuntimeGameVersion();
 
+                Desktop.DesktopFlight.Install(gameObject);
+                StartupDiagnostics.Install();
+
                 PluginManager.Load();
 
                 bsPlugins = new CompositeBSPlugin(PluginManager.BSMetas);

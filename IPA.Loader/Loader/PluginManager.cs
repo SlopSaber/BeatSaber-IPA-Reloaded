@@ -70,7 +70,11 @@ namespace IPA.Loader
 
         internal static Task CommitTransaction(StateTransitionTransaction transaction)
         {
-            if (!transaction.HasStateChanged) return Task.CompletedTask;
+            if (!transaction.HasStateChanged)
+            {
+                transaction.Dispose();
+                return Task.CompletedTask;
+            }
 
             if (!UnityGame.OnMainThread)
             {

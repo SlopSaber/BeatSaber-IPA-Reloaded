@@ -71,6 +71,32 @@ current feature APIs. New compatibility adapters belong at these binary-contract
 boundaries; copying an old `IPA.Loader.dll` into a mod folder does not provide
 isolated historical loader behavior.
 
+IPA provides desktop flight in menus and levels, including versions before 1.0.
+Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
+`--no-fpfc` disables IPA flight. Controls: WASD move, Q/E descend/ascend, Shift
+moves three times faster, Ctrl moves at quarter speed, C releases/captures the
+cursor, right click captures it, and Escape pauses a running level. Movement
+uses unscaled time, so flight also works while paused. `FPFCMoveSpeed` (default
+1.5 metres/second) and `FPFCLookSensitivity` (default 0.2 degrees/pixel) tune it.
+Text fields suppress flight keys. Losing focus releases the cursor and cancels
+pending UI clicks/drags; recapture requires C or right click in the game.
+
+A single camera-aligned pointer uses the game's existing world and curved UI
+raycasters. Left click, dragging and scrolling work in menus and pause screens;
+C also allows ordinary screen-position mouse input. The reticle highlights
+interactive targets. Native/SiraUtil camera controllers, tracking and duplicate
+pointer visuals yield to IPA while active. Their prior states are restored when
+the component shuts down. The input adapter supports legacy Unity Input and the
+new Input System without bundling either engine module.
+
+Plugin transactions now cancel opposite operations instead of reporting a state
+change after returning to the original state. This prevents unchanged disabled-mod
+config reloads from notifying mods such as BS Utils, which can restart the menu in
+response. Actual plugin changes still notify their listeners. Debug logs record
+`MenuTransitionsHelper.RestartGame` callers to identify any remaining extra loads.
+The supplied player log shows one IPA initialization and two fresh-menu callbacks;
+that alone does not identify the restart caller.
+
 The bootstrap locates the game's managed engine assembly and inserts its call
 without replacing an existing camera initializer. Game data directories are
 selected explicitly when multiple directories exist. This remains a managed Mono

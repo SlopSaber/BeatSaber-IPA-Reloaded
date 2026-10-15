@@ -146,9 +146,8 @@ namespace IPA.Loader
                 return false;
             }
 
-            _ = toDisable.Remove(meta);
-            _ = toEnable.Add(meta);
-            stateChanged = true;
+            if (!toDisable.Remove(meta)) _ = toEnable.Add(meta);
+            stateChanged = toEnable.Count != 0 || toDisable.Count != 0;
             return true;
         }
 
@@ -204,9 +203,8 @@ namespace IPA.Loader
                 return false;
             }
 
-            _ = toDisable.Add(meta);
-            _ = toEnable.Remove(meta);
-            stateChanged = true;
+            if (!toEnable.Remove(meta)) _ = toDisable.Add(meta);
+            stateChanged = toEnable.Count != 0 || toDisable.Count != 0;
             return true;
         }
 
