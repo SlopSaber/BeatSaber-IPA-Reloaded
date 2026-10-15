@@ -64,3 +64,7 @@ archive, verifies both pinned SHA-256 values, and caches them under `BSIPA-Meta/
 Its configuration invokes `Doorstop.Entrypoint.Start` in `IPA.Injector.dll`.
 The Doorstop license and source archive accompany the binary under
 `IPA/ThirdParty/Doorstop`. Package generation does not install or launch the game.
+
+The installation check accepts the packaged `doorstop_config.ini`. If another
+file triggers the check, the startup error identifies its path relative to the
+game installation.

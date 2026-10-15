@@ -58,9 +58,9 @@ namespace IPA.Injector
 
                 Default.Debug("Initializing logger");
 
-                if (AntiPiracy.IsInvalid(Environment.CurrentDirectory))
+                if (AntiPiracy.IsInvalid(UnityGame.InstallPath, out var invalidFile))
                 {
-                    Default.Error("Invalid installation; please buy the game to run BSIPA.");
+                    Default.Error($"Unsupported installation file '{Utils.GetRelativePath(invalidFile, UnityGame.InstallPath)}'; BSIPA startup stopped.");
 
                     return;
                 }

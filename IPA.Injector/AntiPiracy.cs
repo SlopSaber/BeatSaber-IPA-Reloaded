@@ -11,12 +11,13 @@ namespace IPA.Injector
         private static readonly string[] excludedIniFiles =
         {
             "desktop.ini",
+            "doorstop_config.ini",
             "ReShade.ini",
             "ReShadePreset.ini",
             "imgui.ini"
         };
 
-        public static bool IsInvalid(string path)
+        public static bool IsInvalid(string path, out string invalidFile)
         {
             var dataPlugins = Path.Combine(GameVersionEarly.ResolveDataPath(path), "Plugins");
 
@@ -38,8 +39,9 @@ namespace IPA.Injector
 
             // To the guys that maintain a fork that removes this code: I would greatly appreciate if we could talk
             //   about this for a little bit. Please message me on Discord at DaNike#6223
-            return Directory.EnumerateFiles(path, "*").Any(IsInvalidFile) ||
-                   Directory.EnumerateFiles(dataPlugins, "*", SearchOption.AllDirectories).Any(IsInvalidFile);
+            invalidFile = Directory.EnumerateFiles(path, "*").FirstOrDefault(IsInvalidFile)
+                ?? Directory.EnumerateFiles(dataPlugins, "*", SearchOption.AllDirectories).FirstOrDefault(IsInvalidFile);
+            return invalidFile != null;
         }
 
         private static bool IsInvalidFile(string filePath)
