@@ -86,7 +86,10 @@ informational/assembly version; retain a manifest for different package IDs,
 versions or declared dependencies. Library DLLs are not treated as plugins.
 Legacy library-path getters in prepared mods target `Mods/Libraries`.
 
-Historical dependencies use `IPA/CoreLibraries/Versions/<BSIPA-version>`;
+Historical dependencies use `IPA/CoreLibraries/Versions/<first>-<last>` when
+adjacent recorded BSIPA releases have identical library inventories. A release
+with its own inventory uses a single version name. Each historical DLL is stored
+once; each range's `libraries.json` lists its shared canonical file paths.
 NuGet and upstream provenance stays in the index. The package includes 65
 historical DLL providers from upstream BSIPA 3/4 tags
 and runtime NuGet dependencies. `CoreLibraryIndex.json` records source releases,
@@ -103,11 +106,13 @@ separate paths; original manifests and mod/loader PDB files are archived under
 retryable duplicates until a later launch. Linked source trees are left alone.
 Set `TidyUp` to `false` to stop automatic cleanup; legacy Libs/Plugins paths
 remain readable. Normal package builds use the committed historical archive.
-The source archive stores duplicate binaries once; packaging materializes each
-BSIPA release folder. Old NuGet/Upstream core layouts move to the TidyUp backup
+The source archive and installable ZIP both store historical DLLs once. Old
+NuGet/Upstream core layouts move to the TidyUp backup
 after the replacement release layout is complete. File-less library manifests
 can associate their DLLs by assembly identity, title or namespace; legacy plugin
 entry points remain discoverable as plugins.
+Old per-release DLL copies move to the backup only after their content hashes
+match a verified canonical replacement. Unknown files remain in place.
 Regenerate it after restoring packages, with upstream tag history present:
 `python tools/build_core_libraries.py`; runtime projects, transitive packages,
 licenses and package metadata are included, while Unity and development tools

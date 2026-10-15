@@ -46,6 +46,36 @@ namespace IPA.Loader
                 }
                 RemoveEmpty(oldLayout);
             }
+            if (releaseLayoutComplete && ((int?)catalog["format"] ?? 1) >= 3)
+            {
+                var canonicalFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var verifiedHashes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (JObject provider in (catalog["providers"] as JArray ?? new JArray()).OfType<JObject>())
+                {
+                    string file = Path.GetFullPath(Path.Combine(UnityGame.CoreLibraryPath, (string)provider["path"]));
+                    if (!Inside(file, UnityGame.CoreLibraryPath)) continue;
+                    canonicalFiles.Add(file);
+                    try
+                    {
+                        string hash = Digest(file);
+                        if (string.Equals(hash, (string)provider["sha256"], StringComparison.OrdinalIgnoreCase)) verifiedHashes.Add(hash);
+                    }
+                    catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
+                    { Logger.Loader.Warn($"Core-library duplicate cleanup deferred: {error.Message}"); }
+                }
+                string versions = Path.Combine(UnityGame.CoreLibraryPath, "Versions");
+                foreach (string file in Walk(versions).Where(file => Path.GetExtension(file).Equals(".dll", StringComparison.OrdinalIgnoreCase) && !canonicalFiles.Contains(file)))
+                {
+                    try
+                    {
+                        if (verifiedHashes.Contains(Digest(file)))
+                            MoveVerified(file, Path.Combine(Backup, "CoreLibraries", Relative(file, UnityGame.CoreLibraryPath)));
+                    }
+                    catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
+                    { Logger.Loader.Warn($"Core-library duplicate cleanup deferred: {error.Message}"); }
+                }
+                RemoveEmpty(versions);
+            }
             var coreNames = new HashSet<string>(typeof(InstallTidy).Assembly.GetReferencedAssemblies().Select(a => a.Name), StringComparer.OrdinalIgnoreCase);
             foreach (string name in (JArray)catalog["coreAssemblyNames"] ?? new JArray()) coreNames.Add(name);
             foreach (JObject provider in (catalog["providers"] as JArray ?? new JArray()).OfType<JObject>())

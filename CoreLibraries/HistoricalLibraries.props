@@ -209,989 +209,73 @@
       <Source>Licenses/System.ValueTuple/4.5.0/THIRD-PARTY-NOTICES.TXT</Source>
       <TargetPath>IPA/CoreLibraries/Licenses/System.ValueTuple/4.5.0/THIRD-PARTY-NOTICES.TXT</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.0/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.0/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.0/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.0/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.0/Microsoft.CSharp.dll">
+    <HistoricalLibrary Include="Versions/3.10.0-3.11.3/Microsoft.CSharp.dll">
       <Source>Objects/ee2ba14f47cb117b898382972df97df24a99f07050e12d381822be3dc9f7086e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.0/Microsoft.CSharp.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.10.0-3.11.3/Microsoft.CSharp.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.0/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.0/System.Runtime.Serialization.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.10.0-3.11.3/libraries.json">
+      <Source>Versions/3.10.0-3.11.3/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.10.0-3.11.3/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.2/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.2/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.2/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.2/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.2/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.2/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.2/Microsoft.CSharp.dll">
-      <Source>Objects/ee2ba14f47cb117b898382972df97df24a99f07050e12d381822be3dc9f7086e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.2/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.2/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.2/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.3/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.3/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.3/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.3/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.3/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.3/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.3/Microsoft.CSharp.dll">
-      <Source>Objects/ee2ba14f47cb117b898382972df97df24a99f07050e12d381822be3dc9f7086e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.3/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.3/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.3/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.4/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.4/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.4/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.4/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.4/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.4/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.4/Microsoft.CSharp.dll">
-      <Source>Objects/ee2ba14f47cb117b898382972df97df24a99f07050e12d381822be3dc9f7086e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.4/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.4/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.4/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.5/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.5/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.5/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.5/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.5/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.5/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.5/Microsoft.CSharp.dll">
-      <Source>Objects/ee2ba14f47cb117b898382972df97df24a99f07050e12d381822be3dc9f7086e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.5/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.10.5/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.10.5/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.0/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.0/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.0/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.0/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.0/Microsoft.CSharp.dll">
-      <Source>Objects/ee2ba14f47cb117b898382972df97df24a99f07050e12d381822be3dc9f7086e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.0/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.0/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.0/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.3/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.3/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.3/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.3/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.3/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.3/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.3/Microsoft.CSharp.dll">
-      <Source>Objects/ee2ba14f47cb117b898382972df97df24a99f07050e12d381822be3dc9f7086e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.3/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.3/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.3/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.4/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.4/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.4/I18N.West.dll">
+    <HistoricalLibrary Include="Versions/3.11.4-3.11.6/I18N.West.dll">
       <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.4/I18N.West.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.11.4-3.11.6/I18N.West.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.4/I18N.dll">
+    <HistoricalLibrary Include="Versions/3.11.4-3.11.6/I18N.dll">
       <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.4/I18N.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.11.4-3.11.6/I18N.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.4/Microsoft.CSharp.dll">
+    <HistoricalLibrary Include="Versions/3.11.4-3.11.6/Microsoft.CSharp.dll">
       <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.4/Microsoft.CSharp.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.11.4-3.11.6/Microsoft.CSharp.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.4/System.Runtime.Serialization.dll">
+    <HistoricalLibrary Include="Versions/3.11.4-3.11.6/System.Runtime.Serialization.dll">
       <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.4/System.Runtime.Serialization.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.11.4-3.11.6/System.Runtime.Serialization.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.5/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.5/0Harmony.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.11.4-3.11.6/libraries.json">
+      <Source>Versions/3.11.4-3.11.6/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.11.4-3.11.6/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.5/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.5/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.5/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.5/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.5/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.5/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.5/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.5/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.6/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.6/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.6/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.6/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.6/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.6/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.6/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.6/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.11.6/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.11.6/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.0/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.0/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.0/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.0/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.0/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.0/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.0/Mono.Debugger.Soft.dll">
+    <HistoricalLibrary Include="Versions/3.12.0-3.12.15/Mono.Debugger.Soft.dll">
       <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.0/Mono.Debugger.Soft.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.12.0-3.12.15/Mono.Debugger.Soft.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.0/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.0/System.Runtime.Serialization.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.12.0-3.12.15/libraries.json">
+      <Source>Versions/3.12.0-3.12.15/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.12.0-3.12.15/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.1/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.1/0Harmony.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.12.16-3.12.23/libraries.json">
+      <Source>Versions/3.12.16-3.12.23/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.12.16-3.12.23/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.1/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.1/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.1/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.1/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.1/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.1/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.1/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.1/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.1/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.1/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.10/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.10/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.10/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.10/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.10/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.10/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.10/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.10/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.10/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.10/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.10/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.10/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.11/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.11/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.11/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.11/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.11/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.11/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.11/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.11/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.11/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.11/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.11/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.11/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.12/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.12/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.12/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.12/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.12/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.12/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.12/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.12/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.12/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.12/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.12/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.12/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.13/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.13/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.13/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.13/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.13/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.13/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.13/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.13/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.13/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.13/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.13/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.13/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.14/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.14/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.14/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.14/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.14/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.14/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.14/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.14/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.14/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.14/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.14/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.14/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.15/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.15/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.15/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.15/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.15/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.15/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.15/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.15/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.15/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.15/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.15/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.15/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.16/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.16/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.16/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.16/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.16/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.16/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.16/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.16/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.16/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.16/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.16/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.16/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.17/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.17/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.17/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.17/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.17/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.17/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.17/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.17/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.17/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.17/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.17/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.17/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.18/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.18/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.18/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.18/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.18/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.18/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.18/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.18/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.18/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.18/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.18/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.18/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.19/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.19/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.19/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.19/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.19/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.19/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.19/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.19/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.19/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.19/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.19/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.19/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.2/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.2/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.2/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.2/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.2/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.2/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.2/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.2/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.2/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.2/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.2/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.2/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.20/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.20/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.20/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.20/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.20/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.20/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.20/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.20/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.20/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.20/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.20/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.20/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.21/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.21/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.21/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.21/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.21/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.21/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.21/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.21/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.21/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.21/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.21/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.21/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.22/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.22/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.22/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.22/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.22/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.22/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.22/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.22/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.22/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.22/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.22/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.22/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.23/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.23/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.23/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.23/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.23/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.23/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.23/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.23/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.23/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.23/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.23/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.23/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.24/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.24/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.24/I18N.West.net3.dll">
+    <HistoricalLibrary Include="Versions/3.12.24-4.0.5/I18N.West.net3.dll">
       <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.24/I18N.West.net3.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.12.24-4.0.5/I18N.West.net3.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.24/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.24/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.24/I18N.net3.dll">
+    <HistoricalLibrary Include="Versions/3.12.24-4.0.5/I18N.net3.dll">
       <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.24/I18N.net3.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.12.24-4.0.5/I18N.net3.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.24/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.24/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.24/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.24/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.24/System.Runtime.Serialization.net3.dll">
+    <HistoricalLibrary Include="Versions/3.12.24-4.0.5/System.Runtime.Serialization.net3.dll">
       <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.24/System.Runtime.Serialization.net3.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.12.24-4.0.5/System.Runtime.Serialization.net3.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.3/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.3/0Harmony.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.12.24-4.0.5/libraries.json">
+      <Source>Versions/3.12.24-4.0.5/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.12.24-4.0.5/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.3/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.3/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.3/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.3/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.3/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.3/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.3/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.3/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.3/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.3/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.4/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.4/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.4/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.4/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.4/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.4/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.4/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.4/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.4/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.4/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.4/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.4/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.5/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.5/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.5/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.5/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.5/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.5/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.5/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.5/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.5/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.5/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.5/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.5/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.6/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.6/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.6/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.6/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.6/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.6/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.6/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.6/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.6/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.6/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.6/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.6/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.7/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.7/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.7/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.7/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.7/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.7/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.7/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.7/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.7/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.7/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.7/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.7/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.8/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.8/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.8/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.8/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.8/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.8/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.8/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.8/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.8/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.8/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.8/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.8/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.9/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.9/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.9/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.9/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.9/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.9/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.9/Microsoft.CSharp.dll">
-      <Source>Objects/397b500b42583ac59ba1f88de31b3e5604c5f6d6a7e504019a6b7290b8e98424.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.9/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.9/Mono.Debugger.Soft.dll">
-      <Source>Objects/5819458a0d7f66efbf9236caa59acc05cff437bf27d50a5d5202555add5d6c2c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.9/Mono.Debugger.Soft.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.12.9/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.12.9/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.0/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.0/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.0/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.0/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.0/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.0/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.0/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.0/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.0/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.0/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.0/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.0/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.1/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.1/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.1/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.1/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.1/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.1/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.1/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.1/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.1/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.1/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.1/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.1/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.1/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.1/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.2/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.2/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.2/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.2/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.2/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.2/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.2/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.2/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.2/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.2/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.2/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.2/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.2/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.2/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.5/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.5/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.5/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.5/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.5/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.5/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.5/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.5/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.5/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.5/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.5/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.5/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.5/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.5/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.7/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.7/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.7/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.7/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.7/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.7/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.7/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.7/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.7/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.7/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.7/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.7/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.13.7/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.13.7/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.0/I18N.West.dll">
+    <HistoricalLibrary Include="Versions/3.8.0-3.8.5/I18N.West.dll">
       <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.0/I18N.West.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.8.0-3.8.5/I18N.West.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.0/I18N.dll">
+    <HistoricalLibrary Include="Versions/3.8.0-3.8.5/I18N.dll">
       <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.0/I18N.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.8.0-3.8.5/I18N.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.1/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.1/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.1/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.1/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.2/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.2/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.2/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.2/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.5/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.5/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.5/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.5/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.6/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.6/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.6/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.6/I18N.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.8.0-3.8.5/libraries.json">
+      <Source>Versions/3.8.0-3.8.5/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.8.0-3.8.5/libraries.json</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/3.8.6/Newtonsoft.Json.dll">
       <Source>Objects/f58c374ffcaae4e36d740d90fbf7fe70d0abb7328cd9af3a0a7b70803e994ba4.dll</Source>
@@ -1201,573 +285,65 @@
       <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/3.8.6/System.Runtime.Serialization.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.7/0Harmony.dll">
+    <HistoricalLibrary Include="Versions/3.8.6/libraries.json">
+      <Source>Versions/3.8.6/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.8.6/libraries.json</TargetPath>
+    </HistoricalLibrary>
+    <HistoricalLibrary Include="Versions/3.8.7-3.8.9/0Harmony.dll">
       <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.7/0Harmony.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/3.8.7-3.8.9/0Harmony.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.7/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.7/I18N.West.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.8.7-3.8.9/libraries.json">
+      <Source>Versions/3.8.7-3.8.9/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.8.7-3.8.9/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.7/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.7/I18N.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/3.9.0-3.9.1/libraries.json">
+      <Source>Versions/3.9.0-3.9.1/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/3.9.0-3.9.1/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.7/Newtonsoft.Json.dll">
-      <Source>Objects/f58c374ffcaae4e36d740d90fbf7fe70d0abb7328cd9af3a0a7b70803e994ba4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.7/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.7/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.7/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.8/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.8/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.8/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.8/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.8/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.8/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.8/Newtonsoft.Json.dll">
-      <Source>Objects/f58c374ffcaae4e36d740d90fbf7fe70d0abb7328cd9af3a0a7b70803e994ba4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.8/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.8/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.8/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.9/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.9/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.9/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.9/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.9/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.9/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.9/Newtonsoft.Json.dll">
-      <Source>Objects/f58c374ffcaae4e36d740d90fbf7fe70d0abb7328cd9af3a0a7b70803e994ba4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.9/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.8.9/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.8.9/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.0/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.0/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.0/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.0/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.0/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.0/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.1/0Harmony.dll">
-      <Source>Objects/273d369baaded811b9dd4973a4338f7f767291ef416148d9f1210ec08e091b92.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.1/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.1/I18N.West.dll">
-      <Source>Objects/2321848ce70e59a602066290112942868f6900e3a4228341bb78862e8a500a5f.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.1/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.1/I18N.dll">
-      <Source>Objects/f90165a22faadf599f2507eadc6fd40bf472981fe43481b53b75e32e48b788c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.1/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/3.9.1/System.Runtime.Serialization.dll">
-      <Source>Objects/20c128fc5dec5b6a7cb92ffc35a864a361f8a4f3283cc7d71e750c38cbb1470c.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/3.9.1/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.2/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.2/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.2/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.2/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.2/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.2/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.2/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.2/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.2/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.2/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.2/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.2/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.2/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.2/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.3/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.3/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.3/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.3/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.3/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.3/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.3/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.3/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.3/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.3/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.3/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.3/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.3/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.3/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.4/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.4/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.4/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.4/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.4/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.4/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.4/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.4/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.4/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.4/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.4/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.4/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.4/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.4/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.5/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.5/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.5/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.5/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.5/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.5/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.5/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.5/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.5/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.5/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.5/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.5/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.0.5/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.0.5/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/0Harmony.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/0Harmony.dll">
       <Source>Objects/eebc3c41e2ef4633e6eb4c5437d4e9688574357e5ee57e3a4433d66da0989891.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/0Harmony.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/0Harmony.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/Mono.Cecil.Mdb.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/Mono.Cecil.Mdb.dll">
       <Source>Objects/f5104aa2f42fd15d36a3c82c0d60b98c4f4e14e2dd0c027bcaf952ba1ecc1c2a.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/Mono.Cecil.Mdb.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/Mono.Cecil.Mdb.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/Mono.Cecil.Pdb.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/Mono.Cecil.Pdb.dll">
       <Source>Objects/a4788b2153629c49ab75297fa273ac0ca7ab0b799d36442ada968ed037023c71.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/Mono.Cecil.Pdb.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/Mono.Cecil.Pdb.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/Mono.Cecil.Rocks.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/Mono.Cecil.Rocks.dll">
       <Source>Objects/31183b063f8043437c07fd3e7168517e0a7ad588b9270190f3cf74556db955ee.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/Mono.Cecil.Rocks.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/Mono.Cecil.Rocks.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/Mono.Cecil.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/Mono.Cecil.dll">
       <Source>Objects/2c91802e6e95afc1d113f486df8c9c03792cb4898da219f0eb212bdd04fb3478.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/Mono.Cecil.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/Mono.Cecil.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/Newtonsoft.Json.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/Newtonsoft.Json.dll">
       <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/Newtonsoft.Json.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/Newtonsoft.Json.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/Portable.System.ValueTuple.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/Portable.System.ValueTuple.dll">
       <Source>Objects/f34c70fe42873ea7bea4e90b31497c3bee573eb7101bfacb3395df9698bc7c12.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/Portable.System.ValueTuple.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/Portable.System.ValueTuple.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/SemVer.dll">
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/SemVer.dll">
       <Source>Objects/ffc9d9f17aca12bfdef6bda70be975b56ed4bda79c8789490f5ebdd385a0f6f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/SemVer.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/SemVer.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/System.Runtime.Serialization.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.1.0-4.1.1/libraries.json">
+      <Source>Versions/4.1.0-4.1.1/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.0-4.1.1/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.0/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.0/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/0Harmony.dll">
-      <Source>Objects/eebc3c41e2ef4633e6eb4c5437d4e9688574357e5ee57e3a4433d66da0989891.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/Mono.Cecil.Mdb.dll">
-      <Source>Objects/f5104aa2f42fd15d36a3c82c0d60b98c4f4e14e2dd0c027bcaf952ba1ecc1c2a.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/Mono.Cecil.Pdb.dll">
-      <Source>Objects/a4788b2153629c49ab75297fa273ac0ca7ab0b799d36442ada968ed037023c71.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/Mono.Cecil.Rocks.dll">
-      <Source>Objects/31183b063f8043437c07fd3e7168517e0a7ad588b9270190f3cf74556db955ee.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/Mono.Cecil.dll">
-      <Source>Objects/2c91802e6e95afc1d113f486df8c9c03792cb4898da219f0eb212bdd04fb3478.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/Newtonsoft.Json.dll">
-      <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/Portable.System.ValueTuple.dll">
-      <Source>Objects/f34c70fe42873ea7bea4e90b31497c3bee573eb7101bfacb3395df9698bc7c12.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/Portable.System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/SemVer.dll">
-      <Source>Objects/ffc9d9f17aca12bfdef6bda70be975b56ed4bda79c8789490f5ebdd385a0f6f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/SemVer.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.1/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.1/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/0Harmony.dll">
+    <HistoricalLibrary Include="Versions/4.1.2-4.1.6/0Harmony.dll">
       <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/0Harmony.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.2-4.1.6/0Harmony.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/Mono.Cecil.Mdb.dll">
-      <Source>Objects/f5104aa2f42fd15d36a3c82c0d60b98c4f4e14e2dd0c027bcaf952ba1ecc1c2a.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/Mono.Cecil.Pdb.dll">
-      <Source>Objects/a4788b2153629c49ab75297fa273ac0ca7ab0b799d36442ada968ed037023c71.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/Mono.Cecil.Rocks.dll">
-      <Source>Objects/31183b063f8043437c07fd3e7168517e0a7ad588b9270190f3cf74556db955ee.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/Mono.Cecil.dll">
-      <Source>Objects/2c91802e6e95afc1d113f486df8c9c03792cb4898da219f0eb212bdd04fb3478.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/Newtonsoft.Json.dll">
-      <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/Portable.System.ValueTuple.dll">
-      <Source>Objects/f34c70fe42873ea7bea4e90b31497c3bee573eb7101bfacb3395df9698bc7c12.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/Portable.System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/SemVer.dll">
-      <Source>Objects/ffc9d9f17aca12bfdef6bda70be975b56ed4bda79c8789490f5ebdd385a0f6f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/SemVer.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.2/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.2/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/0Harmony.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/Mono.Cecil.Mdb.dll">
-      <Source>Objects/f5104aa2f42fd15d36a3c82c0d60b98c4f4e14e2dd0c027bcaf952ba1ecc1c2a.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/Mono.Cecil.Pdb.dll">
-      <Source>Objects/a4788b2153629c49ab75297fa273ac0ca7ab0b799d36442ada968ed037023c71.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/Mono.Cecil.Rocks.dll">
-      <Source>Objects/31183b063f8043437c07fd3e7168517e0a7ad588b9270190f3cf74556db955ee.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/Mono.Cecil.dll">
-      <Source>Objects/2c91802e6e95afc1d113f486df8c9c03792cb4898da219f0eb212bdd04fb3478.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/Newtonsoft.Json.dll">
-      <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/Portable.System.ValueTuple.dll">
-      <Source>Objects/f34c70fe42873ea7bea4e90b31497c3bee573eb7101bfacb3395df9698bc7c12.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/Portable.System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/SemVer.dll">
-      <Source>Objects/ffc9d9f17aca12bfdef6bda70be975b56ed4bda79c8789490f5ebdd385a0f6f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/SemVer.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.3/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.3/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/0Harmony.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/Mono.Cecil.Mdb.dll">
-      <Source>Objects/f5104aa2f42fd15d36a3c82c0d60b98c4f4e14e2dd0c027bcaf952ba1ecc1c2a.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/Mono.Cecil.Pdb.dll">
-      <Source>Objects/a4788b2153629c49ab75297fa273ac0ca7ab0b799d36442ada968ed037023c71.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/Mono.Cecil.Rocks.dll">
-      <Source>Objects/31183b063f8043437c07fd3e7168517e0a7ad588b9270190f3cf74556db955ee.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/Mono.Cecil.dll">
-      <Source>Objects/2c91802e6e95afc1d113f486df8c9c03792cb4898da219f0eb212bdd04fb3478.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/Newtonsoft.Json.dll">
-      <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/Portable.System.ValueTuple.dll">
-      <Source>Objects/f34c70fe42873ea7bea4e90b31497c3bee573eb7101bfacb3395df9698bc7c12.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/Portable.System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/SemVer.dll">
-      <Source>Objects/ffc9d9f17aca12bfdef6bda70be975b56ed4bda79c8789490f5ebdd385a0f6f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/SemVer.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.4/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.4/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/0Harmony.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/Mono.Cecil.Mdb.dll">
-      <Source>Objects/f5104aa2f42fd15d36a3c82c0d60b98c4f4e14e2dd0c027bcaf952ba1ecc1c2a.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/Mono.Cecil.Pdb.dll">
-      <Source>Objects/a4788b2153629c49ab75297fa273ac0ca7ab0b799d36442ada968ed037023c71.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/Mono.Cecil.Rocks.dll">
-      <Source>Objects/31183b063f8043437c07fd3e7168517e0a7ad588b9270190f3cf74556db955ee.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/Mono.Cecil.dll">
-      <Source>Objects/2c91802e6e95afc1d113f486df8c9c03792cb4898da219f0eb212bdd04fb3478.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/Newtonsoft.Json.dll">
-      <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/Portable.System.ValueTuple.dll">
-      <Source>Objects/f34c70fe42873ea7bea4e90b31497c3bee573eb7101bfacb3395df9698bc7c12.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/Portable.System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/SemVer.dll">
-      <Source>Objects/ffc9d9f17aca12bfdef6bda70be975b56ed4bda79c8789490f5ebdd385a0f6f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/SemVer.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.1.6/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.1.6/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/0Harmony.66af1b52.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.1.2-4.1.6/libraries.json">
+      <Source>Versions/4.1.2-4.1.6/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.1.2-4.1.6/libraries.json</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.0/0Harmony.dll">
       <Source>Objects/ab23f9238c6285375e1973a976949f8609d255a5a4698cd363840862bca036f8.dll</Source>
@@ -1777,137 +353,61 @@
       <Source>Objects/e06ff3414376a4b91e8645e9ea8758bf2ee0d863d207ea27a7d89da1dd34edea.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Hive.Versioning.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.96fa99d6.dll">
-      <Source>Objects/96fa99d63cd84b76eb37505afc603d404e12fd5cb27e8caa1581aad97b74ae69.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.96fa99d6.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Mdb.1a05f2f7.dll">
-      <Source>Objects/1a05f2f7aa387210bfd0202fa70a06de73040765f5f988c3e8d50e5fec7827bd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Mdb.1a05f2f7.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Mdb.411f8ed8.dll">
+      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Mdb.411f8ed8.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Mdb.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
+      <Source>Objects/1a05f2f7aa387210bfd0202fa70a06de73040765f5f988c3e8d50e5fec7827bd.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Mdb.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Pdb.4ae57a84.dll">
-      <Source>Objects/4ae57a84baf3a8191312a860adb0ab65199c023f951bd739c6180965fd9b00d1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Pdb.4ae57a84.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Pdb.447ede19.dll">
+      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Pdb.447ede19.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Pdb.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
+      <Source>Objects/4ae57a84baf3a8191312a860adb0ab65199c023f951bd739c6180965fd9b00d1.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Pdb.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Rocks.c1ed51d1.dll">
-      <Source>Objects/c1ed51d12a59edf8b8f3d0a174a8c08ddc1b7e4032659ef983d071db4e1d5230.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Rocks.c1ed51d1.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Rocks.2e262331.dll">
+      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Rocks.2e262331.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.Rocks.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
+      <Source>Objects/c1ed51d12a59edf8b8f3d0a174a8c08ddc1b7e4032659ef983d071db4e1d5230.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.Rocks.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
+      <Source>Objects/96fa99d63cd84b76eb37505afc603d404e12fd5cb27e8caa1581aad97b74ae69.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/MonoMod.RuntimeDetour.ca4e4e83.dll">
-      <Source>Objects/ca4e4e83908426dc5aacfd8ebd418f8e69c047d2bf867915df46c705dd5626d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/MonoMod.RuntimeDetour.ca4e4e83.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.2.0/Mono.Cecil.f66f9786.dll">
+      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Mono.Cecil.f66f9786.dll</TargetPath>
+    </HistoricalLibrary>
+    <HistoricalLibrary Include="Versions/4.2.0/MonoMod.RuntimeDetour.959e193c.dll">
+      <Source>Objects/959e193c9c2629130c2e4cc45b8dbed381674fe498a3cc1df77eaa8ebc136745.dll</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/MonoMod.RuntimeDetour.959e193c.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.0/MonoMod.RuntimeDetour.dll">
-      <Source>Objects/959e193c9c2629130c2e4cc45b8dbed381674fe498a3cc1df77eaa8ebc136745.dll</Source>
+      <Source>Objects/ca4e4e83908426dc5aacfd8ebd418f8e69c047d2bf867915df46c705dd5626d7.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.0/MonoMod.RuntimeDetour.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/MonoMod.Utils.53121288.dll">
-      <Source>Objects/53121288229122cffff9ac7ddaa94d0cfbce9017419eaa6dcdb636b6f5fa5112.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/MonoMod.Utils.53121288.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.2.0/MonoMod.Utils.88fa5969.dll">
+      <Source>Objects/88fa59698ce696952ec448c4d1d19a99cdcf6ea29a21a13ddcb3c04703edbb1a.dll</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/MonoMod.Utils.88fa5969.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.0/MonoMod.Utils.dll">
-      <Source>Objects/88fa59698ce696952ec448c4d1d19a99cdcf6ea29a21a13ddcb3c04703edbb1a.dll</Source>
+      <Source>Objects/53121288229122cffff9ac7ddaa94d0cfbce9017419eaa6dcdb636b6f5fa5112.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.0/MonoMod.Utils.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/Newtonsoft.Json.dll">
-      <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.0/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/0Harmony.66af1b52.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.2.0/libraries.json">
+      <Source>Versions/4.2.0/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.0/libraries.json</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.1/0Harmony.dll">
       <Source>Objects/31992d0c7e368f449e6d293ed739d6ffa2fcde4d25447f66aa37e6e938f574c0.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.1/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/Mono.Cecil.Mdb.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/Mono.Cecil.Pdb.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/Mono.Cecil.Rocks.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/Mono.Cecil.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/Mono.Cecil.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.2.1/MonoMod.RuntimeDetour.dll">
       <Source>Objects/0a920c373cd8e8dfd8500520163c92e142ee7e32ab52e2da7884206610228bcf.dll</Source>
@@ -1917,661 +417,69 @@
       <Source>Objects/a49c85f55158a1813bb6262b5d49f7db7100e3db64887bfdc924ce7b178a9451.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.2.1/MonoMod.Utils.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/Newtonsoft.Json.dll">
-      <Source>Objects/7f912b28a07c226e0be3acfb2f57f050538aba0100fa1f0bf2c39f1a1f1da814.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.2.1/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/0Harmony.66af1b52.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/0Harmony.dll">
-      <Source>Objects/31992d0c7e368f449e6d293ed739d6ffa2fcde4d25447f66aa37e6e938f574c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/Mono.Cecil.Mdb.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/Mono.Cecil.Pdb.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/Mono.Cecil.Rocks.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/Mono.Cecil.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/MonoMod.RuntimeDetour.dll">
-      <Source>Objects/0a920c373cd8e8dfd8500520163c92e142ee7e32ab52e2da7884206610228bcf.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/MonoMod.RuntimeDetour.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/MonoMod.Utils.dll">
-      <Source>Objects/a49c85f55158a1813bb6262b5d49f7db7100e3db64887bfdc924ce7b178a9451.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/MonoMod.Utils.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.2.1/libraries.json">
+      <Source>Versions/4.2.1/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.2.1/libraries.json</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.3.0/Newtonsoft.Json.dll">
       <Source>Objects/b624949df8b0e3a6153fdfb730a7c6f4990b6592ee0d922e1788433d276610f3.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.3.0/Newtonsoft.Json.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/System.Runtime.Serialization.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.3.0/libraries.json">
+      <Source>Versions/4.3.0/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/libraries.json</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.0/netstandard.dll">
-      <Source>Objects/fada723de68eca78dc6e4279ebf1c886810dcd7b4a970290cb7ac068ef04b766.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.0/netstandard.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/0Harmony.66af1b52.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/0Harmony.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/0Harmony.dll">
       <Source>Objects/9846eb9edf64a5e2473342c75b8c5ab37293fb4c27418bc7a5b9a156aa0d7214.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/0Harmony.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/0Harmony.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.Mdb.411f8ed8.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.Mdb.411f8ed8.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.Mdb.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/Mono.Cecil.Mdb.dll">
       <Source>Objects/d65e445a02dc2d2a189d19745f14368c6a24d05914e36bbc7ed9732962998ea5.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.Mdb.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/Mono.Cecil.Mdb.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.Pdb.447ede19.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.Pdb.447ede19.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.Pdb.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/Mono.Cecil.Pdb.dll">
       <Source>Objects/8e221211df8a917d69145239b71b71c87e61761fb0c96d5e997964c172dda4c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.Pdb.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/Mono.Cecil.Pdb.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.Rocks.2e262331.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.Rocks.2e262331.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.Rocks.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/Mono.Cecil.Rocks.dll">
       <Source>Objects/9db3edaa8bc6ccd7ac6e2517c743591658bd6bdd436a146e0eda101d30a1332e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.Rocks.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/Mono.Cecil.Rocks.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/Mono.Cecil.dll">
       <Source>Objects/71c8b01208ab37a5164f5bacd69054899db9fc00f2da87dbd07dc1ee40fc06a8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/Mono.Cecil.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Mono.Cecil.f66f9786.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Mono.Cecil.f66f9786.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/MonoMod.RuntimeDetour.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/MonoMod.RuntimeDetour.dll">
       <Source>Objects/74aef5fa69efedd9c14f8afdff5c77e013d1fbe4a53076f81fcfa5687ce63fed.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/MonoMod.RuntimeDetour.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/MonoMod.RuntimeDetour.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/MonoMod.Utils.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/MonoMod.Utils.dll">
       <Source>Objects/b712ec7781c5bfc9f8a1b65527a43478bcbd0f022a7ed2d2b1823923dc2c1de8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/MonoMod.Utils.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/MonoMod.Utils.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/Newtonsoft.Json.dll">
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/Newtonsoft.Json.dll">
       <Source>Objects/e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.1/netstandard.dll">
-      <Source>Objects/fada723de68eca78dc6e4279ebf1c886810dcd7b4a970290cb7ac068ef04b766.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.1/netstandard.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/0Harmony.66af1b52.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/0Harmony.dll">
-      <Source>Objects/9846eb9edf64a5e2473342c75b8c5ab37293fb4c27418bc7a5b9a156aa0d7214.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.Mdb.411f8ed8.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.Mdb.411f8ed8.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.Mdb.dll">
-      <Source>Objects/d65e445a02dc2d2a189d19745f14368c6a24d05914e36bbc7ed9732962998ea5.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.Pdb.447ede19.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.Pdb.447ede19.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.Pdb.dll">
-      <Source>Objects/8e221211df8a917d69145239b71b71c87e61761fb0c96d5e997964c172dda4c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.Rocks.2e262331.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.Rocks.2e262331.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.Rocks.dll">
-      <Source>Objects/9db3edaa8bc6ccd7ac6e2517c743591658bd6bdd436a146e0eda101d30a1332e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.dll">
-      <Source>Objects/71c8b01208ab37a5164f5bacd69054899db9fc00f2da87dbd07dc1ee40fc06a8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Mono.Cecil.f66f9786.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Mono.Cecil.f66f9786.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/MonoMod.RuntimeDetour.dll">
-      <Source>Objects/74aef5fa69efedd9c14f8afdff5c77e013d1fbe4a53076f81fcfa5687ce63fed.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/MonoMod.RuntimeDetour.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/MonoMod.Utils.dll">
-      <Source>Objects/b712ec7781c5bfc9f8a1b65527a43478bcbd0f022a7ed2d2b1823923dc2c1de8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/MonoMod.Utils.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/Newtonsoft.Json.dll">
-      <Source>Objects/e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.2/netstandard.dll">
-      <Source>Objects/fada723de68eca78dc6e4279ebf1c886810dcd7b4a970290cb7ac068ef04b766.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.2/netstandard.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/0Harmony.66af1b52.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/0Harmony.dll">
-      <Source>Objects/9846eb9edf64a5e2473342c75b8c5ab37293fb4c27418bc7a5b9a156aa0d7214.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.Mdb.411f8ed8.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.Mdb.411f8ed8.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.Mdb.dll">
-      <Source>Objects/d65e445a02dc2d2a189d19745f14368c6a24d05914e36bbc7ed9732962998ea5.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.Pdb.447ede19.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.Pdb.447ede19.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.Pdb.dll">
-      <Source>Objects/8e221211df8a917d69145239b71b71c87e61761fb0c96d5e997964c172dda4c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.Rocks.2e262331.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.Rocks.2e262331.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.Rocks.dll">
-      <Source>Objects/9db3edaa8bc6ccd7ac6e2517c743591658bd6bdd436a146e0eda101d30a1332e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.dll">
-      <Source>Objects/71c8b01208ab37a5164f5bacd69054899db9fc00f2da87dbd07dc1ee40fc06a8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Mono.Cecil.f66f9786.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Mono.Cecil.f66f9786.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/MonoMod.RuntimeDetour.dll">
-      <Source>Objects/74aef5fa69efedd9c14f8afdff5c77e013d1fbe4a53076f81fcfa5687ce63fed.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/MonoMod.RuntimeDetour.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/MonoMod.Utils.dll">
-      <Source>Objects/b712ec7781c5bfc9f8a1b65527a43478bcbd0f022a7ed2d2b1823923dc2c1de8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/MonoMod.Utils.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/Newtonsoft.Json.dll">
-      <Source>Objects/e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.3/netstandard.dll">
-      <Source>Objects/fada723de68eca78dc6e4279ebf1c886810dcd7b4a970290cb7ac068ef04b766.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.3/netstandard.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/0Harmony.66af1b52.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/0Harmony.dll">
-      <Source>Objects/9846eb9edf64a5e2473342c75b8c5ab37293fb4c27418bc7a5b9a156aa0d7214.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/I18N.West.dll">
-      <Source>Objects/9b06605eac93272a91e7a3ea5159d14cd7508ea4dd0ef292e69bbeabcb87a441.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/I18N.West.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/I18N.dll">
-      <Source>Objects/fa99b6f4dc6319fa905ffdf2b8a6c4ca3874d37ca74d6ba69d13d758fe456e98.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/I18N.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.Mdb.411f8ed8.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.Mdb.411f8ed8.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.Mdb.dll">
-      <Source>Objects/d65e445a02dc2d2a189d19745f14368c6a24d05914e36bbc7ed9732962998ea5.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.Pdb.447ede19.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.Pdb.447ede19.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.Pdb.dll">
-      <Source>Objects/8e221211df8a917d69145239b71b71c87e61761fb0c96d5e997964c172dda4c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.Rocks.2e262331.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.Rocks.2e262331.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.Rocks.dll">
-      <Source>Objects/9db3edaa8bc6ccd7ac6e2517c743591658bd6bdd436a146e0eda101d30a1332e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.dll">
-      <Source>Objects/71c8b01208ab37a5164f5bacd69054899db9fc00f2da87dbd07dc1ee40fc06a8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Mono.Cecil.f66f9786.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Mono.Cecil.f66f9786.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/MonoMod.RuntimeDetour.dll">
-      <Source>Objects/74aef5fa69efedd9c14f8afdff5c77e013d1fbe4a53076f81fcfa5687ce63fed.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/MonoMod.RuntimeDetour.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/MonoMod.Utils.dll">
-      <Source>Objects/b712ec7781c5bfc9f8a1b65527a43478bcbd0f022a7ed2d2b1823923dc2c1de8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/MonoMod.Utils.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/Newtonsoft.Json.dll">
-      <Source>Objects/e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/System.Runtime.Serialization.dll">
-      <Source>Objects/8efe4c0cdedb6da713197dea7ea3530c2d6a66c8ec283ffb35187561db3941f1.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/System.Runtime.Serialization.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.4/netstandard.dll">
-      <Source>Objects/fada723de68eca78dc6e4279ebf1c886810dcd7b4a970290cb7ac068ef04b766.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.4/netstandard.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/0Harmony.66af1b52.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/0Harmony.dll">
-      <Source>Objects/9846eb9edf64a5e2473342c75b8c5ab37293fb4c27418bc7a5b9a156aa0d7214.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.Mdb.411f8ed8.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.Mdb.411f8ed8.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.Mdb.dll">
-      <Source>Objects/d65e445a02dc2d2a189d19745f14368c6a24d05914e36bbc7ed9732962998ea5.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.Pdb.447ede19.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.Pdb.447ede19.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.Pdb.dll">
-      <Source>Objects/8e221211df8a917d69145239b71b71c87e61761fb0c96d5e997964c172dda4c0.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.Rocks.2e262331.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.Rocks.2e262331.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.Rocks.dll">
-      <Source>Objects/9db3edaa8bc6ccd7ac6e2517c743591658bd6bdd436a146e0eda101d30a1332e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.dll">
-      <Source>Objects/71c8b01208ab37a5164f5bacd69054899db9fc00f2da87dbd07dc1ee40fc06a8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Mono.Cecil.f66f9786.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Mono.Cecil.f66f9786.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/MonoMod.RuntimeDetour.dll">
-      <Source>Objects/74aef5fa69efedd9c14f8afdff5c77e013d1fbe4a53076f81fcfa5687ce63fed.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/MonoMod.RuntimeDetour.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/MonoMod.Utils.dll">
-      <Source>Objects/b712ec7781c5bfc9f8a1b65527a43478bcbd0f022a7ed2d2b1823923dc2c1de8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/MonoMod.Utils.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/Newtonsoft.Json.dll">
-      <Source>Objects/e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.5/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/0Harmony.66af1b52.dll">
-      <Source>Objects/66af1b523b83d814a1253f7c1f2bc6b81d6a8f64dae52c0850c2aff288696680.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/0Harmony.66af1b52.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/0Harmony.dll">
-      <Source>Objects/9846eb9edf64a5e2473342c75b8c5ab37293fb4c27418bc7a5b9a156aa0d7214.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/0Harmony.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/I18N.West.net3.dll">
-      <Source>Objects/e827a090dc5ff235461ba4051d28f6c433cf5e7b32ccbfc1565b53445e11e149.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/I18N.West.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/I18N.net3.dll">
-      <Source>Objects/0ddd1f2a9e945943aa6629505b9ffa10bdf5760c70fda924702bf22ce089d030.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/I18N.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.Mdb.411f8ed8.dll">
-      <Source>Objects/411f8ed8c49738fa38a56ed8f991d556227d13602e83186e66ae1c4f821c940b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.Mdb.411f8ed8.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.Mdb.dll">
-      <Source>Objects/570a437dea0271d1d5c8b7d6a408b0b2635bdb0e8b8d5051878f3e7fca087f89.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.Pdb.447ede19.dll">
-      <Source>Objects/447ede1984bb4acd73bd97c0ec57a11c079cee8301c91fb199ca98c1906d3cc4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.Pdb.447ede19.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.Pdb.dll">
-      <Source>Objects/50a1a1a79dc86fcfb8b51249b5325a10dd93d193c52999cf6775d25030a4e606.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.Rocks.2e262331.dll">
-      <Source>Objects/2e2623319bdc362974a78ea4a43f4893011ec257884d24267f4594142fcd436e.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.Rocks.2e262331.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.Rocks.dll">
-      <Source>Objects/842e09959084eda733aab1a5354d7af79e29594f4d8b91c8792103e5c755ed9b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.dll">
-      <Source>Objects/c41bdb9ffd3c5f6e17d2382c1012d73703e035e3f1100245fdd4e08c8dc6eb5b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Mono.Cecil.f66f9786.dll">
-      <Source>Objects/f66f97866433e688acc3e4cd1e6ef14505f81df6b26dd6215e376767f6f954bc.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Mono.Cecil.f66f9786.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/MonoMod.RuntimeDetour.dll">
-      <Source>Objects/74aef5fa69efedd9c14f8afdff5c77e013d1fbe4a53076f81fcfa5687ce63fed.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/MonoMod.RuntimeDetour.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/MonoMod.Utils.dll">
-      <Source>Objects/b712ec7781c5bfc9f8a1b65527a43478bcbd0f022a7ed2d2b1823923dc2c1de8.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/MonoMod.Utils.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/Newtonsoft.Json.dll">
-      <Source>Objects/e1e27af7b07eeedf5ce71a9255f0422816a6fc5849a483c6714e1b472044fa9d.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/System.Runtime.Serialization.net3.dll">
-      <Source>Objects/a0205bbc9a75d38a491afc399379fb3225a1446879c55b91c2901d0ecf50fdbd.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/System.Runtime.Serialization.net3.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.6/netstandard.dll">
-      <Source>Objects/fada723de68eca78dc6e4279ebf1c886810dcd7b4a970290cb7ac068ef04b766.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/netstandard.dll</TargetPath>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/Newtonsoft.Json.dll</TargetPath>
+    </HistoricalLibrary>
+    <HistoricalLibrary Include="Versions/4.3.1-4.3.4/libraries.json">
+      <Source>Versions/4.3.1-4.3.4/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.1-4.3.4/libraries.json</TargetPath>
+    </HistoricalLibrary>
+    <HistoricalLibrary Include="Versions/4.3.5/libraries.json">
+      <Source>Versions/4.3.5/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.5/libraries.json</TargetPath>
+    </HistoricalLibrary>
+    <HistoricalLibrary Include="Versions/4.3.6/libraries.json">
+      <Source>Versions/4.3.6/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.6/libraries.json</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.3.7/0Harmony.dll">
       <Source>Objects/0b66cd1ddbf0b35c98382220bc7b66684d1115fa53a76bd64249d10e082aabd9.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.3.7/0Harmony.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/Hive.Versioning.dll">
-      <Source>Objects/dae244b3dfdf74a25d4ebacc79e1b836a4a8552400f400b9f1ed433164cb2503.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/Hive.Versioning.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/Microsoft.CSharp.dll">
-      <Source>Objects/6c43ad3a67d2d46ff7359a09e681bb81c1c1ae11670a2e4e770110ea0e3f68d7.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/Microsoft.CSharp.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/Mono.Cecil.Mdb.dll">
-      <Source>Objects/570a437dea0271d1d5c8b7d6a408b0b2635bdb0e8b8d5051878f3e7fca087f89.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/Mono.Cecil.Mdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/Mono.Cecil.Pdb.dll">
-      <Source>Objects/50a1a1a79dc86fcfb8b51249b5325a10dd93d193c52999cf6775d25030a4e606.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/Mono.Cecil.Pdb.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/Mono.Cecil.Rocks.dll">
-      <Source>Objects/842e09959084eda733aab1a5354d7af79e29594f4d8b91c8792103e5c755ed9b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/Mono.Cecil.Rocks.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/Mono.Cecil.dll">
-      <Source>Objects/c41bdb9ffd3c5f6e17d2382c1012d73703e035e3f1100245fdd4e08c8dc6eb5b.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/Mono.Cecil.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/MonoMod.Backports.dll">
-      <Source>Objects/6db3486eb3bfc458c770d61a1391569000cd871dcc7160fb3da2cbfe8d98601a.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/MonoMod.Backports.dll</TargetPath>
-    </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.3.7/MonoMod.Core.dll">
       <Source>Objects/4bb34dd557481564105e279ee92912d2fa615ba9f39e5212f0031bf62eff9571.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.3.7/MonoMod.Core.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/MonoMod.ILHelpers.dll">
-      <Source>Objects/20df341949b81662e09787e42b66ac3fea601d4cf4b717294f2d72a80860e4ec.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/MonoMod.ILHelpers.dll</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="Versions/4.3.7/MonoMod.Iced.dll">
       <Source>Objects/7890f9eeac088c52796c1ae73fa8feb1e7967a36e63f71d84cfb0445045a19c0.dll</Source>
@@ -2585,21 +493,46 @@
       <Source>Objects/f0bdd7717cca42312e55ccd23e3ee7b61df104fe9440881d2e8abbebaf8fe644.dll</Source>
       <TargetPath>IPA/CoreLibraries/Versions/4.3.7/MonoMod.Utils.dll</TargetPath>
     </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/Newtonsoft.Json.dll">
-      <Source>Objects/f0c07af0e84d4dd4da4bd7823ba4535bc0481b3bf623ed40b659b68147a6bb75.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/Newtonsoft.Json.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/System.ValueTuple.dll">
-      <Source>Objects/e905d102585b22c6df04f219af5cbdbfa7bc165979e9788b62df6dcc165e10f4.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/System.ValueTuple.dll</TargetPath>
-    </HistoricalLibrary>
-    <HistoricalLibrary Include="Versions/4.3.7/netstandard.dll">
-      <Source>Objects/fada723de68eca78dc6e4279ebf1c886810dcd7b4a970290cb7ac068ef04b766.dll</Source>
-      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/netstandard.dll</TargetPath>
+    <HistoricalLibrary Include="Versions/4.3.7/libraries.json">
+      <Source>Versions/4.3.7/libraries.json</Source>
+      <TargetPath>IPA/CoreLibraries/Versions/4.3.7/libraries.json</TargetPath>
     </HistoricalLibrary>
     <HistoricalLibrary Include="provider-releases.tsv">
       <Source>provider-releases.tsv</Source>
       <TargetPath>IPA/CoreLibraries/provider-releases.tsv</TargetPath>
     </HistoricalLibrary>
+    <BootstrapLibrary Include="Hive.Versioning.dll">
+      <ExpectedHash>DAE244B3DFDF74A25D4EBACC79E1B836A4A8552400F400B9F1ED433164CB2503</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="Microsoft.CSharp.dll">
+      <ExpectedHash>6C43AD3A67D2D46FF7359A09E681BB81C1C1AE11670A2E4E770110EA0E3F68D7</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="Mono.Cecil.Mdb.dll">
+      <ExpectedHash>570A437DEA0271D1D5C8B7D6A408B0B2635BDB0E8B8D5051878F3E7FCA087F89</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="Mono.Cecil.Pdb.dll">
+      <ExpectedHash>50A1A1A79DC86FCFB8B51249B5325A10DD93D193C52999CF6775D25030A4E606</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="Mono.Cecil.Rocks.dll">
+      <ExpectedHash>842E09959084EDA733AAB1A5354D7AF79E29594F4D8B91C8792103E5C755ED9B</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="Mono.Cecil.dll">
+      <ExpectedHash>C41BDB9FFD3C5F6E17D2382C1012D73703E035E3F1100245FDD4E08C8DC6EB5B</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="MonoMod.Backports.dll">
+      <ExpectedHash>6DB3486EB3BFC458C770D61A1391569000CD871DCC7160FB3DA2CBFE8D98601A</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="MonoMod.ILHelpers.dll">
+      <ExpectedHash>20DF341949B81662E09787E42B66AC3FEA601D4CF4B717294F2D72A80860E4EC</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="Newtonsoft.Json.dll">
+      <ExpectedHash>F0C07AF0E84D4DD4DA4BD7823BA4535BC0481B3BF623ED40B659B68147A6BB75</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="System.ValueTuple.dll">
+      <ExpectedHash>E905D102585B22C6DF04F219AF5CBDBFA7BC165979E9788B62DF6DCC165E10F4</ExpectedHash>
+    </BootstrapLibrary>
+    <BootstrapLibrary Include="netstandard.dll">
+      <ExpectedHash>FADA723DE68ECA78DC6E4279EBF1C886810DCD7B4A970290CB7AC068EF04B766</ExpectedHash>
+    </BootstrapLibrary>
   </ItemGroup>
 </Project>

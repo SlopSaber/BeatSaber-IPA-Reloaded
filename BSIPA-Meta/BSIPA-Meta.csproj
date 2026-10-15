@@ -101,7 +101,19 @@
     <Touch Files="$(HistoricalCache)ready.stamp" AlwaysCreate="true" />
   </Target>
 
-  <Target Name="GatherPackageInputs" DependsOnTargets="PrepareDoorstop;PrepareHistoricalLibraries">
+  <Target Name="PrepareVersionLayout" Inputs="$(HistoricalArchive);$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.props"
+          Outputs="$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)\version-layout.stamp">
+    <RemoveDir Directories="$(OutputPath)IPA\CoreLibraries\Versions" />
+    <MakeDir Directories="$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)" />
+    <Touch Files="$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)\version-layout.stamp" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="GatherPackageInputs" DependsOnTargets="PrepareDoorstop;PrepareHistoricalLibraries;PrepareVersionLayout">
+    <GetFileHash Files="@(BootstrapLibrary->'$(InjectorOutputPath)Libs\%(Identity)')" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="BootstrapLibraryHash" />
+    </GetFileHash>
+    <Error Condition="'%(BootstrapLibraryHash.FileHash)' != '%(BootstrapLibraryHash.ExpectedHash)'"
+           Text="A shared core dependency changed. Regenerate CoreLibraries/HistoricalLibraries.zip with tools/build_core_libraries.py." />
     <Error Condition="!Exists('$(InjectorOutputPath)Data\Managed\IPA.Injector.dll') Or !Exists('$(InjectorOutputPath)Data\Managed\IPA.Loader.dll')"
            Text="The injector and loader output must exist before packaging." />
     <ItemGroup>

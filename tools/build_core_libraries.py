@@ -56,6 +56,31 @@ def package_data(package, version):
     return path.read_bytes()
 
 
+def bootstrap_libraries():
+    """Use the restored runtime asset graph, matching what MSBuild copies."""
+    files = list((ROOT / "Libs").glob("*.dll"))
+    for project in ("IPA.Loader", "IPA.Injector"):
+        graph_path = ROOT / project / "obj/project.assets.json"
+        if not graph_path.exists():
+            raise ValueError(f"Restore {project} before regenerating the historical bundle")
+        graph = json.loads(graph_path.read_text(encoding="utf-8-sig"))
+        target = next(value for name, value in graph["targets"].items()
+                      if name in ("net472", ".NETFramework,Version=v4.7.2"))
+        for package, resolved in target.items():
+            library = graph["libraries"][package]
+            if library["type"] != "package":
+                continue
+            for asset in resolved.get("runtime", {}):
+                if not asset.lower().endswith(".dll"):
+                    continue
+                for folder in graph["packageFolders"]:
+                    file = pathlib.Path(folder) / library["path"] / asset
+                    if file.exists():
+                        files.append(file)
+                        break
+    return {hashlib.sha256(file.read_bytes()).hexdigest(): file.name for file in files}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default=str(ROOT / "CoreLibraries/HistoricalLibraries.zip"))
@@ -144,9 +169,9 @@ def main():
     for provider in providers:
         if "package" in provider:
             provider["releases"] = sorted(references[(provider["package"], provider["packageVersion"])])
-    unique_providers = len(providers)
-    # Physical layout follows the loader release a mod targets. Package origins
-    # remain in the index, rather than forming user-facing directory names.
+    source_provider_count = len(providers)
+    # Group adjacent releases with identical inventories; each DLL's bytes are
+    # stored once, even when other inventories also need that same library.
     source_assets = assets
     assets = {path.replace("Versions/NuGet/", "Licenses/").replace("/Licenses/", "/"): data
               for path, data in source_assets.items() if path not in {p["path"] for p in providers}}
@@ -154,32 +179,52 @@ def main():
     for provider in providers:
         for release in provider["releases"]:
             by_release[release].append(provider)
-    arranged = []
-    for release, provided in sorted(by_release.items()):
-        used = {}
-        def priority(provider):
-            version = tuple(int(n) for n in re.findall(r"\d+", provider.get("packageVersion", "0"))[:4])
-            return bool(provider.get("package")), version, provider["path"]
-        for provider in sorted(provided, key=priority, reverse=True):
+    def release_key(release):
+        return tuple(int(n) for n in release.split("."))
+    groups = []
+    for release in sorted(by_release, key=release_key):
+        signature = frozenset((pathlib.PurePosixPath(p["path"]).name, p["sha256"]) for p in by_release[release])
+        if groups and groups[-1]["signature"] == signature:
+            groups[-1]["releases"].append(release)
+        else:
+            groups.append({"signature": signature, "releases": [release]})
+    stored = {}
+    bootstrap = bootstrap_libraries()
+    shared_bootstrap = {}
+    release_groups = []
+    for group in groups:
+        releases = group["releases"]
+        label = releases[0] if len(releases) == 1 else releases[0] + "-" + releases[-1]
+        directory = "Versions/" + label
+        paths = set()
+        for provider in sorted(by_release[releases[0]], key=lambda p: p["path"]):
             filename = pathlib.PurePosixPath(provider["path"]).name
             digest = provider["sha256"]
-            if (filename, digest) in used:
-                continue
-            destination = f"Versions/{release}/{filename}"
-            if any(key[0] == filename for key in used):
-                stem = pathlib.PurePosixPath(filename).stem
-                destination = f"Versions/{release}/{stem}.{digest[:8]}.dll"
-            used[(filename, digest)] = destination
-            assets[destination] = source_assets[provider["path"]]
-            record = dict(provider, path=destination, releases=[release])
-            arranged.append(record)
-    providers = arranged
-    assets["CoreLibraryIndex.json"] = (json.dumps({"format": 2, "uniqueProviders": unique_providers, "coreAssemblyNames": sorted(names), "providers": providers}, indent=2) + "\n").encode()
+            if digest not in stored:
+                if digest in bootstrap:
+                    destination = bootstrap[digest]
+                    shared_bootstrap[destination] = digest
+                else:
+                    destination = f"{directory}/{filename}"
+                    if destination in assets:
+                        destination = f"{directory}/{pathlib.PurePosixPath(filename).stem}.{digest[:8]}.dll"
+                    assets[destination] = source_assets[provider["path"]]
+                stored[digest] = dict(provider, path=destination, releases=[])
+            record = stored[digest]
+            record["releases"] = sorted(set(record["releases"]) | set(releases), key=release_key)
+            paths.add(record["path"])
+        mapping = {"directory": directory, "releases": releases, "files": sorted(paths)}
+        release_groups.append(mapping)
+        assets[directory + "/libraries.json"] = (json.dumps(mapping, indent=2) + "\n").encode()
+    # Preserve all package/source provenance, including providers sharing bytes.
+    for digest, record in stored.items():
+        record["origins"] = [p for p in providers if p["sha256"] == digest]
+    providers = sorted(stored.values(), key=lambda p: p["path"])
+    assets["CoreLibraryIndex.json"] = (json.dumps({"format": 3, "uniqueProviders": len(providers), "sourceProviders": source_provider_count, "releaseGroups": release_groups, "coreAssemblyNames": sorted(names), "providers": providers}, indent=2) + "\n").encode()
     assets["provider-releases.tsv"] = "".join(provider["path"] + "\t" + ",".join(provider["releases"]) + "\n" for provider in providers).encode()
     license_source = git("show", "4.3.7:LICENSE")
     assets["Historical-LICENSE.txt"] = license_source.encode()
-    # Store each binary once in git. MSBuild materializes the release folders
-    # using this generated item map when it creates the distributable package.
+    # The committed archive and distributable both retain one copy per binary.
     packed = {}
     project = ET.Element("Project")
     items = ET.SubElement(project, "ItemGroup")
@@ -189,6 +234,9 @@ def main():
         item = ET.SubElement(items, "HistoricalLibrary", Include=path)
         ET.SubElement(item, "Source").text = source
         ET.SubElement(item, "TargetPath").text = "IPA/CoreLibraries/" + path
+    for path, digest in sorted(shared_bootstrap.items()):
+        item = ET.SubElement(items, "BootstrapLibrary", Include=path)
+        ET.SubElement(item, "ExpectedHash").text = digest.upper()
     ET.indent(project)
     props_path = output.with_suffix(".props")
     ET.ElementTree(project).write(props_path, encoding="utf-8", xml_declaration=True)
@@ -201,7 +249,7 @@ def main():
             archive.writestr(info, data)
     temporary.replace(output)
     output.with_suffix(output.suffix + ".sha256").write_text(hashlib.sha256(output.read_bytes()).hexdigest().upper() + "\n")
-    print(json.dumps({"providers": len(providers), "assemblies": len(names), "bytes": output.stat().st_size}), flush=True)
+    print(json.dumps({"providers": len(providers), "sharedBootstrap": len(shared_bootstrap), "releaseGroups": len(groups), "assemblies": len(names), "bytes": output.stat().st_size}), flush=True)
 
 
 if __name__ == "__main__":
