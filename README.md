@@ -81,6 +81,27 @@ loading, it moves legacy Plugins contents into Mods and identifies core mods
 from embedded manifest IDs. `CoreMods` defaults to `BeatSaberMarkupLanguage`,
 `SongCore`, `SiraUtil` and `BS Utils`; these go into `Mods/Core`.
 
+Stage mod files under `IPA/Pending` while the game is running. On the next
+launch, BSIPA installs them into `Mods` before TidyUp and mod discovery, then
+refreshes dependency lookup. This works with either TidyUp setting. For example:
+
+```text
+IPA/Pending/MyMod.dll                -> Mods/MyMod.dll
+IPA/Pending/MyMod/Assets/icon.png    -> Mods/MyMod/Assets/icon.png
+IPA/Pending/Libraries/Helper.dll     -> Mods/Libraries/Helper.dll
+```
+
+Use paths relative to `Mods` inside the queue. Files are installed individually;
+ZIP extraction and the old whole-installation updater/deletion instructions are
+not part of this queue. Existing destination files are backed up under
+`IPA/Backups/Pending` before atomic replacement. Copied content is verified
+before removing the queued file. Interrupted or locked installs remain queued
+for the next launch; the reserved `.installing` subfolder holds claimed files
+until they are installed. Linked source/destination paths are left alone. Empty
+queue subfolders are removed and the `IPA/Pending` root remains available.
+An exclusive queue lock prevents simultaneous game launches from installing
+the same pending files concurrently.
+
 Bundled loader dependencies now live in `IPA/CoreLibraries`. Mod-supplied
 libraries go directly into `Mods/Libraries`, without per-library/version folders.
 Different files with the same filename get a content hash suffix. Native asset

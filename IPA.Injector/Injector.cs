@@ -68,6 +68,8 @@ namespace IPA.Injector
                 WriteDebugLogs(args);
 
                 EnsureDirectories();
+                PendingMods.Apply();
+                Loader.LibLoader.SetupAssemblyFilenames(true);
 
                 SelfConfig.Load();
                 InstallTidy.Apply();
