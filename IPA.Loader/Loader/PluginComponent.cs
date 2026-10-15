@@ -31,6 +31,7 @@ namespace IPA.Loader
             {
                 UnityGame.SetMainThread();
                 UnityGame.EnsureRuntimeGameVersion();
+                LegacyRuntimeCompatibility.Install();
 
                 Desktop.DesktopFlight.Install(gameObject);
                 StartupDiagnostics.Install();

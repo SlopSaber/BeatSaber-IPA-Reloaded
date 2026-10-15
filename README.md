@@ -166,8 +166,10 @@ the cursor. Movement uses unscaled time, so flight also works while paused.
 `FPFCMoveSpeed` (default 1.5 metres/second) and `FPFCLookSensitivity` (default 0.2)
 tune movement and look. Text fields suppress flight and look controls while
 keeping the cursor locked.
-Camera binding preserves the game's world spawn pose. A 1.6 m fallback applies
-only at world ground level, so standing-height parent rigs are not counted twice.
+Camera binding preserves the game's world spawn pose. An untracked head near
+local floor level receives 1.6 m of standing height in its parent rig's space,
+including when a legacy room offset places it below world zero. Parent rigs
+already supplying standing height are not counted twice.
 
 FPFC locks and hides the cursor whenever the game is focused and a camera is
 active. UI clicks require captured input; the pointer always follows the centre
@@ -185,6 +187,14 @@ tracking and duplicate pointer visuals yield to IPA while active. Their prior
 states are restored when the component shuts down. The input adapter supports
 legacy Unity Input and the new Input System without bundling either engine
 module.
+
+On 0.11.x, saving graphics settings applies the window mode and resolution to
+Unity immediately. Legacy cloned animator components obtain their missing
+Zenject injection from their owning scene container, and level tables can
+recover their owning data source before a mod refreshes them. Old IPA plugins
+that discard a newly created file stream close that stream before continuing;
+this prevents first-run configuration reads from failing with a sharing
+violation. Plugin binaries remain unchanged; preparation uses cached copies.
 
 Legacy mouse axes retain their configured scaling and receive
 `FPFCLookSensitivity` once, with no extra backend multiplier. In the inspected

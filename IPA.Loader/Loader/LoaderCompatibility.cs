@@ -214,6 +214,7 @@ namespace IPA.Loader
                 key = file + "|" + profile?.Version;
                 if (PreparedFiles.TryGetValue(key, out prepared)) return prepared;
                 bool compatibilityChanged = IPA.Compat3.Runtime.Rewrite(module, profile);
+                compatibilityChanged |= LegacyPluginRewriter.Rewrite(module);
                 bool dataRoutingChanged = IPA.Data.SaveDataRewriter.Rewrite(module);
                 if (!compatibilityChanged && !dataRoutingChanged)
                 {

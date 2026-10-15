@@ -389,6 +389,7 @@ namespace IPA.Loader
                 #region Fix assemblies for refactor
 
                 using var module = ModuleDefinition.ReadModule(Path.Combine(pluginDirectory, s));
+                LegacyPluginRewriter.Rewrite(module);
                 foreach (var @ref in module.AssemblyReferences)
                 { // fix assembly references
                     if (@ref.Name == "IllusionPlugin" || @ref.Name == "IllusionInjector")

@@ -94,8 +94,15 @@ namespace IPA.Desktop
                     originalRotation = Camera.transform.localRotation;
                     originalStereo = Camera.stereoTargetEye;
                     position = Camera.transform.position;
-                    // A parent rig can already supply standing height while local camera Y is zero.
-                    if (Mathf.Abs(position.y) < 0.1f) position.y = 1.6f;
+                    // Legacy room offsets can put an untracked head below world zero.
+                    // Supply standing height in tracking space, retaining room translation/rotation.
+                    if (Mathf.Abs(originalPosition.y) < 0.1f && position.y < 1f)
+                    {
+                        Vector3 standing = originalPosition;
+                        standing.y = 1.6f;
+                        position = Camera.transform.parent != null ? Camera.transform.parent.TransformPoint(standing) : standing;
+                    }
+                    else if (position.y < 0.1f) position.y = 1.6f;
                     Vector3 angles = Camera.transform.eulerAngles;
                     yaw = angles.y;
                     pitch = Mathf.DeltaAngle(0f, angles.x);
