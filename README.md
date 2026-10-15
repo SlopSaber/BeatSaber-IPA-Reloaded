@@ -78,12 +78,19 @@ from embedded manifest IDs. `CoreMods` defaults to `BeatSaberMarkupLanguage`,
 `SongCore`, `SiraUtil` and `BS Utils`; these go into `Mods/Core`.
 
 Bundled loader dependencies now live in `IPA/CoreLibraries`. Mod-supplied
-libraries go into `Mods/Libraries`. Bare `.manifest` files retain dependency
-identity/version information and move alongside the library collection. File
-lists in external and embedded manifests are updated to the new locations.
+libraries go directly into `Mods/Libraries`, without per-library/version folders.
+Different files with the same filename get a content hash suffix. Native asset
+directories retain their relative layout. File lists in external and embedded
+manifests are updated to the new locations.
+With `TidyUp=true`, bare manifest metadata moves into `IPA/ModLibraryIndex.json`;
+manifest files, XML documentation, debug symbols and text sidecars are backed up
+before removal. Package IDs, versions, dependencies and feature data remain in
+the index. The index is committed before sidecar removal. With `TidyUp=false`,
+libraries and their sidecars are flattened into `Mods/Libraries`; indexed
+manifests and archived library sidecars are restored there when switching modes.
 Libraries without manifests get metadata inferred from their assembly ID and
-informational/assembly version; retain a manifest for different package IDs,
-versions or declared dependencies. Library DLLs are not treated as plugins.
+informational/assembly version unless indexed metadata already supplies their
+package identity. Library DLLs are not treated as plugins.
 Legacy library-path getters in prepared mods target `Mods/Libraries`.
 
 Historical dependencies use `IPA/CoreLibraries/Versions/<first>-<last>` when
@@ -100,12 +107,13 @@ and compatible assembly majors. Current loader dependencies remain at the core
 library root. Already-loaded CLR assembly identities retain normal runtime
 binding behavior; this does not provide separate runtimes per mod.
 
-Tidy moves verify content before removing the source. Different versions use
-separate paths; original manifests and mod/loader PDB files are archived under
+Tidy moves verify content before removing the source. Original manifests,
+documentation and mod/loader PDB files are archived under
 `IPA/Backups/TidyUp`, with an operation journal for rollback. Locked files remain
 retryable duplicates until a later launch. Linked source trees are left alone.
-Set `TidyUp` to `false` to stop automatic cleanup; legacy Libs/Plugins paths
-remain readable. Normal package builds use the committed historical archive.
+Set `TidyUp` to `false` to retain sidecars and stop plugin/core cleanup; the flat
+library layout still applies. Legacy Libs/Plugins paths remain readable. Normal
+package builds use the committed historical archive.
 The source archive and installable ZIP both store historical DLLs once. Old
 NuGet/Upstream core layouts move to the TidyUp backup
 after the replacement release layout is complete. File-less library manifests

@@ -27,16 +27,18 @@ namespace IPA.Loader
 
         internal static void Apply()
         {
-            if (!SelfConfig.Instance.TidyUp) return;
+            bool tidy = SelfConfig.Instance.TidyUp;
+            JObject libraryIndex = ModLibraryIndex.Read();
             Directory.CreateDirectory(UnityGame.ModsPath);
-            Directory.CreateDirectory(Path.Combine(UnityGame.ModsPath, "Core"));
+            if (tidy) Directory.CreateDirectory(Path.Combine(UnityGame.ModsPath, "Core"));
             Directory.CreateDirectory(UnityGame.ModLibrariesPath);
             Directory.CreateDirectory(UnityGame.CoreLibraryPath);
+            if (!tidy) RestoreSidecars(libraryIndex);
             string index = Path.Combine(UnityGame.CoreLibraryPath, "CoreLibraryIndex.json");
             JObject catalog = File.Exists(index) ? JObject.Parse(File.ReadAllText(index)) : new JObject();
             bool releaseLayoutComplete = ((int?)catalog["format"] ?? 1) >= 2
                 && (catalog["providers"] as JArray ?? new JArray()).OfType<JObject>().All(provider => File.Exists(Path.Combine(UnityGame.CoreLibraryPath, (string)provider["path"])));
-            foreach (string layout in releaseLayoutComplete ? new[] { "NuGet", "Upstream" } : Array.Empty<string>())
+            foreach (string layout in tidy && releaseLayoutComplete ? new[] { "NuGet", "Upstream" } : Array.Empty<string>())
             {
                 string oldLayout = Path.Combine(UnityGame.CoreLibraryPath, "Versions", layout);
                 foreach (string file in Walk(oldLayout))
@@ -46,7 +48,7 @@ namespace IPA.Loader
                 }
                 RemoveEmpty(oldLayout);
             }
-            if (releaseLayoutComplete && ((int?)catalog["format"] ?? 1) >= 3)
+            if (tidy && releaseLayoutComplete && ((int?)catalog["format"] ?? 1) >= 3)
             {
                 var canonicalFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var verifiedHashes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -93,19 +95,38 @@ namespace IPA.Loader
             files = files.OrderBy(file => file.EndsWith(".manifest", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".manifest.json", StringComparison.OrdinalIgnoreCase) ? 0 : 1).ToArray();
             var moves = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var descriptors = new List<Descriptor>();
+            foreach (JObject entry in (JArray)libraryIndex["libraries"])
+            {
+                var descriptor = new Descriptor { Source = ModLibraryIndex.ManifestPath((string)entry["name"]), Manifest = (JObject)entry["manifest"].DeepClone() };
+                foreach (string reference in (JArray)descriptor.Manifest["files"] ?? new JArray())
+                {
+                    string resolved = ResolveOriginal(descriptor.Source, reference.Replace('/', Path.DirectorySeparatorChar));
+                    descriptor.References[reference] = resolved;
+                    describedLibraries.Add(resolved);
+                }
+                descriptors.Add(descriptor);
+            }
             var coreIds = new HashSet<string>(SelfConfig.Instance.CoreMods, StringComparer.OrdinalIgnoreCase);
             foreach (string file in files)
             {
                 string extension = Path.GetExtension(file);
                 bool oldLibrary = oldLibraries.Any(directory => Inside(file, directory));
                 bool plugin = Inside(file, UnityGame.PluginsPath);
-                if (extension.Equals(".pdb", StringComparison.OrdinalIgnoreCase)) continue;
-                if (extension.Equals(".manifest", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".manifest.json", StringComparison.OrdinalIgnoreCase))
+                bool modLibrary = Inside(file, UnityGame.ModLibrariesPath) && !Inside(file, Path.Combine(UnityGame.ModLibrariesPath, "Native"));
+                string nativeRoot = oldLibraries.Select(directory => Path.Combine(directory, "Native")).FirstOrDefault(directory => Inside(file, directory));
+                if (nativeRoot != null) { moves[file] = Path.Combine(UnityGame.ModLibrariesPath, "Native", Relative(file, nativeRoot)); continue; }
+                if (tidy && extension.Equals(".pdb", StringComparison.OrdinalIgnoreCase) && !modLibrary && !oldLibrary) continue;
+                if (IsManifest(file) || extension.Equals(".json", StringComparison.OrdinalIgnoreCase) && !Inside(file, Path.Combine(UnityGame.ModLibrariesPath, "Native")))
                 {
                     try
                     {
                         var data = JObject.Parse(File.ReadAllText(file));
-                        if (data["id"] == null || data["version"] == null) continue;
+                        if (data["id"] == null || data["version"] == null || !IsManifest(file) && (data["name"] == null || data["author"] == null || data["description"] == null))
+                        {
+                            if (modLibrary || oldLibrary) moves[file] = Path.Combine(UnityGame.ModLibrariesPath, Path.GetFileName(file));
+                            else if (tidy && plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
+                            continue;
+                        }
                         var references = data["files"] as JArray ?? new JArray();
                         if (references.Count == 0)
                             foreach (string library in LibraryManifestFiles.Find(data, files)) references.Add(Relative(library, Install).Replace('\\', '/'));
@@ -117,10 +138,16 @@ namespace IPA.Loader
                             descriptor.References[(string)entry] = ResolveOriginal(file, reference);
                             describedLibraries.Add(descriptor.References[(string)entry]);
                         }
+                        descriptors.RemoveAll(existing => (string)existing.Manifest["id"] == (string)data["id"] && (string)existing.Manifest["version"] == (string)data["version"]);
                         descriptors.Add(descriptor);
-                        if (!Inside(file, UnityGame.ModLibrariesPath)) moves[file] = Path.Combine(UnityGame.ModLibrariesPath, Segment((string)data["id"]), Segment((string)data["version"]), Path.GetFileName(file));
+                        moves[file] = Path.Combine(UnityGame.ModLibrariesPath, Path.GetFileName(file));
                     }
-                    catch (JsonException error) { Logger.Loader.Warn($"Cannot tidy invalid library manifest '{file}': {error.Message}"); }
+                    catch (JsonException error)
+                    {
+                        if (IsManifest(file)) Logger.Loader.Warn($"Cannot tidy invalid library manifest '{file}': {error.Message}");
+                        else if (modLibrary || oldLibrary) moves[file] = Path.Combine(UnityGame.ModLibrariesPath, Path.GetFileName(file));
+                        else if (tidy && plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
+                    }
                     continue;
                 }
                 if (extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
@@ -129,34 +156,40 @@ namespace IPA.Loader
                     {
                         var identity = AssemblyName.GetAssemblyName(file);
                         string id = EmbeddedId(file);
-                        if (id != null && coreIds.Contains(id))
+                        if (tidy && id != null && coreIds.Contains(id))
                         {
                             if (!Inside(file, Path.Combine(UnityGame.ModsPath, "Core"))) moves[file] = Path.Combine(UnityGame.ModsPath, "Core", Path.GetFileName(file));
                         }
-                        else if (oldLibrary || describedLibraries.Contains(file) && id == null && !LibraryManifestFiles.HasLegacyEntry(file))
+                        else if (modLibrary || oldLibrary || describedLibraries.Contains(file) && id == null && !LibraryManifestFiles.HasLegacyEntry(file))
                         {
                             string libraryRoot = coreNames.Contains(identity.Name) ? UnityGame.CoreLibraryPath : UnityGame.ModLibrariesPath;
-                            moves[file] = Path.Combine(libraryRoot, "Versions", Segment(identity.Name), identity.Version.ToString(), Digest(file).Substring(0, 12), Path.GetFileName(file));
+                            moves[file] = libraryRoot == UnityGame.ModLibrariesPath
+                                ? Path.Combine(libraryRoot, Path.GetFileName(file))
+                                : Path.Combine(libraryRoot, "Versions", Segment(identity.Name), identity.Version.ToString(), Digest(file).Substring(0, 12), Path.GetFileName(file));
                         }
-                        else if (plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
+                        else if (tidy && plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
                     }
                     catch (BadImageFormatException)
                     {
                         if (oldLibrary) moves[file] = Path.Combine(UnityGame.ModLibrariesPath, "Native", Relative(file, oldLibraries.First(directory => Inside(file, directory))));
-                        else if (plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
+                        else if (tidy && plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
                     }
                     catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
                     { Logger.Loader.Warn($"Cannot inspect '{file}' for TidyUp: {error.Message}"); }
                 }
-                else if (plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
-                else if (oldLibrary) moves[file] = Path.Combine(UnityGame.ModLibrariesPath, "LegacyAssets", Relative(file, oldLibraries.First(directory => Inside(file, directory))));
+                else if (modLibrary || oldLibrary) moves[file] = Path.Combine(UnityGame.ModLibrariesPath, Path.GetFileName(file));
+                else if (tidy && plugin) moves[file] = Path.Combine(UnityGame.ModsPath, Relative(file, UnityGame.PluginsPath));
             }
             // Resolve all final paths before updating file lists. Never overwrite a different binary.
+            var reservedTargets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (string source in moves.Keys.ToArray())
             {
                 string target = moves[source];
-                if (File.Exists(target) && Digest(source) != Digest(target))
-                    target = Path.Combine(Path.GetDirectoryName(target), "Versions", Digest(source).Substring(0, 12), Path.GetFileName(target));
+                if (string.Equals(Path.GetFullPath(source), Path.GetFullPath(target), StringComparison.OrdinalIgnoreCase)) { moves.Remove(source); continue; }
+                string hash = Digest(source);
+                if (File.Exists(target) && hash != Digest(target) || reservedTargets.TryGetValue(target, out string reserved) && reserved != hash)
+                    target = Path.Combine(Path.GetDirectoryName(target), Path.GetFileNameWithoutExtension(target) + "." + hash + Path.GetExtension(target));
+                reservedTargets[target] = hash;
                 moves[source] = target;
             }
             int moved = 0;
@@ -166,41 +199,145 @@ namespace IPA.Loader
                 catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
                 { moves.Remove(move.Key); Logger.Loader.Warn($"TidyUp will retry '{move.Key}' next launch: {error.Message}"); }
             }
+            var indexedLibraries = new JArray();
+            var removals = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var indexedNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var manifestPaths = new HashSet<string>(descriptors.Select(descriptor => moves.TryGetValue(descriptor.Source, out string path) && File.Exists(path) ? path : descriptor.Source), StringComparer.OrdinalIgnoreCase);
             foreach (var descriptor in descriptors)
             {
                 string path = moves.TryGetValue(descriptor.Source, out string movedPath) && File.Exists(movedPath) ? movedPath : descriptor.Source;
-                if (!File.Exists(path)) continue;
                 var references = new JArray();
                 foreach (var reference in descriptor.References)
                 {
-                    if (Path.GetExtension(reference.Key).Equals(".pdb", StringComparison.OrdinalIgnoreCase)) continue;
                     string destination = moves.TryGetValue(reference.Value, out string target) && File.Exists(target) ? target : reference.Value;
+                    if (tidy && Inside(destination, UnityGame.ModLibrariesPath) && !Inside(destination, Path.Combine(UnityGame.ModLibrariesPath, "Native")) && (IsRemovableSidecar(destination) || manifestPaths.Contains(destination))) continue;
                     references.Add(Inside(destination, Install) ? Relative(destination, Install).Replace('\\', '/') : reference.Key);
                 }
                 descriptor.Manifest["files"] = references;
                 string text = descriptor.Manifest.ToString(Formatting.Indented);
-                if (JToken.DeepEquals(JObject.Parse(File.ReadAllText(path)), descriptor.Manifest)) continue;
-                Archive(path, "Manifests");
-                string temporary = path + ".tidy-" + Guid.NewGuid().ToString("N");
-                try { File.WriteAllText(temporary, text); File.Replace(temporary, path, null); }
-                finally { if (File.Exists(temporary)) File.Delete(temporary); }
+                string name = Path.GetFileName(path);
+                string identity = (string)descriptor.Manifest["id"] + "\0" + (string)descriptor.Manifest["version"];
+                if (indexedNames.TryGetValue(name, out string existingIdentity) && existingIdentity != identity)
+                    name = ManifestCollisionName(name, text);
+                if (!tidy)
+                {
+                    string flat = ModLibraryIndex.ManifestPath(name);
+                    if (File.Exists(flat) && !JToken.DeepEquals(JObject.Parse(File.ReadAllText(flat)), descriptor.Manifest)
+                        && ((string)JObject.Parse(File.ReadAllText(flat))["id"] != (string)descriptor.Manifest["id"]
+                            || (string)JObject.Parse(File.ReadAllText(flat))["version"] != (string)descriptor.Manifest["version"]))
+                    {
+                        name = ManifestCollisionName(name, text);
+                        flat = ModLibraryIndex.ManifestPath(name);
+                    }
+                    if (!File.Exists(flat) || !JToken.DeepEquals(JObject.Parse(File.ReadAllText(flat)), descriptor.Manifest))
+                    {
+                        if (File.Exists(flat)) Archive(flat, "Manifests");
+                        WriteJson(flat, descriptor.Manifest);
+                    }
+                }
+                else if (File.Exists(path))
+                {
+                    Archive(path, "Manifests");
+                    removals[path] = Digest(path);
+                }
+                indexedNames[name] = identity;
+                indexedLibraries.Add(new JObject { ["name"] = name, ["manifest"] = descriptor.Manifest });
+            }
+            libraryIndex["libraries"] = indexedLibraries;
+            if (tidy)
+                foreach (string file in Walk(UnityGame.ModLibrariesPath).Where(file => !Inside(file, Path.Combine(UnityGame.ModLibrariesPath, "Native")) && !IsManifest(file) && IsRemovableSidecar(file)))
+                {
+                    Archive(file, "Sidecars");
+                    string hash = Digest(file);
+                    var sidecars = (JArray)libraryIndex["sidecars"];
+                    if (!sidecars.OfType<JObject>().Any(entry => (string)entry["name"] == Path.GetFileName(file) && (string)entry["sha256"] == hash))
+                        sidecars.Add(new JObject { ["name"] = Path.GetFileName(file), ["sha256"] = hash, ["backup"] = Relative(Path.Combine(Backup, "Sidecars", hash), Install).Replace('\\', '/') });
+                    removals[file] = hash;
+                }
+            if (File.Exists(ModLibraryIndex.FilePath)) Archive(ModLibraryIndex.FilePath, "LibraryIndexes");
+            ModLibraryIndex.Write(libraryIndex);
+            foreach (var removal in removals)
+            {
+                try
+                {
+                    if (!File.Exists(removal.Key) || Digest(removal.Key) != removal.Value) continue;
+                    Journal(removal.Key, null, removal.Value);
+                    File.Delete(removal.Key);
+                }
+                catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
+                { Logger.Loader.Warn($"Sidecar cleanup deferred for '{removal.Key}': {error.Message}"); }
             }
             foreach (string source in files.Where(p => Path.GetExtension(p).Equals(".dll", StringComparison.OrdinalIgnoreCase)))
             {
                 string destination = moves.TryGetValue(source, out string target) && File.Exists(target) ? target : source;
                 if (!File.Exists(destination)) continue;
-                try { UpdateEmbeddedManifest(source, destination, moves); }
+                try { UpdateEmbeddedManifest(source, destination, moves, removals); }
                 catch (Exception error) when (error is IOException || error is UnauthorizedAccessException || error is BadImageFormatException)
                 { Logger.Loader.Warn($"Cannot update embedded file paths in '{destination}': {error.Message}"); }
             }
-            foreach (string file in files.Concat(Walk(UnityGame.CoreLibraryPath)).Where(p => Path.GetExtension(p).Equals(".pdb", StringComparison.OrdinalIgnoreCase)))
+            foreach (string file in (tidy ? files.Concat(Walk(UnityGame.CoreLibraryPath)) : Array.Empty<string>()).Where(p => File.Exists(p) && Path.GetExtension(p).Equals(".pdb", StringComparison.OrdinalIgnoreCase)))
             {
                 try { Archive(file, "Symbols"); Journal(file, null, Digest(file)); File.Delete(file); }
                 catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { Logger.Loader.Warn($"Cannot remove debug symbols '{file}': {error.Message}"); }
             }
             foreach (string directory in oldLibraries.Concat(new[] { UnityGame.PluginsPath })) RemoveEmpty(directory);
+            RemoveEmpty(UnityGame.ModLibrariesPath);
             LibLoader.SetupAssemblyFilenames(true);
-            Logger.Loader.Info($"TidyUp organized {moved} files; manifests retained, debug symbols archived under IPA/Backups/TidyUp.");
+            Logger.Loader.Info(tidy ? $"TidyUp organized {moved} files; library metadata indexed, sidecars backed up under IPA/Backups/TidyUp."
+                : $"Library layout flattened {moved} files; manifests and documentation retained.");
+        }
+
+        private static bool IsRemovableSidecar(string path)
+        {
+            string extension = Path.GetExtension(path);
+            if (extension.Equals(".xml", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!File.Exists(path)) return false;
+                try
+                {
+                    using var reader = System.Xml.XmlReader.Create(path, new System.Xml.XmlReaderSettings { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null });
+                    return reader.MoveToContent() == System.Xml.XmlNodeType.Element && reader.LocalName == "doc";
+                }
+                catch (System.Xml.XmlException) { return false; }
+            }
+            bool text = extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) || extension.Equals(".md", StringComparison.OrdinalIgnoreCase);
+            bool documentation = text && new[] { "LICENSE", "NOTICE", "COPYING", "README", "CHANGELOG", "AUTHORS" }.Any(prefix => Path.GetFileName(path).StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+            return extension.Equals(".pdb", StringComparison.OrdinalIgnoreCase) || documentation
+                || path.EndsWith(".dll.mdb", StringComparison.OrdinalIgnoreCase) || IsManifest(path);
+        }
+
+        private static bool IsManifest(string path) => path.EndsWith(".manifest", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".manifest.json", StringComparison.OrdinalIgnoreCase);
+
+        private static string ManifestCollisionName(string name, string text)
+        {
+            using var hash = SHA256.Create();
+            return Path.GetFileNameWithoutExtension(name) + "." + BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(text))).Replace("-", "").ToLowerInvariant() + Path.GetExtension(name);
+        }
+
+        private static void WriteJson(string path, JObject data)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            string temporary = path + ".tidy-" + Guid.NewGuid().ToString("N");
+            try
+            {
+                File.WriteAllText(temporary, data.ToString(Formatting.Indented));
+                if (File.Exists(path)) File.Replace(temporary, path, null); else File.Move(temporary, path);
+            }
+            finally { if (File.Exists(temporary)) File.Delete(temporary); }
+        }
+
+        private static void RestoreSidecars(JObject index)
+        {
+            foreach (JObject entry in (JArray)index["sidecars"])
+            {
+                string backup = Path.GetFullPath(Path.Combine(Install, (string)entry["backup"]));
+                if (!Inside(backup, Backup) || !File.Exists(backup) || Digest(backup) != (string)entry["sha256"]) continue;
+                string path = ModLibraryIndex.ManifestPath((string)entry["name"]);
+                if (File.Exists(path) && Digest(path) != (string)entry["sha256"])
+                    path = Path.Combine(UnityGame.ModLibrariesPath, Path.GetFileNameWithoutExtension(path) + "." + (string)entry["sha256"] + Path.GetExtension(path));
+                if (!File.Exists(path)) File.Copy(backup, path);
+                if (Digest(path) != (string)entry["sha256"]) throw new IOException("Restored library sidecar failed its content hash check.");
+            }
         }
 
         private static IEnumerable<string> Walk(string directory)
@@ -227,7 +364,7 @@ namespace IPA.Loader
             }
             return rooted;
         }
-        private static void UpdateEmbeddedManifest(string original, string path, Dictionary<string, string> moves)
+        private static void UpdateEmbeddedManifest(string original, string path, Dictionary<string, string> moves, Dictionary<string, string> removals)
         {
             using var module = ModuleDefinition.ReadModule(path, new ReaderParameters { InMemory = true });
             bool changed = false;
@@ -242,13 +379,13 @@ namespace IPA.Loader
                 {
                     if (entry.Type != JTokenType.String) { files.Add(entry.DeepClone()); continue; }
                     string relative = (string)entry;
-                    if (Path.GetExtension(relative).Equals(".pdb", StringComparison.OrdinalIgnoreCase)) continue;
                     string source = ResolveOriginal(original, relative.Replace('/', Path.DirectorySeparatorChar));
                     if (!moves.ContainsKey(source))
                     {
                         string local = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(original), relative.Replace('/', Path.DirectorySeparatorChar)));
                         if (moves.ContainsKey(local)) source = local;
                     }
+                    if (removals.ContainsKey(source) || moves.TryGetValue(source, out string removedTarget) && removals.ContainsKey(removedTarget)) continue;
                     files.Add(moves.TryGetValue(source, out string target) && File.Exists(target) ? Relative(target, Install).Replace('\\', '/') : relative);
                 }
                 if (JToken.DeepEquals(entries, files)) continue;

@@ -269,9 +269,21 @@ namespace IPA.Loader
                 }
             }
 
-            IEnumerable<string> bareManifests = ModFiles.Manifests;
-            foreach (var manifest in bareManifests)
+            var bareManifests = ModFiles.Manifests.Select(path => (Path: path, Data: (Newtonsoft.Json.Linq.JObject?)null)).ToList();
+            try
             {
+                foreach (Newtonsoft.Json.Linq.JObject entry in (Newtonsoft.Json.Linq.JArray)ModLibraryIndex.Read()["libraries"]!)
+                {
+                    string path = ModLibraryIndex.ManifestPath((string)entry["name"]!);
+                    if (!bareManifests.Any(item => string.Equals(item.Path, path, StringComparison.OrdinalIgnoreCase)))
+                        bareManifests.Add((path, (Newtonsoft.Json.Linq.JObject)entry["manifest"]!));
+                }
+            }
+            catch (Exception error) when (error is IOException || error is JsonException || error is UnauthorizedAccessException)
+            { Logger.Loader.Error($"Cannot read mod library index: {error.Message}"); }
+            foreach (var entry in bareManifests)
+            {
+                string manifest = entry.Path;
                 try
                 {
                     var metadata = new PluginMetadata
@@ -281,7 +293,7 @@ namespace IPA.Loader
                         IsBare = true,
                     };
 
-                    string manifestText = File.ReadAllText(manifest);
+                    string manifestText = entry.Data == null ? File.ReadAllText(manifest) : entry.Data.ToString();
                     if (Path.GetExtension(manifest).Equals(".json", StringComparison.OrdinalIgnoreCase))
                     {
                         Newtonsoft.Json.Linq.JToken candidate;
@@ -306,6 +318,7 @@ namespace IPA.Loader
 
                     metadata.Manifest = manifestObj;
                     LoaderCompatibility.SelectProfile(metadata);
+                    if (PluginsMetadata.Any(existing => existing.IsBare && existing.Id == metadata.Id && existing.HVersion.ToString() == metadata.HVersion.ToString())) continue;
 
                     if (metadata.Manifest.Files.Length < 1)
                         Logger.Loader.Warn($"Bare manifest {Path.GetFileName(manifest)} does not declare any files. " +
