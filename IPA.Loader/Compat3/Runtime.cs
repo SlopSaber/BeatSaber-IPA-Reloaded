@@ -223,7 +223,14 @@ namespace IPA.Compat3
             while (type.DeclaringType != null) type = type.DeclaringType;
             return (type.Scope as AssemblyNameReference)?.Version;
         }
-        internal static bool Rewrite(ModuleDefinition module)
+        internal static bool UsesLegacyFeatureContract(ModuleDefinition module) => Types(module.Types).Any(type => type.BaseType?.FullName == "IPA.Loader.Features.Feature" && IsLoaderReference(type.BaseType)
+                && type.Methods.Any(method => method.IsVirtual && method.Name == "Initialize" && method.Parameters.Count == 2 && method.Parameters[1].ParameterType.FullName == "System.String[]")
+                && !type.Methods.Any(method => method.Name == "Initialize" && method.Parameters.Count == 2 && method.Parameters[1].ParameterType.FullName == "Newtonsoft.Json.Linq.JObject"))
+                || module.GetMemberReferences().OfType<MethodReference>().Any(method => IsLoaderReference(method.DeclaringType) && method.DeclaringType.FullName == "IPA.Loader.Features.Feature"
+                    && (method.Name == "Evaluate" || method.Name == "BeforeLoad" || method.Name == "RequireLoaded" || method.Name == "get_StoreOnPlugin"
+                        || (method.Name == "BeforeInit" && method.ReturnType.FullName == "System.Boolean")));
+
+        internal static bool Rewrite(ModuleDefinition module, IPA.Loader.Compatibility.CompatibilityProfile profile = null)
         {
             var target = IPA.Loader.LoaderCompatibility.GetTargetVersion(module);
             IPA.Loader.LoaderCompatibility.ValidateTarget(target);
@@ -236,12 +243,8 @@ namespace IPA.Compat3
                 entry.Name == "IPA.Loader.PluginLoader/PluginInfo" || entry.Name == "IPA.Loader.PluginLoader/PluginMetadata");
             bool legacyConfig = target?.Major == 1 || references.Any(entry =>
                 entry.Name == "IPA.Config.IConfigProvider" || entry.Namespace == "IPA.Config.ConfigProviders");
-            bool legacyFeatures = Types(module.Types).Any(type => type.BaseType?.FullName == "IPA.Loader.Features.Feature"
-                && type.Methods.Any(method => method.IsVirtual && method.Name == "Initialize" && method.Parameters.Count == 2 && method.Parameters[1].ParameterType.FullName == "System.String[]")
-                && !type.Methods.Any(method => method.Name == "Initialize" && method.Parameters.Count == 2 && method.Parameters[1].ParameterType.FullName == "Newtonsoft.Json.Linq.JObject"))
-                || module.GetMemberReferences().OfType<MethodReference>().Any(method => method.DeclaringType.FullName == "IPA.Loader.Features.Feature"
-                    && (method.Name == "Evaluate" || method.Name == "BeforeLoad" || method.Name == "RequireLoaded" || method.Name == "get_StoreOnPlugin"
-                        || (method.Name == "BeforeInit" && method.ReturnType.FullName == "System.Boolean")));
+            bool legacyFeatures = UsesLegacyFeatureContract(module)
+                || (profile?.UsesLegacyFeatures == true && !IPA.Loader.Compatibility.CompatibilityProfiles.HasJsonFeatureContract(module));
             bool changed = false;
             if (module.Assembly.Name.Name == "0Harmony" && module.Assembly.Name.Version.Major < 2)
             {
@@ -269,6 +272,10 @@ namespace IPA.Compat3
             }
             foreach (var method in module.GetMemberReferences().OfType<MethodReference>())
             {
+                if (IsLoaderReference(method.DeclaringType)
+                    && method.DeclaringType.FullName == "IPA.Utilities.Async.UnityMainThreadTaskScheduler"
+                    && method.Name == "get_Default" && method.ReturnType.FullName == "System.Threading.Tasks.TaskScheduler")
+                { method.Name = "get_LegacyDefault"; changed = true; }
                 if (IsLoaderReference(method.DeclaringType) && method.ReturnType.FullName.Contains("IPA.Compat4.Features.Feature")
                     && method.DeclaringType.FullName == "IPA.Loader.PluginMetadata" && method.Name == "get_Features")
                 { method.Name = "get_LegacyFeatures4"; changed = true; }

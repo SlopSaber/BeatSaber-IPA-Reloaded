@@ -301,6 +301,10 @@ namespace IPA.Loader
         /// </summary>
         /// <value>a collection of all enabled plugins</value>
         public static IEnumerable<PluginMetadata> EnabledPlugins => BSMetas.Select(p => p.Metadata);
+
+        /// <summary>Gets enabled plugins through the historical BSIPA API name.</summary>
+        [Obsolete("Use EnabledPlugins instead.")]
+        public static IEnumerable<PluginMetadata> AllPlugins => EnabledPlugins;
         /// <summary>
         /// Gets a list of disabled BSIPA plugins.
         /// </summary>

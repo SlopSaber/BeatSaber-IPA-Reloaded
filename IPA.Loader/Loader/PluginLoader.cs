@@ -97,6 +97,7 @@ namespace IPA.Loader
 
                 var manifestObj = JsonConvert.DeserializeObject<PluginManifest>(manifest);
                 selfMeta.Manifest = manifestObj ?? throw new InvalidOperationException("Deserialized manifest was null");
+                LoaderCompatibility.SelectProfile(selfMeta);
 
                 PluginsMetadata.Add(selfMeta);
                 SelfMeta = selfMeta;
@@ -169,12 +170,6 @@ namespace IPA.Loader
                         Logger.Loader.Notice($"No manifest.json in {Path.GetFileName(plugin)}");
 #endif
                         continue;
-                    }
-
-                    if (pluginManifest.Id == null)
-                    {
-                        Logger.Loader.Warn($"Plugin '{pluginManifest.Name}' does not have a listed ID, using name");
-                        pluginManifest.Id = pluginManifest.Name;
                     }
 
                     metadata.Manifest = pluginManifest;
@@ -254,7 +249,7 @@ namespace IPA.Loader
                         continue;
                     }
 
-                    LoaderCompatibility.SelectProfile(metadata);
+                    LoaderCompatibility.SelectProfile(metadata, pluginModule);
                     Logger.Loader.Debug($"Adding info for {Path.GetFileName(plugin)}");
                     PluginsMetadata.Add(metadata);
                 }

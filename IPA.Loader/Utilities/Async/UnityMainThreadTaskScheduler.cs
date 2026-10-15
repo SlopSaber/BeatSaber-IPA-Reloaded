@@ -20,6 +20,9 @@ namespace IPA.Utilities.Async
         /// </summary>
         /// <value>a scheduler that is managed by BSIPA</value>
         public static new UnityMainThreadTaskScheduler Default { get; } = new UnityMainThreadTaskScheduler();
+        /// <summary>Gets the main thread scheduler through the historical return type.</summary>
+        [Obsolete("Use Default instead.")]
+        public static TaskScheduler LegacyDefault => Default;
         /// <summary>
         /// Gets a factory for creating tasks on <see cref="Default"/>.
         /// </summary>

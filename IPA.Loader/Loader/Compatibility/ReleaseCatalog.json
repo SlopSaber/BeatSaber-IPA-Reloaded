@@ -1,0 +1,854 @@
+{
+  "upstream": "https://api.github.com/repos/nike4613/BeatSaber-IPA-Reloaded/tags?per_page=100",
+  "distributions": "https://beatmods.com/api/v1/mod",
+  "retrievedAt": "2026-10-14",
+  "releases": [
+    {
+      "version": "4.3.7",
+      "tag": "4.3.7",
+      "commit": "977051a82d200314a9d944a0be54fece2c313115",
+      "publishedAt": "2026-01-11T20:07:47Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.7"
+    },
+    {
+      "version": "4.3.6",
+      "tag": "4.3.6",
+      "commit": "39e36ce4f3c21408dbbe4c41c1a954ed1f717a6a",
+      "publishedAt": "2025-06-07T01:45:10Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.6"
+    },
+    {
+      "version": "4.3.5",
+      "tag": "4.3.5",
+      "commit": "a81bad951faa2996c93ab866290a8f11e87270ce",
+      "publishedAt": "2024-08-09T19:10:30Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.5"
+    },
+    {
+      "version": "4.3.4",
+      "tag": "4.3.4",
+      "commit": "80222a6da147bae9b95433ef78d03c5dd581e465",
+      "publishedAt": "2024-06-04T17:10:52Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.4"
+    },
+    {
+      "version": "4.3.3",
+      "tag": "4.3.3",
+      "commit": "01a05403ef4edd9646be6b698e7da30c741965e5",
+      "publishedAt": "2024-03-18T20:39:28Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.3"
+    },
+    {
+      "version": "4.3.2",
+      "tag": "4.3.2",
+      "commit": "607ab516a4167c897fc4f07fce11fb60225379a5",
+      "publishedAt": "2023-11-14T04:43:53Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.2"
+    },
+    {
+      "version": "4.3.1",
+      "tag": "4.3.1",
+      "commit": "f6ebc69a5936d4b18a6aff2e56faa1b8cadc2c52",
+      "publishedAt": "2023-11-13T03:35:28Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.1"
+    },
+    {
+      "version": "4.3.0",
+      "tag": "4.3.0",
+      "commit": "21873bee3caf2a67e6a33d478b5deb596c304f54",
+      "publishedAt": "2023-05-21T01:14:17Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.3.0"
+    },
+    {
+      "version": "4.2.2",
+      "distributionId": "1405",
+      "source": "https://beatmods.com/api/v1/mod",
+      "sourceNote": "Approved distribution without a matching upstream tag; adapter boundary inferred from its API family."
+    },
+    {
+      "version": "4.2.1",
+      "tag": "4.2.1",
+      "commit": "3adbdc18e8891cba87b2754e0028bfc7f6b8b314",
+      "publishedAt": "2021-12-21T11:45:09Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.2.1"
+    },
+    {
+      "version": "4.2.0",
+      "tag": "4.2.0",
+      "commit": "7b6a755dcc8549f0e6f8e36b9ebdb2e7fc1647ff",
+      "publishedAt": "2021-07-20T21:11:59Z",
+      "sourceGameVersion": "1.16.1",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.2.0"
+    },
+    {
+      "version": "4.1.6",
+      "tag": "4.1.6",
+      "commit": "46a51fd9c7e6bdff6fe421cdf915bc239d3f9444",
+      "publishedAt": "2021-03-18T21:11:57Z",
+      "sourceGameVersion": "1.13.5",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.1.6"
+    },
+    {
+      "version": "4.1.4",
+      "tag": "4.1.4",
+      "commit": "2a9a26967e49ba0e52a96e33ef9394a2ee2b4268",
+      "publishedAt": "2021-01-22T04:44:16Z",
+      "sourceGameVersion": "1.13.2",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.1.4"
+    },
+    {
+      "version": "4.1.3",
+      "tag": "4.1.3",
+      "commit": "9cb44d8d8466965d589b616f0507b011e8663ae6",
+      "publishedAt": "2020-10-22T00:05:18Z",
+      "sourceGameVersion": "1.11.1",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.1.3"
+    },
+    {
+      "version": "4.1.2",
+      "tag": "4.1.2",
+      "commit": "190cc0150df43004a3da1870e86d90dbb6cef75e",
+      "publishedAt": "2020-09-03T00:08:35Z",
+      "sourceGameVersion": "1.11.1",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.1.2"
+    },
+    {
+      "version": "4.1.1",
+      "tag": "4.1.1",
+      "commit": "158cc75caa1cd9536a5bade49b3eca99feb0076a",
+      "publishedAt": "2020-09-02T01:00:44Z",
+      "sourceGameVersion": "1.11.1",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.1.1"
+    },
+    {
+      "version": "4.1.0",
+      "tag": "4.1.0",
+      "commit": "83e06645d5bfeafe8c4701ed4f05a0d1c2202bd9",
+      "publishedAt": "2020-08-31T07:29:18Z",
+      "sourceGameVersion": "1.11.0",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.1.0"
+    },
+    {
+      "version": "4.0.5",
+      "tag": "4.0.5",
+      "commit": "d8c4f8b1e9c696eefe99d38ed6e8b03ad9098914",
+      "publishedAt": "2020-04-05T09:44:17Z",
+      "sourceGameVersion": "1.8.0",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.0.5"
+    },
+    {
+      "version": "4.0.4",
+      "tag": "4.0.4",
+      "commit": "835be0700f90292c1a37c2b89480f9daf989cc99",
+      "publishedAt": "2020-04-04T05:13:45Z",
+      "sourceGameVersion": "1.8.0",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.0.4"
+    },
+    {
+      "version": "4.0.3",
+      "tag": "4.0.3",
+      "commit": "d0885638666b41f4c8fe55b7ea89b42f2946fb9b",
+      "publishedAt": "2020-03-30T06:28:17Z",
+      "sourceGameVersion": "1.8.0",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.0.3"
+    },
+    {
+      "version": "4.0.2",
+      "tag": "4.0.2",
+      "commit": "529e8de4640820c96cb63d772a78a2a06573f94e",
+      "publishedAt": "2020-03-26T22:52:30Z",
+      "sourceGameVersion": "1.8.0b2",
+      "loaderAssemblyVersion": "2.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/4.0.2"
+    },
+    {
+      "version": "4.0.1",
+      "distributionId": "553",
+      "source": "https://beatmods.com/api/v1/mod",
+      "sourceNote": "Approved distribution without a matching upstream tag; adapter boundary inferred from its API family."
+    },
+    {
+      "version": "3.13.7",
+      "tag": "3.13.7",
+      "commit": "681860c90103925ac6ef06d1bfc7010beb11418a",
+      "publishedAt": "2020-03-26T21:36:30Z",
+      "sourceGameVersion": "1.6.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.13.7"
+    },
+    {
+      "version": "3.13.6",
+      "distributionId": "486",
+      "source": "https://beatmods.com/api/v1/mod",
+      "sourceNote": "Approved distribution without a matching upstream tag; adapter boundary inferred from its API family."
+    },
+    {
+      "version": "3.13.5",
+      "tag": "3.13.5",
+      "commit": "e6097054b26d7a7cf584f5acb928b92b168ebc2c",
+      "publishedAt": "2019-12-21T21:11:40Z",
+      "sourceGameVersion": "1.6.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.13.5"
+    },
+    {
+      "version": "3.13.4",
+      "distributionId": "427",
+      "source": "https://beatmods.com/api/v1/mod",
+      "sourceNote": "Approved distribution without a matching upstream tag; adapter boundary inferred from its API family."
+    },
+    {
+      "version": "3.13.2",
+      "tag": "3.13.2",
+      "commit": "596a831b123de9de04a388ae33c20c3307203773",
+      "publishedAt": "2019-08-30T02:43:27Z",
+      "sourceGameVersion": "1.3.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.13.2"
+    },
+    {
+      "version": "3.13.1",
+      "tag": "3.13.1",
+      "commit": "c57fdfa83eef52955dd90baad18123997d7ec4b9",
+      "publishedAt": "2019-08-30T01:11:05Z",
+      "sourceGameVersion": "1.3.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.13.1"
+    },
+    {
+      "version": "3.13.0",
+      "tag": "3.13.0",
+      "commit": "d9d57711629d8a2a4ffc2ca8f66f4896bbedc4ee",
+      "publishedAt": "2019-08-29T12:49:37Z",
+      "sourceGameVersion": "1.3.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.13.0"
+    },
+    {
+      "version": "3.12.24",
+      "tag": "3.12.24",
+      "commit": "1de9c9979edd8fe6e51ce55dcad25a6698923e57",
+      "publishedAt": "2019-07-25T18:54:40Z",
+      "sourceGameVersion": "1.1.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.24"
+    },
+    {
+      "version": "3.12.23",
+      "tag": "3.12.23",
+      "commit": "29894bb88e44e12ca18ce1deb4cadaa09d720a71",
+      "publishedAt": "2019-07-16T02:25:21Z",
+      "sourceGameVersion": "1.1.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.23"
+    },
+    {
+      "version": "3.12.22",
+      "tag": "3.12.22",
+      "commit": "b5a8908c64733d72ba88dfd7158ad02c92da3fdb",
+      "publishedAt": "2019-06-13T19:03:10Z",
+      "sourceGameVersion": "1.1.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.22"
+    },
+    {
+      "version": "3.12.21",
+      "tag": "3.12.21",
+      "commit": "7af13b948d2794937af97861aa9ffa925c8fc17b",
+      "publishedAt": "2019-06-10T11:41:43Z",
+      "sourceGameVersion": "1.1.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.21"
+    },
+    {
+      "version": "3.12.20",
+      "tag": "3.12.20",
+      "commit": "8d6ce02824c0c2e53411b3cdaa06cb690a938312",
+      "publishedAt": "2019-05-22T20:49:56Z",
+      "sourceGameVersion": "1.0.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.20"
+    },
+    {
+      "version": "3.12.19",
+      "tag": "3.12.19",
+      "commit": "ac81be1e1552d4c62ae1ca4f7caff3fcd3be568d",
+      "publishedAt": "2019-05-20T20:38:16Z",
+      "sourceGameVersion": "1.0.0",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.19"
+    },
+    {
+      "version": "3.12.18",
+      "tag": "3.12.18",
+      "commit": "0d3588cad56fe605a5c2ee5dcc36faa4646fd0c8",
+      "publishedAt": "2019-05-17T23:04:48Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.18"
+    },
+    {
+      "version": "3.12.17",
+      "tag": "3.12.17",
+      "commit": "c6e1106a444a96c2f0498986cc9f26c9e7fd3140",
+      "publishedAt": "2019-05-16T02:39:15Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.17"
+    },
+    {
+      "version": "3.12.16",
+      "tag": "3.12.16",
+      "commit": "081749e79da787b00337071b670f9f8a833a37a7",
+      "publishedAt": "2019-05-14T00:51:59Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.16"
+    },
+    {
+      "version": "3.12.15",
+      "tag": "3.12.15",
+      "commit": "4a4b2ef17f2fbb05f72859ad90895a6631047ee5",
+      "publishedAt": "2019-05-05T22:13:53Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.15"
+    },
+    {
+      "version": "3.12.14",
+      "tag": "3.12.14",
+      "commit": "b79f3c6afabba2fb4822b01eaca82f229347f7dd",
+      "publishedAt": "2019-04-23T00:38:55Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.14"
+    },
+    {
+      "version": "3.12.13",
+      "tag": "3.12.13",
+      "commit": "04095214cab12e40493be03ba4df5acc4c014ddd",
+      "publishedAt": "2019-04-22T06:25:37Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.13"
+    },
+    {
+      "version": "3.12.12",
+      "tag": "3.12.12",
+      "commit": "117e419fed85e9ecc017ff16475ce71966e6bb07",
+      "publishedAt": "2019-04-15T01:48:26Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.12"
+    },
+    {
+      "version": "3.12.11",
+      "tag": "3.12.11",
+      "commit": "656395c598ef72f0e1414c3029b96848f0e1d527",
+      "publishedAt": "2019-04-14T20:32:32Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.11"
+    },
+    {
+      "version": "3.12.10",
+      "tag": "3.12.10",
+      "commit": "b268ba6996ece1006082f15a3cb60ad5d44c9092",
+      "publishedAt": "2019-04-11T01:40:43Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.10"
+    },
+    {
+      "version": "3.12.9",
+      "tag": "3.12.9",
+      "commit": "67184bcf19bb4b23a27dc04e32abc5df9d03e616",
+      "publishedAt": "2019-04-09T01:35:29Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.9"
+    },
+    {
+      "version": "3.12.8",
+      "tag": "3.12.8",
+      "commit": "cf3557fada6a4574ad0d6896f3b2f12a4f8346f8",
+      "publishedAt": "2019-04-06T17:39:37Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.8"
+    },
+    {
+      "version": "3.12.7",
+      "tag": "3.12.7",
+      "commit": "527be5ab4a294e07337648b540f7e5ea181f26c9",
+      "publishedAt": "2019-04-06T04:57:04Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.7"
+    },
+    {
+      "version": "3.12.6",
+      "tag": "3.12.6",
+      "commit": "1948512ebccda0bcc67258e9bd8ba75eec1ca9ae",
+      "publishedAt": "2019-04-05T23:06:46Z",
+      "sourceGameVersion": "0.13.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.6"
+    },
+    {
+      "version": "3.12.5",
+      "tag": "3.12.5",
+      "commit": "703b5877a4b9f546ae0ef220e009fbc1583580eb",
+      "publishedAt": "2019-04-04T00:26:55Z",
+      "sourceGameVersion": "0.13.1",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.5"
+    },
+    {
+      "version": "3.12.4",
+      "tag": "3.12.4",
+      "commit": "1f506afe3f1c1a4f61144059a049c5be975f6e29",
+      "publishedAt": "2019-04-03T03:30:04Z",
+      "sourceGameVersion": "0.13.1",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.4"
+    },
+    {
+      "version": "3.12.3",
+      "tag": "3.12.3",
+      "commit": "9b6bd612bea5a2b90639bd1623c857ba89bf1bc8",
+      "publishedAt": "2019-03-21T19:18:30Z",
+      "sourceGameVersion": "0.12.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.3"
+    },
+    {
+      "version": "3.12.2",
+      "tag": "3.12.2",
+      "commit": "522ddb18c30e6751607e08cd9481a5791f52c86a",
+      "publishedAt": "2019-02-20T03:03:25Z",
+      "sourceGameVersion": "0.12.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.2"
+    },
+    {
+      "version": "3.12.1",
+      "tag": "3.12.1",
+      "commit": "efbfeb393c84e457e8dc90dd1a64defe2f9d650d",
+      "publishedAt": "2019-02-09T03:11:22Z",
+      "sourceGameVersion": "0.12.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.1"
+    },
+    {
+      "version": "3.12.0",
+      "tag": "3.12.0",
+      "commit": "befdaf847961494f7e04a8834a39093291348756",
+      "publishedAt": "2019-02-09T02:51:09Z",
+      "sourceGameVersion": "0.12.2",
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.12.0"
+    },
+    {
+      "version": "3.11.6",
+      "tag": "3.11.6",
+      "commit": "923dfd658c6c8c99779046adb06962ee5f65f27f",
+      "publishedAt": "2018-12-23T18:07:56Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.11.6"
+    },
+    {
+      "version": "3.11.5",
+      "tag": "3.11.5",
+      "commit": "5999ab4ffb3a695a7e20a3c9c44896d7feaf0309",
+      "publishedAt": "2018-12-04T06:24:42Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.11.5"
+    },
+    {
+      "version": "3.11.4",
+      "tag": "3.11.4",
+      "commit": "78ab95a495ae235594ed7037ca58aded3ee503f0",
+      "publishedAt": "2018-11-25T02:15:35Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.11.4"
+    },
+    {
+      "version": "3.11.3",
+      "tag": "3.11.3",
+      "commit": "e552b220667b9b35eda91a0603ce1bd205f3bd07",
+      "publishedAt": "2018-11-17T03:44:41Z",
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.11.3"
+    },
+    {
+      "version": "3.11.0",
+      "tag": "3.11.0",
+      "commit": "240d73e931913b8a3529d4cc4e962c7ce2d9a6f2",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.11.0"
+    },
+    {
+      "version": "3.10.5",
+      "tag": "3.10.5",
+      "commit": "1f7968acbc1bd8a582c905f4451055cad0a8e1ac",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.10.5"
+    },
+    {
+      "version": "3.10.4",
+      "tag": "3.10.4",
+      "commit": "e4459052b2d3c7930cde19ac0610c215f7943590",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.10.4"
+    },
+    {
+      "version": "3.10.3",
+      "tag": "3.10.3",
+      "commit": "68db01ef97f42f730b9aad5cf0a114da556c495b",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.10.3"
+    },
+    {
+      "version": "3.10.2",
+      "tag": "3.10.2",
+      "commit": "66f1a12a623340fe77a5df9ebec625532b2f37c1",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.10.2"
+    },
+    {
+      "version": "3.10.0",
+      "tag": "3.10.0",
+      "commit": "64e2aaa968cf338f1e8a7dc87ee7a27f7abe1126",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.10.0"
+    },
+    {
+      "version": "3.9.1",
+      "tag": "3.9.1",
+      "commit": "87a84d5163f952965db409c1167798bc96850a78",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.9.1"
+    },
+    {
+      "version": "3.9.0",
+      "tag": "3.9.0",
+      "commit": "5d48f636e042c355fb5f3c28a301c02decb2815f",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": "1.0.0.0",
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.9.0"
+    },
+    {
+      "version": "3.8.9",
+      "tag": "3.8.9",
+      "commit": "25fc635157f7c88ed44a5ecb9079b9a0861354dc",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.9"
+    },
+    {
+      "version": "3.8.8",
+      "tag": "3.8.8",
+      "commit": "21300c6879ebfd7ec133028de4e25ade45d7b2f3",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.8"
+    },
+    {
+      "version": "3.8.7",
+      "tag": "3.8.7",
+      "commit": "ca50eedcaa941b7836a97f3d026be3f7f1c9ae6f",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.7"
+    },
+    {
+      "version": "3.8.6",
+      "tag": "3.8.6",
+      "commit": "2131676597a84dd8b98ba3e4861c597f791ac61a",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.6"
+    },
+    {
+      "version": "3.8.5",
+      "tag": "3.8.5",
+      "commit": "b05cebff576836f399f201b722a797b514c2cfeb",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.5"
+    },
+    {
+      "version": "3.8.2",
+      "tag": "3.8.2",
+      "commit": "adbd871c0d08b4d58af9ee9fe18872127aaa1d9a",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.2"
+    },
+    {
+      "version": "3.8.1",
+      "tag": "3.8.1",
+      "commit": "6e8f5d5dd08a1d00d9ee6de1dc8d7e4bb0577ead",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.1"
+    },
+    {
+      "version": "3.8.0",
+      "tag": "3.8.0",
+      "commit": "4a1d3c763bf1c4db01a665617569e29baae2a1c4",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.8.0"
+    },
+    {
+      "version": "3.7.2",
+      "tag": "3.7.2",
+      "commit": "d67379933390670f8b3f3dad234efc007f83633f",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.7.2"
+    },
+    {
+      "version": "3.7.1",
+      "tag": "3.7.1",
+      "commit": "28ab962dbd1c303a8734eaa7e3f1b110d53ec450",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.7.1"
+    },
+    {
+      "version": "3.7.0",
+      "tag": "3.7",
+      "commit": "40e7676fa3d7ec56b9ef95a1ff210e04dd0c9783",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.7"
+    },
+    {
+      "version": "3.6.3",
+      "tag": "3.6.3",
+      "commit": "12dc58433fc66d342d5178db8867f12d963a66b4",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.6.3"
+    },
+    {
+      "version": "3.6.2",
+      "tag": "3.6.2",
+      "commit": "0628920fdf7dbcdfcdfc3b2bab74b83bfb6425b2",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.6.2"
+    },
+    {
+      "version": "3.6.1",
+      "tag": "3.6.1",
+      "commit": "e6e11776f990048ce090197c349f95d09da52df0",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.6.1"
+    },
+    {
+      "version": "3.6.0",
+      "tag": "3.6",
+      "commit": "7997feedb46554cc64bf7d836342b4f6052c4f23",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.6"
+    },
+    {
+      "version": "3.5.2",
+      "tag": "3.5.2",
+      "commit": "d2bd2285ae9aae3f2aad357d0edfa1893acb9619",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.5.2"
+    },
+    {
+      "version": "3.5.0",
+      "tag": "3.5",
+      "commit": "512dd0a73575a585c5651e515f6544af4a1e7d36",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.5"
+    },
+    {
+      "version": "3.4.0",
+      "tag": "3.4",
+      "commit": "ffd57fdf6e6e13d35bfcee5fce1b83990d9a7927",
+      "publishedAt": null,
+      "sourceGameVersion": null,
+      "loaderAssemblyVersion": null,
+      "source": "https://github.com/nike4613/BeatSaber-IPA-Reloaded/tree/3.4"
+    }
+  ],
+  "gameReleases": [
+    {
+      "gameVersion": "0.12.2",
+      "ipaVersion": "3.12.3",
+      "source": "upstream manifest"
+    },
+    {
+      "gameVersion": "0.13.2",
+      "ipaVersion": "3.12.18",
+      "distributionId": "16"
+    },
+    {
+      "gameVersion": "1.0.0",
+      "ipaVersion": "3.12.20",
+      "distributionId": "137"
+    },
+    {
+      "gameVersion": "1.1.0",
+      "ipaVersion": "3.12.23",
+      "distributionId": "201"
+    },
+    {
+      "gameVersion": "1.3.0",
+      "ipaVersion": "3.13.2",
+      "distributionId": "303"
+    },
+    {
+      "gameVersion": "1.6.0",
+      "ipaVersion": "3.13.4",
+      "distributionId": "427"
+    },
+    {
+      "gameVersion": "1.6.1",
+      "ipaVersion": "3.13.7",
+      "distributionId": "485"
+    },
+    {
+      "gameVersion": "1.8.0",
+      "ipaVersion": "4.0.5",
+      "distributionId": "549"
+    },
+    {
+      "gameVersion": "1.12.2",
+      "ipaVersion": "4.1.3",
+      "distributionId": "744"
+    },
+    {
+      "gameVersion": "1.13.2",
+      "ipaVersion": "4.1.4",
+      "distributionId": "848"
+    },
+    {
+      "gameVersion": "1.13.4",
+      "ipaVersion": "4.1.6",
+      "distributionId": "923"
+    },
+    {
+      "gameVersion": "1.16.3",
+      "ipaVersion": "4.2.0",
+      "distributionId": "1098"
+    },
+    {
+      "gameVersion": "1.19.0",
+      "ipaVersion": "4.2.1",
+      "distributionId": "1307"
+    },
+    {
+      "gameVersion": "1.20.0",
+      "ipaVersion": "4.2.2",
+      "distributionId": "1405"
+    },
+    {
+      "gameVersion": "1.30.2",
+      "ipaVersion": "4.3.0",
+      "distributionId": "1761",
+      "note": "Original API-era baseline; 4.3.6 was later backported to this game version."
+    },
+    {
+      "gameVersion": "1.33.0",
+      "ipaVersion": "4.3.2",
+      "distributionId": "1840"
+    },
+    {
+      "gameVersion": "1.35.0",
+      "ipaVersion": "4.3.3",
+      "distributionId": "1919"
+    },
+    {
+      "gameVersion": "1.37.0",
+      "ipaVersion": "4.3.4",
+      "distributionId": "1992"
+    },
+    {
+      "gameVersion": "1.37.2",
+      "ipaVersion": "4.3.5",
+      "distributionId": "2062"
+    },
+    {
+      "gameVersion": "1.41.1",
+      "ipaVersion": "4.3.7",
+      "distributionId": "2561"
+    }
+  ]
+}

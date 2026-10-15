@@ -21,14 +21,32 @@ BSIPA 4 plugins keep the modern manager and configuration APIs. Old
 while current calls keep their `Hive.Versioning.Version` return type. Compatibility
 rewriting applies only to types from `IPA.Loader`, including dependent libraries.
 
-BSIPA dependencies select the newest matching recorded release profile in the
-binary's family, including bounded ranges for older releases. A known IPA binary
-without `dependsOn.BSIPA` gets an inferred loader dependency instead of being
-discarded. A bare manifest can select a profile through its dependency range.
-`"misc": { "ipa-version": "4.1.6" }` can request an exact API profile. It must agree
-with the binary family and dependency range. A profile uses the retained family
-adapters; it does not run a complete historical loader beside the current one.
-Future API profiles and binary contracts are rejected.
+BSIPA dependencies select the nearest recorded release profile for the plugin's
+manifest game version, subject to the dependency range and binary API signatures.
+The catalog records 80 upstream tags and four additional approved BeatMods
+releases. For example, the game-era defaults select 4.0.5 for Beat Saber 1.11.1
+and 4.1.3 for 1.12.2. A mod requiring a newer API is promoted to the first eligible
+recorded release. An explicit `"misc": { "ipa-version": "4.1.6" }` takes precedence
+and must match a recorded release, the binary contract and dependency range.
+Without a manifest game version, selection uses the running game; without a known
+game baseline, it uses the dependency range and binary evidence. Selection logs
+include the chosen version and its evidence.
+
+Profiles now choose the positional feature contract before 4.1.0 and the JSON
+feature contract from 4.1.0 onward. Legacy arrays are ignored under later profiles,
+as in those upstream releases. Cached member references retain historical feature
+return types, the scheduler's original `TaskScheduler` return type and SemVer
+getters. `PluginManager.AllPlugins` retains its historical enabled-plugins view.
+Legacy profiles accept an explicit null manifest ID and substitute the plugin's
+name; current profiles require a non-null ID. Profiles before 4.2.1 require a
+manifest game version. Cache paths include the selected profile, and dependent
+libraries use their own recorded profile or the requesting plugin's context.
+
+A known IPA binary without `dependsOn.BSIPA` gets an inferred loader dependency.
+A profile uses shared adapters at verified API boundaries; it does not execute
+a complete historical loader. See [the compatibility research](docs/articles/compatibility.md)
+for sources, release coverage and limits. Future and unrecorded explicit profiles
+are rejected.
 
 Legacy version parsing accepts historical loose forms, including `1.8.0.1` as
 `1.8.0-1`, while the SemVer facade's strict constructor remains strict. Legacy

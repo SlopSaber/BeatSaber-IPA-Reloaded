@@ -171,7 +171,7 @@ namespace IPA.Loader
             if (library != null)
             {
                 Log(Logger.Level.Debug, $"Found library {asmName.Name} as {library}");
-                return LoadSafe(library);
+                return LoadSafe(library, requester);
             }
 
             Log(Logger.Level.Critical, $"No library {asmName} found");
@@ -179,7 +179,7 @@ namespace IPA.Loader
             return null;
         }
 
-        private static Assembly? LoadSafe(string path)
+        private static Assembly? LoadSafe(string path, string? requester)
         {
             if (!File.Exists(path))
             {
@@ -202,7 +202,7 @@ namespace IPA.Loader
                 }
             }
 
-            return Assembly.LoadFrom(LoaderCompatibility.PrepareAssembly(path));
+            return Assembly.LoadFrom(LoaderCompatibility.PrepareAssembly(path, LoaderCompatibility.ProfileForPath(requester)));
         }
 
         internal static void Log(Logger.Level lvl, string message)

@@ -18,6 +18,8 @@ namespace IPA.Loader
     public class PluginMetadata
     {
         internal bool IsInterface3;
+        internal Compatibility.CompatibilityProfile? CompatibilityProfile;
+        internal string CompatibilitySelection = "";
 
         /// <summary>
         /// Gets the IPA.Loader assembly version referenced by the original plugin binary.
