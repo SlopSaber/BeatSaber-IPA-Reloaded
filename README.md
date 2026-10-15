@@ -52,6 +52,10 @@ with game-relative paths. Already-patched files are left alone. A game assembly
 loaded too early is reported and requires a full game restart. Profiles from
 4.3.0 onward do not request these patches. Changes persist in the game files;
 restore the saved originals to undo them.
+The 4.1.6-era rules reset eligible virtual-final methods to new slots and retain
+the historical ordering of required/optional parameter modifiers. Matching
+original backups also let a later legacy profile upgrade methods that an older
+pass already virtualized; unchanged metadata does not trigger another write.
 
 Missing optional XML serializer assemblies are logged at debug level. Explicit
 assembly dependencies still report missing libraries as errors.

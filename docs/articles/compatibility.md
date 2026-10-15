@@ -70,6 +70,52 @@ These changes do not execute game code during the build. They apply on the next 
 
 The log also contains unavailable remote endpoints, a missing DynamicOpenVR action file, user/configuration messages and later mod null-reference failures. These are not evidence of further loader API failures. Some scene/song failures may be downstream of the confirmed access errors; their outcome needs a fresh game log after installing this build.
 
+## Virtualizer history audit
+
+The historical virtualizer has several separate contracts. Checking only whether
+a method is virtual does not reproduce its metadata or upgrade behavior.
+
+| Upstream change | Relevant behavior |
+| --- | --- |
+| [f1a6583b, September 2018](https://github.com/nike4613/BeatSaber-IPA-Reloaded/commit/f1a6583b) | Move virtualization into the loader; unseal eligible classes, expose eligible instance methods as public virtual new-slot methods, and make private fields protected. |
+| [0168e3db, December 2019](https://github.com/nike4613/BeatSaber-IPA-Reloaded/commit/0168e3db) | Use the configured game assembly list rather than one hardcoded assembly. |
+| [24643eb9, March 2021](https://github.com/nike4613/BeatSaber-IPA-Reloaded/commit/24643eb9) | Add parameter modifier handling and rebuild signatures with required modifiers inside optional modifiers. |
+| [17809558, March 2021](https://github.com/nike4613/BeatSaber-IPA-Reloaded/commit/17809558) | Make nested private types public. |
+| [8ad818e1, March 2021](https://github.com/nike4613/BeatSaber-IPA-Reloaded/commit/8ad818e1) | Stop adding an `out` parameter modreq because it breaks overrides. |
+| [c6b9f05b, March 2021](https://github.com/nike4613/BeatSaber-IPA-Reloaded/commit/c6b9f05b) | Also process virtual-final methods, clear final, and explicitly set new-slot dispatch. |
+| [634d8fe2, May 2023](https://github.com/nike4613/BeatSaber-IPA-Reloaded/commit/634d8fe2) | Remove the virtualizer and HarmonyProtector. The first containing release is 4.3.0. |
+
+The nested-type, parameter-modifier and virtual-final changes first appear in
+the recorded 4.1.6 release. The compatibility profiles retain that boundary and
+the removal boundary at 4.3.0. `out` modreqs remain excluded.
+
+The audit found that this branch set new-slot only for previously nonvirtual
+methods, missing the upstream assignment for virtual-final methods. It also
+wrapped the `in` modreq around existing optional modifiers rather than rebuilding
+their historical order. Both differences are corrected.
+
+A matching original backup is used to identify eligible methods after a prior
+pass has cleared their original final/private flags. The earliest readable
+LegacyCompatibility backup with the same module MVID and assembly identity
+supplies the baseline; method token, declaring type, name and generic/parameter
+counts are checked before using its metadata. Modifier order comes from that
+baseline, avoiding repeated reordering on subsequent launches. Actual changes
+are compared before writing, and the existing backup and loaded-assembly guards
+remain in place. This reads original metadata; it does not restore old method
+bodies over persistence routing or other current code.
+
+Without a matching original, only the available current metadata can determine
+eligibility. A clean game assembly or matching pre-virtualization backup is
+needed to recover flags already erased by another patcher. Value types,
+interfaces and static class layouts retain the current safety exclusions rather
+than reproducing invalid metadata transformations.
+
+Static inspection found no original reused-slot final methods in the installed
+0.11.2 Assembly-CSharp baseline. The history audit therefore establishes
+implementation gaps, not the cause of an unspecified mod failure. A concrete
+mod, game version and error are still required for that attribution. Compilation
+does not establish complete historical compatibility.
+
 ## Coverage limits
 
 Recorded release versions are selection points, not 84 separate complete historical runtimes. Releases sharing the same relevant contract share adapters. The four untagged distributions are identified below; their API boundary is inferred from their release family rather than claimed as a source-complete audit. Existing fixes and security checks remain in the current loader. Removed game APIs, arbitrary Harmony differences, native runtime issues, historical bugs and missing third-party assets are not emulated.
