@@ -75,6 +75,7 @@ namespace IPA.Utilities
         /// <returns>the value referenced by the object</returns>
         public static implicit operator T(Ref<T> self)
         {
+            if (self == null) throw new ArgumentNullException(nameof(self));
             return self.Value;
         }
 
@@ -113,7 +114,7 @@ namespace IPA.Utilities
         /// </summary>
         /// <param name="other">the wrapped object to compare to</param>
         /// <returns>the value of the comparison</returns>
-        public int CompareTo(Ref<T> other) => CompareTo(other.Value);
+        public int CompareTo(Ref<T> other) => other == null ? 1 : CompareTo(other.Value);
     }
     
     internal static class ExceptionUtilities

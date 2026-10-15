@@ -41,4 +41,8 @@
     <BuildType Solution="Verbose_Release|*" Project="Release" />
     <BuildType Solution="Verbose|*" Project="Debug" />
   </Project>
+  <Project Path="SemVer/SemVer.csproj">
+    <BuildType Solution="Verbose_Release|*" Project="Release" />
+    <BuildType Solution="Verbose|*" Project="Debug" />
+  </Project>
 </Solution>

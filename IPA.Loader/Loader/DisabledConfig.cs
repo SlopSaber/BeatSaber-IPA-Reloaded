@@ -5,6 +5,7 @@ using IPA.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IPA.Loader
@@ -30,8 +31,8 @@ namespace IPA.Loader
         protected internal virtual void Changed() { }
         protected internal virtual IDisposable ChangeTransaction() => null;
 
-        private Task disableUpdateTask = null;
-        private int updateState = 0;
+        private Task disableUpdateTask;
+        private int updateState;
 
         protected virtual void OnReload()
         {
@@ -56,7 +57,7 @@ namespace IPA.Loader
                     // skip if another got here before the last finished
                     if (referToState != updateState) return Task.CompletedTask;
                     else return UpdateDisabledMods(copy);
-                });
+                }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default).Unwrap();
             }
         }
 
@@ -84,7 +85,7 @@ namespace IPA.Loader
                             Logger.Loader.Error("Error changing disabled plugins");
                             Logger.Loader.Error(t.Exception);
                         }
-                    });
+                    }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default);
                 }
                 catch (InvalidOperationException)
                 {

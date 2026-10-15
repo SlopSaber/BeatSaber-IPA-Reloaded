@@ -106,15 +106,15 @@ namespace IPA.Logging
         /// </summary>
         /// <value>the global filter level</value>
         public static LogLevel PrintFilter { get; internal set; } = LogLevel.All;
-        private static bool showTrace = false;
-        private static volatile bool syncLogging = false;
+        private static bool showTrace;
+        private static volatile bool syncLogging;
 
         private readonly List<LogPrinter> printers = new();
         private readonly StandardLogger? parent;
 
         private readonly Dictionary<string, StandardLogger> children = new();
 
-        private static bool addedFilePrinter = false;
+        private static bool addedFilePrinter;
         /// <summary>
         /// Configures internal debug settings based on the config passed in.
         /// </summary>
@@ -275,7 +275,7 @@ namespace IPA.Logging
         }
 
         [ThreadStatic]
-        private static bool? isOnLoggerThread = null;
+        private static bool? isOnLoggerThread;
         /// <summary>
         /// Whether or not the calling thread is the logger thread.
         /// </summary>

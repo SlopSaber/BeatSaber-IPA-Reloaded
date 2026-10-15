@@ -66,13 +66,13 @@ namespace IPA.Utilities.Async
         /// Gets whether or not this scheduler is currently executing tasks.
         /// </summary>
         /// <value><see langword="true"/> if the scheduler is running, <see langword="false"/> otherwise</value>
-        public bool IsRunning { get; private set; } = false;
+        public bool IsRunning { get; private set; }
 
         /// <summary>
         /// Gets whether or not this scheduler is in the process of shutting down.
         /// </summary>
         /// <value><see langword="true"/> if the scheduler is shutting down, <see langword="false"/> otherwise</value>
-        public bool Cancelling { get; private set; } = false;
+        public bool Cancelling { get; private set; }
 
         private int yieldAfterTasks = 64;
         /// <summary>
@@ -249,7 +249,7 @@ namespace IPA.Utilities.Async
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue; // To detect redundant calls
 
         /// <summary>
         /// Disposes this object.
@@ -276,6 +276,7 @@ namespace IPA.Utilities.Async
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

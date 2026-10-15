@@ -4,6 +4,7 @@ using IPA.Config.Stores;
 using IPA.Config.Stores.Converters;
 using System;
 using System.Collections.Generic;
+using SVersion = SemVer.Version;
 using Version = Hive.Versioning.Version;
 
 namespace IPA.Utilities
@@ -12,7 +13,10 @@ namespace IPA.Utilities
     /// A type that wraps <see cref="Version"/> so that the string of the version is stored when the string is
     /// not a valid <see cref="Version"/>.
     /// </summary>
-    public class AlmostVersion : IComparable<AlmostVersion>, IComparable<Version>
+    public class AlmostVersion : IComparable<AlmostVersion>, IComparable<Version>,
+#pragma warning disable CS0618 // Type or member is obsolete
+        IComparable<SVersion>
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         /// <summary>
         /// Represents a storage type of either parsed <see cref="Version"/> object or raw <see cref="String"/>.
@@ -48,6 +52,13 @@ namespace IPA.Utilities
             SemverValue = ver;
             StorageMode = StoredAs.SemVer;
         }
+
+        /// <summary>
+        /// Creates an <see cref="AlmostVersion"/> from the <see cref="SVersion"/> provided in <paramref name="ver"/>.
+        /// </summary>
+        /// <param name="ver">the <see cref="SVersion"/> to store</param>
+        [Obsolete("Use Hive.Versioning.Version constructor instead.")]
+        public AlmostVersion(SVersion ver) : this(ver?.UnderlyingVersion ?? throw new ArgumentNullException(nameof(ver))) { }
 
         /// <summary>
         /// Creates an <see cref="AlmostVersion"/> from the version string in <paramref name="vertext"/> stored using
@@ -158,6 +169,19 @@ namespace IPA.Utilities
         }
 
         /// <summary>
+        /// Compares <see langword="this"/> to the <see cref="SVersion"/> in <paramref name="other"/> using <see cref="Version.CompareTo(Version)"/>.
+        /// </summary>
+        /// <remarks>
+        /// The storage method of <see langword="this"/> must be <see cref="StoredAs.SemVer"/>, else an <see cref="InvalidOperationException"/> will
+        /// be thrown.
+        /// </remarks>
+        /// <param name="other">the <see cref="SVersion"/> to compare to</param>
+        /// <returns>less than 0 if <paramref name="other"/> is considered bigger than <see langword="this"/>, 0 if equal, and greater than zero if smaller</returns>
+        /// <seealso cref="CompareTo(AlmostVersion)"/>
+        [Obsolete("Use the Hive.Versioning.Version overload instead.")]
+        public int CompareTo(SVersion other) => CompareTo(other.UnderlyingVersion);
+
+        /// <summary>
         /// Performs a strict equality check between <see langword="this"/> and <paramref name="obj"/>.
         /// </summary>
         /// <remarks>
@@ -220,7 +244,26 @@ namespace IPA.Utilities
         public static bool operator!=(AlmostVersion l, AlmostVersion r) => !(l == r);
 
         // implicitly convertible from Version
+#pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable CA2225 // Operator overloads have named alternates
+        /// <summary>
+        /// Implicitly converts a <see cref="SVersion"/> to <see cref="AlmostVersion"/> using <see cref="AlmostVersion(SVersion)"/>.
+        /// </summary>
+        /// <param name="ver">the <see cref="SVersion"/> to convert</param>
+        /// <seealso cref="AlmostVersion(SVersion)"/>
+        [Obsolete("Use Hive.Versioning.Version instead of SemVer.Version")]
+        public static implicit operator AlmostVersion?(SVersion? ver) => ver is null ? null : new(ver);
+
+        // implicitly convertible to Version
+        /// <summary>
+        /// Implicitly converts an <see cref="AlmostVersion"/> to <see cref="SVersion"/>, if applicable, using <see cref="SemverValue"/>.
+        /// If not applicable, returns <see langword="null"/>
+        /// </summary>
+        /// <param name="av">the <see cref="AlmostVersion"/> to convert to a <see cref="SVersion"/></param>
+        /// <seealso cref="SemverValue"/>
+        [Obsolete("Use Hive.Versioning.Version instead of SemVer.Version")]
+        public static implicit operator SVersion?(AlmostVersion? av) => av?.SemverValue is not null ? SVersion.ForHiveVersion(av.SemverValue) : null;
+#pragma warning restore CS0618 // Type or member is obsolete
         /// <summary>
         /// Implicitly converts a <see cref="SVersion"/> to <see cref="AlmostVersion"/> using <see cref="AlmostVersion(SVersion)"/>.
         /// </summary>
@@ -238,15 +281,19 @@ namespace IPA.Utilities
         public static implicit operator Version?(AlmostVersion av) => av?.SemverValue;
 #pragma warning restore CA2225 // Operator overloads have named alternates
 
+        /// <summary>Compares versions with null ordered before non-null values.</summary>
         public static bool operator <(AlmostVersion left, AlmostVersion right)
             => left is null ? right is not null : left.CompareTo(right) < 0;
 
+        /// <summary>Gets whether the left version precedes or equals the right version.</summary>
         public static bool operator <=(AlmostVersion left, AlmostVersion right)
             => left is null || left.CompareTo(right) <= 0;
 
+        /// <summary>Gets whether the left version follows the right version.</summary>
         public static bool operator >(AlmostVersion left, AlmostVersion right)
             => left is not null && left.CompareTo(right) > 0;
 
+        /// <summary>Gets whether the left version follows or equals the right version.</summary>
         public static bool operator >=(AlmostVersion left, AlmostVersion right)
             => left is null ? right is null : left.CompareTo(right) >= 0;
     }

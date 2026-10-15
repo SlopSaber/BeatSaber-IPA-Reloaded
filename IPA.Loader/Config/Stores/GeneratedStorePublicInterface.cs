@@ -82,6 +82,7 @@ namespace IPA.Config.Stores
         /// <returns>a generated instance of <typeparamref name="T"/> as a special <see cref="IConfigStore"/></returns>
         public static T Generated<T>(this Config cfg, bool loadSync = true) where T : class
         {
+            if (cfg == null) throw new ArgumentNullException(nameof(cfg));
             var ret = GeneratedStoreImpl.Create<T>();
             cfg.SetStore(ret as IConfigStore);
             if (loadSync)

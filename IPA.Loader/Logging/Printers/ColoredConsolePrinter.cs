@@ -41,11 +41,13 @@ namespace IPA.Logging.Printers
         private readonly bool darkenMessages;
 
 
+        /// <summary>Creates a printer using the configured message-darkening preference.</summary>
         public ColoredConsolePrinter() : this(Config.SelfConfig.Debug_.DarkenMessages_)
         {
             darkenSetManually = false;
         }
 
+        /// <summary>Creates a printer with an explicit message-darkening preference.</summary>
         public ColoredConsolePrinter(bool darkenMessages)
         {
             darkenSetManually = true;
@@ -150,9 +152,11 @@ namespace IPA.Logging.Printers
         // ReSharper restore NotAccessedField.Local
 
 
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [DllImport("kernel32.dll", EntryPoint = "GetConsoleScreenBufferInfo", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern bool GetConsoleScreenBufferInfo(IntPtr handle, out ConsoleScreenBufferInfo info);
 
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [DllImport("kernel32.dll", EntryPoint = "SetConsoleTextAttribute", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern bool SetConsoleTextAttribute(IntPtr handle, short attribute);
     }

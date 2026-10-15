@@ -153,7 +153,7 @@ namespace IPA.Utilities.Async
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue; // To detect redundant calls
 
         /// <summary>
         /// Disposes this object.
@@ -180,6 +180,7 @@ namespace IPA.Utilities.Async
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

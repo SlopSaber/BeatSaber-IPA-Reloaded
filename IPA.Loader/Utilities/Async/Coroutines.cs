@@ -28,6 +28,7 @@ namespace IPA.Utilities.Async
         /// <returns>a coroutine waiting for the given task</returns>
         public static IEnumerator WaitForTask(Task task, bool throwOnFault = false)
         {
+            if (task == null) throw new ArgumentNullException(nameof(task));
             while (!task.IsCompleted && !task.IsCanceled && !task.IsFaulted)
                 yield return null;
             if (throwOnFault && task.IsFaulted)

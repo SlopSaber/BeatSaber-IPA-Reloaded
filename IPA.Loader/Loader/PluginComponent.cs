@@ -4,6 +4,7 @@ using IPA.Utilities;
 using IPA.Utilities.Async;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 // ReSharper disable UnusedMember.Local
 
 namespace IPA.Loader
@@ -12,9 +13,10 @@ namespace IPA.Loader
     internal class PluginComponent : MonoBehaviour
     {
         private CompositeBSPlugin bsPlugins;
+        private CompositeIPAPlugin ipaPlugins;
         private bool quitting;
         public static PluginComponent Instance;
-        private static bool initialized = false;
+        private static bool initialized;
 
         internal static PluginComponent Create()
         {
@@ -33,7 +35,15 @@ namespace IPA.Loader
                 PluginManager.Load();
 
                 bsPlugins = new CompositeBSPlugin(PluginManager.BSMetas);
+#pragma warning disable 618
+                ipaPlugins = new CompositeIPAPlugin(PluginManager.Plugins);
+#pragma warning restore 618
                 bsPlugins.OnEnable();
+                ipaPlugins.OnApplicationStart();
+
+                SceneManager.activeSceneChanged += OnActiveSceneChanged;
+                SceneManager.sceneLoaded += OnSceneLoaded;
+                SceneManager.sceneUnloaded += OnSceneUnloaded;
 
                 var unitySched = UnityMainThreadTaskScheduler.Default as UnityMainThreadTaskScheduler;
                 if (!unitySched.IsRunning)
@@ -49,9 +59,28 @@ namespace IPA.Loader
 
         internal void Update()
         {
+            bsPlugins.OnUpdate();
+            ipaPlugins.OnUpdate();
+            IPA.Compat3.Runtime.UpdateModern();
+            IPA.Compat3.Config.Config.Update();
+
             var unitySched = UnityMainThreadTaskScheduler.Default as UnityMainThreadTaskScheduler;
             if (!unitySched.IsRunning)
                 StartCoroutine(unitySched.Coroutine());
+        }
+
+        internal void LateUpdate()
+        {
+            bsPlugins.OnLateUpdate();
+            ipaPlugins.OnLateUpdate();
+            IPA.Compat3.Runtime.LateUpdateModern();
+        }
+
+        internal void FixedUpdate()
+        {
+            bsPlugins.OnFixedUpdate();
+            ipaPlugins.OnFixedUpdate();
+            IPA.Compat3.Runtime.FixedUpdateModern();
         }
 
         internal void OnDestroy()
@@ -64,11 +93,47 @@ namespace IPA.Loader
 
         internal void OnApplicationQuit()
         {
-            bsPlugins.OnDisable();
+            if (quitting) return;
+            quitting = true;
+            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
 
+            IPA.Compat3.Runtime.QuitModern();
+            bsPlugins?.OnApplicationQuit();
+            ipaPlugins?.OnApplicationQuit();
+
+            IPA.Compat3.Config.Config.Save();
             ConfigRuntime.ShutdownRuntime(); // this seems to be needed
 
             quitting = true;
         }
+
+        internal void OnLevelWasLoaded(int level)
+        {
+            ipaPlugins.OnLevelWasLoaded(level);
+        }
+
+        internal void OnLevelWasInitialized(int level)
+        {
+            ipaPlugins.OnLevelWasInitialized(level);
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
+        {
+            bsPlugins.OnSceneLoaded(scene, sceneMode);
+            IPA.Compat3.Runtime.SceneLoaded(scene, sceneMode);
+        }
+
+        private void OnSceneUnloaded(Scene scene) {
+            bsPlugins.OnSceneUnloaded(scene);
+            IPA.Compat3.Runtime.SceneUnloaded(scene);
+        }
+
+        private void OnActiveSceneChanged(Scene prevScene, Scene nextScene) {
+            bsPlugins.OnActiveSceneChanged(prevScene, nextScene);
+            IPA.Compat3.Runtime.SceneChanged(prevScene, nextScene);
+        }
+
     }
 }

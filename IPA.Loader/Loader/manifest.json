@@ -6,8 +6,8 @@
     "A mod loader specifically for Beat Saber."
   ],
   "id": "BSIPA",
-  "name": "Beat Saber IPA",
-  "version": "4.3.7",
+  "name": "Beat Saber IPA 5",
+  "version": "5.0.0",
   "icon": "IPA.icon_white.png",
   "features": {
     "IPA.DefineFeature": [
@@ -24,10 +24,12 @@
   },
   "files": [
     "Libs/0Harmony.dll",
+    "Libs/0Harmony.Legacy1.dll",
     "Libs/Ionic.Zip.dll",
     "Libs/netstandard.dll",
     "Libs/Newtonsoft.Json.dll",
     "Libs/Mono.Cecil.dll",
+    "Libs/SemVer.dll",
     "Libs/Hive.Versioning.dll"
   ]
 }

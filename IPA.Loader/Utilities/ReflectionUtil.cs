@@ -92,6 +92,8 @@ namespace IPA.Utilities
         /// <returns>the copied component</returns>
         public static Component CopyComponent(this Component original, Type overridingType, GameObject destination, Type originalTypeOverride = null)
         {
+            if (original == null) throw new ArgumentNullException(nameof(original));
+            if (destination == null) throw new ArgumentNullException(nameof(destination));
             var copy = destination.AddComponent(overridingType);
             var originalType = originalTypeOverride ?? original.GetType();
 
@@ -117,6 +119,8 @@ namespace IPA.Utilities
         public static T CopyComponent<T>(this Component original, GameObject destination, Type originalTypeOverride = null)
             where T : Component
         {
+            if (original == null) throw new ArgumentNullException(nameof(original));
+            if (destination == null) throw new ArgumentNullException(nameof(destination));
             var copy = destination.AddComponent<T>();
             var originalType = originalTypeOverride ?? original.GetType();
 

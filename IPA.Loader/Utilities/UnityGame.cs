@@ -190,12 +190,30 @@ namespace IPA.Utilities
         /// The path to the `Libs` folder. Use only if necessary.
         /// </summary>
         /// <value>the path to the library directory</value>
-        public static string LibraryPath => Path.Combine(InstallPath, "Libs");
+        public static string LibraryPath
+        {
+            get
+            {
+                string current = Path.Combine(InstallPath, "Libs");
+                if (Directory.Exists(current)) return current;
+                string legacy = Path.Combine(InstallPath, "IPA", "Libs");
+                return Directory.Exists(legacy) ? legacy : current;
+            }
+        }
         /// <summary>
         /// The path to the `Libs\Native` folder. Use only if necessary.
         /// </summary>
         /// <value>the path to the native library directory</value>
-        public static string NativeLibraryPath => Path.Combine(LibraryPath, "Native");
+        public static string NativeLibraryPath
+        {
+            get
+            {
+                string current = Path.Combine(LibraryPath, "Native");
+                if (Directory.Exists(current)) return current;
+                string legacy = Path.Combine(InstallPath, "IPA", "Libs", "Native");
+                return Directory.Exists(legacy) ? legacy : current;
+            }
+        }
         /// <summary>
         /// The directory to load plugins from.
         /// </summary>

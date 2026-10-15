@@ -42,8 +42,8 @@ namespace IPA.Loader
 
     internal static class LibLoader
     {
-        internal static string LibraryPath => Path.Combine(Environment.CurrentDirectory, "Libs");
-        internal static string NativeLibraryPath => Path.Combine(LibraryPath, "Native");
+        internal static string LibraryPath => IPA.Utilities.UnityGame.LibraryPath;
+        internal static string NativeLibraryPath => IPA.Utilities.UnityGame.NativeLibraryPath;
         internal static Dictionary<string, (string Path, Version Version)> FilenameLocations = null!;
 
         internal static void Configure()
@@ -75,8 +75,13 @@ namespace IPA.Loader
 
                     var newFilenameLocations = new Dictionary<string, (string, Version Version)>();
 
-                    var files = TraverseTree(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!)
-                        .Concat(TraverseTree(LibraryPath, s => s != NativeLibraryPath));
+                    string installPath = IPA.Utilities.UnityGame.InstallPath;
+                    bool IncludeLibraryDirectory(string path) => !string.Equals(Path.GetFileName(path), ".cache", StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(Path.GetFileName(path), "Native", StringComparison.OrdinalIgnoreCase);
+                    var roots = new[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                        Path.Combine(installPath, "Libs"), Path.Combine(installPath, "IPA", "Libs"), IPA.Utilities.UnityGame.PluginsPath };
+                    var files = roots.Distinct(StringComparer.OrdinalIgnoreCase).Where(Directory.Exists)
+                        .SelectMany(root => TraverseTree(root, IncludeLibraryDirectory));
 
                     foreach (var fileInfo in files)
                     {
@@ -103,13 +108,19 @@ namespace IPA.Loader
 
                     static void AddDirectoryToPath(string path)
                     {
-                        Environment.SetEnvironmentVariable("Path", path + Path.PathSeparator + Environment.GetEnvironmentVariable("Path"));
+                        string current = Environment.GetEnvironmentVariable("Path") ?? string.Empty;
+                        if (!current.Split(Path.PathSeparator).Any(entry => string.Equals(entry.Trim('"').TrimEnd(Path.DirectorySeparatorChar),
+                            path.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase)))
+                            Environment.SetEnvironmentVariable("Path", path + Path.PathSeparator + current);
                     }
 
-                    if (Directory.Exists(NativeLibraryPath))
+                    var nativeRoots = new[] { NativeLibraryPath, Path.Combine(installPath, "Libs", "Native"),
+                        Path.Combine(installPath, "IPA", "Libs", "Native") };
+                    foreach (string nativeRoot in nativeRoots.Distinct(StringComparer.OrdinalIgnoreCase))
                     {
-                        AddDirectoryToPath(NativeLibraryPath);
-                        _ = TraverseTree(NativeLibraryPath, dir =>
+                        if (!Directory.Exists(nativeRoot)) continue;
+                        AddDirectoryToPath(nativeRoot);
+                        _ = TraverseTree(nativeRoot, dir =>
                         { // this is a terrible hack for iterating directories
                             AddDirectoryToPath(dir); return true;
                         }).All(f => true); // force it to iterate all
@@ -137,6 +148,10 @@ namespace IPA.Loader
 
             SetupAssemblyFilenames();
 
+            if (asmName.Name == "0Harmony" && asmName.Version != null && asmName.Version.Major < 2)
+            {
+                asmName = new AssemblyName(asmName.FullName) { Name = "0Harmony.Legacy1" };
+            }
             var testFile = $"{asmName.Name}.dll";
             Log(Logger.Level.Debug, $"Looking for file {asmName.Name}.dll");
 
@@ -180,7 +195,7 @@ namespace IPA.Loader
                 }
             }
 
-            return Assembly.LoadFrom(path);
+            return Assembly.LoadFrom(LoaderCompatibility.PrepareAssembly(path));
         }
 
         internal static void Log(Logger.Level lvl, string message)

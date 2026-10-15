@@ -25,18 +25,25 @@
 
   <ItemGroup>
     <PackageReference Include="HarmonyX" Version="2.16.1" />
+    <PackageReference Include="Lib.Harmony" Version="1.2.0.1" GeneratePathProperty="true" ExcludeAssets="all" />
     <PackageReference Include="Ionic.Zip" Version="1.9.1.8" />
     <PackageReference Include="Hive.Versioning.Standalone" Version="0.1.0-gh846.1" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
     <PackageReference Include="MonoMod.Backports" Version="1.1.2" Aliases="MONOMOD_BACKPORTS" />
     <PackageReference Include="MonoMod.RuntimeDetour" Version="25.3.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+
+    <ProjectReference Include="..\SemVer\SemVer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Loader\manifest.json" />
     <EmbeddedResource Include="icon_white.png" />
     <EmbeddedResource Include="Loader\description.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(PkgLib_Harmony)\lib\net472\0Harmony.dll" Link="0Harmony.Legacy1.dll" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <Import Project="..\Common.targets" />

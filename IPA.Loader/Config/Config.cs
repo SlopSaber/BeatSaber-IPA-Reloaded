@@ -132,7 +132,7 @@ namespace IPA.Config
         /// </summary>
         public IConfigProvider Provider { get; }
 
-        internal IConfigStore Store = null;
+        internal IConfigStore Store;
         internal readonly FileInfo File;
         internal readonly ConfigProvider configProvider;
         internal readonly object WriteTimeLock = new();

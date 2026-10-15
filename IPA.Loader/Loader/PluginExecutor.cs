@@ -28,12 +28,18 @@ namespace IPA.Loader
                 LifecycleEnable = o => Task.CompletedTask;
                 LifecycleDisable = o => Task.CompletedTask;
             }
+            else if (meta.IsInterface3)
+            {
+                CreatePlugin = IPA.Compat3.Runtime.CreateModern;
+                LifecycleEnable = IPA.Compat3.Runtime.EnableModern;
+                LifecycleDisable = IPA.Compat3.Runtime.DisableModern;
+            }
             else
                 PrepareDelegates();
         }
 
 
-        public object Instance { get; private set; } = null;
+        public object Instance { get; private set; }
         private Func<PluginMetadata, object> CreatePlugin { get; set; }
         private Func<object, Task> LifecycleEnable { get; set; }
         private Func<object, Task> LifecycleDisable { get; set; }

@@ -12,6 +12,7 @@ namespace IPA.Utilities
     /// </summary>
     internal static class Win32
     {
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
 

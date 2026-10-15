@@ -15,6 +15,7 @@ namespace IPA.Utilities
         /// <returns>the default value of <paramref name="type"/></returns>
         public static object GetDefault(this Type type)
         {
+            if (type == null) throw new ArgumentNullException(nameof(type));
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 
@@ -32,6 +33,8 @@ namespace IPA.Utilities
         /// </summary>
         public static bool IsSubPathOf(this string path, string baseDirPath)
         {
+            if (path == null) throw new ArgumentNullException(nameof(path));
+            if (baseDirPath == null) throw new ArgumentNullException(nameof(baseDirPath));
             string normalizedPath = Path.GetFullPath(path.Replace('/', '\\')
                 .WithEnding("\\"));
 
@@ -51,6 +54,8 @@ namespace IPA.Utilities
             if (str == null)
                 return ending;
 
+            if (ending == null) throw new ArgumentNullException(nameof(ending));
+
             string result = str;
 
             // Right() is 1-indexed, so include these cases
@@ -59,7 +64,7 @@ namespace IPA.Utilities
             for (int i = 0; i <= ending.Length; i++)
             {
                 string tmp = result + ending.Right(i);
-                if (tmp.EndsWith(ending))
+                if (tmp.EndsWith(ending, StringComparison.Ordinal))
                     return tmp;
             }
 

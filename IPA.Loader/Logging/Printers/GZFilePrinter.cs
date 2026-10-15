@@ -14,6 +14,7 @@ namespace IPA.Logging.Printers
     /// </summary>
     public abstract class GZFilePrinter : LogPrinter, IDisposable
     {
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern bool CreateHardLink(
             string lpFileName,

@@ -130,7 +130,7 @@ namespace IPA.Config.Stores
 
         private static readonly SingleCreationValueCache<Type, SerializedMemberInfo[]> objectStructureCache = new();
 
-        private static IEnumerable<SerializedMemberInfo> ReadObjectMembers(Type type)
+        private static SerializedMemberInfo[] ReadObjectMembers(Type type)
             => objectStructureCache.GetOrAdd(type, t => ReadObjectMembersInternal(type).ToArray());
 
         private static IEnumerable<SerializedMemberInfo> ReadObjectMembersInternal(Type type)
