@@ -117,6 +117,12 @@ namespace IPA.Utilities
         public Version? SemverValue { get; private set; }
 
         /// <summary>
+        /// Gets the semantic version through the historical SemVer binary contract.
+        /// </summary>
+        [Obsolete("Use SemverValue instead.")]
+        public SVersion? LegacySemverValue => SemverValue is null ? null : SVersion.ForHiveVersion(SemverValue);
+
+        /// <summary>
         /// The way the value is stored, whether it be as a <see cref="Version"/> or a <see cref="string"/>.
         /// </summary>
         /// <value>the storage mode used to store this value</value>

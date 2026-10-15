@@ -211,14 +211,22 @@ namespace IPA.Compat3
         {
             foreach (var type in types) { yield return type; foreach (var child in Types(type.NestedTypes)) yield return child; }
         }
-        private static bool UsesLegacyContracts(ModuleDefinition module) => IsInterfacePlugin(module)
-            || module.GetTypeReferences().Any(type => type.FullName == "IPA.Loader.PluginLoader/PluginInfo"
-                || type.FullName == "IPA.Loader.PluginLoader/PluginMetadata"
-                || type.FullName == "IPA.Config.IConfigProvider" || type.Namespace == "IPA.Config.ConfigProviders"
-                || type.FullName == "IPA.Utilities.BeatSaber");
+        private static bool IsLoaderReference(TypeReference type)
+        {
+            while (type.DeclaringType != null) type = type.DeclaringType;
+            return type.Scope is AssemblyNameReference assembly && assembly.Name == "IPA.Loader";
+        }
         internal static bool Rewrite(ModuleDefinition module)
         {
-            bool legacy = UsesLegacyContracts(module);
+            var target = IPA.Loader.LoaderCompatibility.GetTargetVersion(module);
+            IPA.Loader.LoaderCompatibility.ValidateTarget(target);
+            // Snapshot names before changing declaring types also changes nested names.
+            var references = module.GetTypeReferences().Where(IsLoaderReference)
+                .Select(type => (Type: type, Name: type.FullName, Namespace: type.Namespace)).ToArray();
+            bool legacyManager = target?.Major == 1 || references.Any(entry =>
+                entry.Name == "IPA.Loader.PluginLoader/PluginInfo" || entry.Name == "IPA.Loader.PluginLoader/PluginMetadata");
+            bool legacyConfig = target?.Major == 1 || references.Any(entry =>
+                entry.Name == "IPA.Config.IConfigProvider" || entry.Namespace == "IPA.Config.ConfigProviders");
             bool changed = false;
             if (module.Assembly.Name.Name == "0Harmony" && module.Assembly.Name.Version.Major < 2)
             {
@@ -231,19 +239,20 @@ namespace IPA.Compat3
                 if (reference.Name == "IPA.Loader" && reference.Version != typeof(Runtime).Assembly.GetName().Version)
                 { reference.Version = typeof(Runtime).Assembly.GetName().Version; changed = true; }
             }
-            if (!legacy) return changed;
-            // Snapshot the original names before renaming declaring types also
-            // changes the full names of their nested metadata/delegate types.
-            var references = module.GetTypeReferences().Select(type => (Type: type, Name: type.FullName, Namespace: type.Namespace)).ToArray();
             foreach (var entry in references)
             {
                 var reference = entry.Type;
-                if (entry.Name == "IPA.Loader.PluginLoader" || entry.Name == "IPA.Loader.PluginManager"
-                    || entry.Name == "IPA.Loader.PluginInitInjector") { reference.Namespace = "IPA.Compat3"; changed = true; }
-                if (entry.Name == "IPA.Config.Config" || entry.Name == "IPA.Config.IConfigProvider"
-                    || entry.Namespace == "IPA.Config.ConfigProviders")
+                if (legacyManager && (entry.Name == "IPA.Loader.PluginLoader" || entry.Name == "IPA.Loader.PluginManager"
+                    || entry.Name == "IPA.Loader.PluginInitInjector")) { reference.Namespace = "IPA.Compat3"; changed = true; }
+                if (legacyConfig && (entry.Name == "IPA.Config.Config" || entry.Name == "IPA.Config.IConfigProvider"
+                    || entry.Namespace == "IPA.Config.ConfigProviders"))
                 { reference.Namespace = "IPA.Compat3.Config" + (entry.Namespace.EndsWith("ConfigProviders", StringComparison.Ordinal) ? ".ConfigProviders" : ""); changed = true; }
-                if (entry.Name == "IPA.Utilities.BeatSaber") { reference.Name = "UnityGame"; changed = true; }
+            }
+            foreach (var method in module.GetMemberReferences().OfType<MethodReference>())
+            {
+                if (IsLoaderReference(method.DeclaringType) && method.DeclaringType.FullName == "IPA.Utilities.AlmostVersion"
+                    && method.Name == "get_SemverValue" && method.ReturnType.FullName == "SemVer.Version")
+                { method.Name = "get_LegacySemverValue"; changed = true; }
             }
             return changed;
         }

@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -123,9 +124,10 @@ namespace IPA.Injector
             var sw = Stopwatch.StartNew();
 
             var cAsmName = Assembly.GetExecutingAssembly().GetName();
-            var managedPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+            var dataPath = GameVersionEarly.ResolveDataPath(UnityGame.InstallPath);
+            var managedPath = Path.Combine(dataPath, "Managed");
 
-            var dataDir = new DirectoryInfo(managedPath).Parent!.Name;
+            var dataDir = Path.GetFileName(dataPath);
             var gameName = dataDir.Substring(0, dataDir.Length - 5);
 
             Logging.Logger.Injector.Debug("Finding backup");
@@ -141,11 +143,12 @@ namespace IPA.Injector
                 ReadingMode = ReadingMode.Immediate
             };
 
-            Logging.Logger.Injector.Debug("Ensuring patch on UnityEngine.CoreModule exists");
-
-            #region Insert patch into UnityEngine.CoreModule.dll
-
             var unityPath = Path.Combine(managedPath, "UnityEngine.CoreModule.dll");
+            if (!File.Exists(unityPath)) unityPath = Path.Combine(managedPath, "UnityEngine.dll");
+            if (!File.Exists(unityPath))
+                throw new NotSupportedException("No managed Unity engine assembly was found. BSIPA requires a Mono player.");
+
+            Logging.Logger.Injector.Debug($"Ensuring bootstrap patch in {Path.GetFileName(unityPath)} exists");
 
             using var unityAsmDef = AssemblyDefinition.ReadAssembly(unityPath, readerParameters);
             var unityModDef = unityAsmDef.MainModule;
@@ -167,9 +170,7 @@ namespace IPA.Injector
 
             if (application == null)
             {
-                Logging.Logger.Injector.Critical("UnityEngine.CoreModule doesn't have a definition for UnityEngine.Camera!"
-                    + "Nothing to patch to get ourselves into the Unity run cycle!");
-                goto endPatchCoreModule;
+                throw new NotSupportedException($"{Path.GetFileName(unityPath)} has no UnityEngine.Camera definition to bootstrap.");
             }
 
             MethodDefinition? cctor = null;
@@ -193,47 +194,27 @@ namespace IPA.Injector
             }
             else
             {
+                if (!cctor.HasBody)
+                    throw new NotSupportedException("UnityEngine.Camera has an initializer without managed IL.");
                 var ilp = cctor.Body.GetILProcessor();
-                for (var i = 0; i < Math.Min(2, cctor.Body.Instructions.Count); i++)
+                var bootstrapCalls = cctor.Body.Instructions.Where(instruction => instruction.OpCode == OpCodes.Call
+                    && instruction.Operand is MethodReference method && method.FullName == cbs.FullName).ToArray();
+                if (bootstrapCalls.Length == 0)
                 {
-                    var ins = cctor.Body.Instructions[i];
-                    switch (i)
-                    {
-                        case 0 when ins.OpCode != OpCodes.Call:
-                            ilp.Replace(ins, ilp.Create(OpCodes.Call, cbs));
-                            modified = true;
-                            break;
-
-                        case 0:
-                            {
-                                var methodRef = ins.Operand as MethodReference;
-                                if (methodRef?.FullName != cbs.FullName)
-                                {
-                                    ilp.Replace(ins, ilp.Create(OpCodes.Call, cbs));
-                                    modified = true;
-                                }
-
-                                break;
-                            }
-                        case 1 when ins.OpCode != OpCodes.Ret:
-                            ilp.Replace(ins, ilp.Create(OpCodes.Ret));
-                            modified = true;
-                            break;
-                    }
+                    if (cctor.Body.Instructions.Count == 0) ilp.Emit(OpCodes.Ret);
+                    ilp.InsertBefore(cctor.Body.Instructions[0], ilp.Create(OpCodes.Call, cbs));
+                    modified = true;
                 }
             }
 
             if (modified)
             {
                 string tempFilePath = Path.GetTempFileName();
-                bkp?.Add(unityPath);
+                (bkp ?? new BackupUnit(backupPath)).Add(unityPath);
                 unityAsmDef.Write(tempFilePath);
                 File.Delete(unityPath);
                 File.Move(tempFilePath, unityPath);
             }
-            endPatchCoreModule:
-            #endregion Insert patch into UnityEngine.CoreModule.dll
-
             sw.Stop();
             Logging.Logger.Injector.Info($"Installing bootstrapper took {sw.Elapsed}");
         }

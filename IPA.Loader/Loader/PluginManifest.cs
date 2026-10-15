@@ -71,6 +71,9 @@ namespace IPA.Loader
         [Serializable]
         public class MiscObject
         {
+            [JsonProperty("ipa-version", Required = Required.DisallowNull), JsonConverter(typeof(SemverVersionConverter))]
+            public Version? IpaVersion;
+
             [JsonProperty("plugin-hint", Required = Required.DisallowNull)]
             public string? PluginMainHint = null;
         }

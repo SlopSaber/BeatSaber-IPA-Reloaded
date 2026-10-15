@@ -139,6 +139,7 @@ namespace IPA.Loader
                         AssemblyResolver = resolver
                     }).MainModule;
                     metadata.IsInterface3 = IPA.Compat3.Runtime.IsInterfacePlugin(pluginModule);
+                    metadata.TargetLoaderVersion = LoaderCompatibility.GetTargetVersion(pluginModule);
 
                     string pluginNs = "";
 
@@ -176,6 +177,7 @@ namespace IPA.Loader
                     }
 
                     metadata.Manifest = pluginManifest;
+                    LoaderCompatibility.SelectProfile(metadata);
 
                     bool TryPopulatePluginType(TypeDefinition type, PluginMetadata meta)
                     {
@@ -284,6 +286,7 @@ namespace IPA.Loader
                     }
 
                     metadata.Manifest = manifestObj;
+                    LoaderCompatibility.SelectProfile(metadata);
 
                     if (metadata.Manifest.Files.Length < 1)
                         Logger.Loader.Warn($"Bare manifest {Path.GetFileName(manifest)} does not declare any files. " +
@@ -882,7 +885,10 @@ namespace IPA.Loader
         internal static void Load(PluginMetadata meta)
         {
             if (meta is { Assembly: null, PluginType: not null })
+            {
+                Logger.Loader.Debug($"Loading '{meta.Id}' with BSIPA profile {meta.TargetIpaVersion}; binary contract {meta.TargetLoaderVersion?.ToString() ?? "unspecified"}.");
                 meta.Assembly = Assembly.LoadFrom(LoaderCompatibility.PrepareAssembly(meta.File.FullName));
+            }
         }
 
         internal static PluginExecutor? InitPlugin(PluginMetadata meta, IEnumerable<PluginMetadata> alreadyLoaded)
@@ -922,11 +928,10 @@ namespace IPA.Loader
             if (meta.IsBare)
                 return new PluginExecutor(meta, PluginExecutor.Special.Bare);
 
-            Load(meta);
-
             PluginExecutor exec;
             try
             {
+                Load(meta);
                 exec = new PluginExecutor(meta);
             }
             catch (Exception e)

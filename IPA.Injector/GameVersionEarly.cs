@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using IPA.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -14,8 +15,18 @@ namespace IPA.Injector
         private const string GlobalGameManagersFileName = "globalgamemanagers";
         private const string AppStoreCategory = "public.app-category.games";
 
-        internal static string ResolveDataPath(string installDir) =>
-            Directory.EnumerateDirectories(installDir, "*_Data").First();
+        internal static string ResolveDataPath(string installDir)
+        {
+            string expected = Path.Combine(installDir, Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[0]) + "_Data");
+            if (Directory.Exists(expected)) return expected;
+#if BeatSaber
+            expected = Path.Combine(installDir, "Beat Saber_Data");
+            if (Directory.Exists(expected)) return expected;
+#endif
+            var candidates = Directory.GetDirectories(installDir, "*_Data");
+            if (candidates.Length == 1) return candidates[0];
+            throw new DirectoryNotFoundException($"Could not unambiguously select the game's data directory in {installDir}.");
+        }
 
         private static string GetGameVersion()
         {
@@ -87,11 +98,19 @@ namespace IPA.Injector
                     // Ensures we get a valid SemVer.
                     if (dotCount == 2)
                     {
+                        var resumePosition = stream.Position;
+                        if (resumePosition < bytesRead + sizeof(int)) break;
                         stream.Seek(-bytesRead - sizeof(int), SeekOrigin.Current);
                         var lengthPrefix = reader.ReadInt32();
-                        version = Encoding.UTF8.GetString(reader.ReadBytes(lengthPrefix));
-
-                        return true;
+                        if (lengthPrefix > 0 && lengthPrefix <= 256 && lengthPrefix <= stream.Length - stream.Position)
+                        {
+                            version = Encoding.UTF8.GetString(reader.ReadBytes(lengthPrefix));
+                            var parsed = new AlmostVersion(version.Split('_')[0]);
+                            if (parsed.StorageMode == AlmostVersion.StoredAs.SemVer) return true;
+                        }
+                        // Resume after the original candidate rather than trusting its prefix.
+                        stream.Position = resumePosition;
+                        break;
                     }
                 }
             }

@@ -10,6 +10,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <BuildForBeatSaber Condition="'$(BuildForBeatSaber)' == ''">true</BuildForBeatSaber>
+    <UnityManagedPath Condition="'$(UnityManagedPath)' == '' and '$(GameDirectory)' != ''">$(GameDirectory)\Beat Saber_Data\Managed</UnityManagedPath>
+    <UnityManagedPath Condition="'$(UnityManagedPath)' == ''">$(MSBuildThisFileDirectory)..\Refs</UnityManagedPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(BuildForBeatSaber)' == 'true'">
@@ -18,7 +20,7 @@
 
   <ItemGroup>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\Refs\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(UnityManagedPath)\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

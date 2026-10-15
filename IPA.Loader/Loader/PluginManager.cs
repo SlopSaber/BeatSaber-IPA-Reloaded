@@ -374,7 +374,7 @@ namespace IPA.Loader
 
                 #region Fix assemblies for refactor
 
-                var module = ModuleDefinition.ReadModule(Path.Combine(pluginDirectory, s));
+                using var module = ModuleDefinition.ReadModule(Path.Combine(pluginDirectory, s));
                 foreach (var @ref in module.AssemblyReferences)
                 { // fix assembly references
                     if (@ref.Name == "IllusionPlugin" || @ref.Name == "IllusionInjector")
@@ -404,8 +404,15 @@ namespace IPA.Loader
                     if (@ref.Namespace == "IllusionInjector.Utilities") @ref.Namespace = "IPA.Utilities"; //@ref.Name = "";
                     if (@ref.Namespace == "IllusionInjector.Logging.Printers") @ref.Namespace = "IPA.Logging.Printers"; //@ref.Name = "";
                 }
-                IPA.Compat3.Runtime.Rewrite(module);
-                module.Write(pluginCopy);
+                try
+                {
+                    IPA.Compat3.Runtime.Rewrite(module);
+                    module.Write(pluginCopy);
+                }
+                catch (NotSupportedException error)
+                {
+                    Logger.Loader.Warn($"Skipping unsupported plugin {Path.GetFileName(s)}: {error.Message}");
+                }
 
                 #endregion
             }

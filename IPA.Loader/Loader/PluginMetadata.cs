@@ -18,6 +18,16 @@ namespace IPA.Loader
     public class PluginMetadata
     {
         internal bool IsInterface3;
+
+        /// <summary>
+        /// Gets the IPA.Loader assembly version referenced by the original plugin binary.
+        /// </summary>
+        public System.Version? TargetLoaderVersion { get; internal set; }
+
+        /// <summary>
+        /// Gets the BSIPA API version selected from the binary contract and manifest.
+        /// </summary>
+        public Version? TargetIpaVersion { get; internal set; }
         /// <summary>
         /// The assembly the plugin was loaded from.
         /// </summary>
