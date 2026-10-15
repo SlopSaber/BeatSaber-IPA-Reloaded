@@ -83,11 +83,20 @@ pending UI clicks/drags; recapture requires C or right click in the game.
 
 A single camera-aligned pointer uses the game's existing world and curved UI
 raycasters. Left click, dragging and scrolling work in menus and pause screens;
-C also allows ordinary screen-position mouse input. The reticle highlights
-interactive targets. Native/SiraUtil camera controllers, tracking and duplicate
-pointer visuals yield to IPA while active. Their prior states are restored when
-the component shuts down. The input adapter supports legacy Unity Input and the
+C also allows ordinary screen-position mouse input. The laser and hit dot use
+the running game's native menu prefabs, including their materials and newer
+laser fading. Controller hilts stay hidden during FPFC. The visible beam starts
+slightly below/right of the camera and ends at the same hit as the input ray;
+there is no overlay crosshair. Native/SiraUtil camera controllers, tracking and
+duplicate pointer visuals yield to IPA while active. Their prior states are
+restored when the component shuts down. The input adapter supports legacy Unity Input and the
 new Input System without bundling either engine module.
+
+Legacy mouse axes retain their configured scaling and receive
+`FPFCLookSensitivity` once, with no extra backend multiplier. In the inspected
+1.11.1 settings, MouseX/MouseY sensitivity is 1; removing IPA's previous 10x
+multiplier reduces default legacy look speed tenfold without changing the saved
+sensitivity or the new Input System path.
 
 Plugin transactions now cancel opposite operations instead of reporting a state
 change after returning to the original state. This prevents unchanged disabled-mod

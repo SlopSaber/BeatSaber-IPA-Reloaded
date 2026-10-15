@@ -120,6 +120,6 @@ namespace IPA.Desktop
         internal Vector2 Position => Current(mouseType) is object device ? Vector(Property(device, "position")) : (Vector2)(position?.Invoke() ?? Vector3.zero);
         internal Vector2 Scroll => Current(mouseType) is object device ? Vector(Property(device, "scroll")) / 120f : scroll?.Invoke() ?? Vector2.zero;
         internal Vector2 Look => Current(mouseType) is object device ? Vector(Property(device, "delta"))
-            : new Vector2(axis?.Invoke("MouseX") ?? 0f, axis?.Invoke("MouseY") ?? 0f) * 10f;
+            : new Vector2(axis?.Invoke("MouseX") ?? 0f, axis?.Invoke("MouseY") ?? 0f);
     }
 }

@@ -11,7 +11,12 @@ namespace IPA.Desktop
         private GameObject lastClick;
         private float lastClickTime;
         private Vector2 lastScreenPosition;
-        internal bool Hovering { get; private set; }
+        private DesktopPointerVisuals visuals;
+
+        internal void BindVisuals(Behaviour source)
+        {
+            if (visuals == null || !visuals.IsAlive) visuals = DesktopPointerVisuals.Create(source);
+        }
 
         public override bool IsModuleSupported() => Flight != null && Flight.Ready;
         public override bool ShouldActivateModule() => IsModuleSupported() && Application.isFocused;
@@ -46,8 +51,7 @@ namespace IPA.Desktop
                 pointer.position = pointer.pointerCurrentRaycast.screenPosition;
             pointer.delta = pointer.position - previousPosition;
             GameObject current = pointer.pointerCurrentRaycast.gameObject;
-            Hovering = ExecuteEvents.GetEventHandler<IPointerClickHandler>(current) != null
-                || ExecuteEvents.GetEventHandler<IDragHandler>(current) != null;
+            visuals?.Draw(Flight.Camera, ray, pointer.pointerCurrentRaycast);
             HandlePointerExitAndEnter(pointer, current);
             if (Flight.Input.Mouse(0, 1)) Press(current);
             if (pointer.pointerDrag != null && Flight.Input.Mouse(0))
@@ -107,10 +111,20 @@ namespace IPA.Desktop
         {
             Release(null, false);
             if (pointer != null) HandlePointerExitAndEnter(pointer, null);
-            Hovering = false;
+            visuals?.Hide();
         }
 
         public override void DeactivateModule() { CancelPointer(); base.DeactivateModule(); }
-        protected override void OnDisable() { CancelPointer(); base.OnDisable(); }
+        private void LateUpdate()
+        {
+            if (EventSystem.current != eventSystem || !ShouldActivateModule()) visuals?.Hide();
+        }
+        protected override void OnDisable()
+        {
+            CancelPointer();
+            visuals?.Dispose();
+            visuals = null;
+            base.OnDisable();
+        }
     }
 }

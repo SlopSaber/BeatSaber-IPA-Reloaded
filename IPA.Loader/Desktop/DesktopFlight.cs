@@ -7,7 +7,6 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace IPA.Desktop
 {
@@ -36,11 +35,8 @@ namespace IPA.Desktop
         private bool dirty = true;
         private CursorLockMode originalLock;
         private bool originalCursor;
-        private GameObject reticle;
-        private GameObject reticleCanvas;
         private bool stopping;
         private MethodInfo autoTracking;
-        private Image[] reticleLines;
         private Behaviour pauseTarget;
         private MethodInfo pauseMethod;
         private PropertyInfo pauseProperty;
@@ -69,7 +65,6 @@ namespace IPA.Desktop
             originalLock = Cursor.lockState;
             originalCursor = Cursor.visible;
             SceneManager.sceneLoaded += SceneLoaded;
-            BuildReticle();
             DesktopGameHooks.Install();
             Logger.Default.Info("IPA FPFC enabled: WASD fly, Q/E down/up, Shift faster, Ctrl slower, C release/capture cursor, Escape pause.");
         }
@@ -115,6 +110,7 @@ namespace IPA.Desktop
             pauseMethod = null;
             pauseProperty = null;
             pausedField = null;
+            Behaviour visualSource = null;
             foreach (Behaviour behaviour in Resources.FindObjectsOfTypeAll<Behaviour>())
             {
                 if (behaviour == null || !behaviour.gameObject.scene.IsValid() || !behaviour.gameObject.scene.isLoaded) continue;
@@ -132,15 +128,14 @@ namespace IPA.Desktop
                     pointer.Flight = this;
                     pointer.enabled = true;
                 }
-                if (name == "VRLaserPointer")
-                    foreach (Renderer renderer in behaviour.GetComponentsInChildren<Renderer>(true)) Hide(renderer);
                 if (name == "VRController")
                     foreach (Renderer renderer in behaviour.GetComponentsInChildren<Renderer>(true)) Hide(renderer);
                 if (name == "VRPointer")
                 {
+                    if (visualSource == null || (!visualSource.gameObject.activeInHierarchy && behaviour.gameObject.activeInHierarchy)) visualSource = behaviour;
                     foreach (string member in PointerVisuals)
                     {
-                        if (type.GetField(member, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(behaviour) is Component visual)
+                        if (type.GetField(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(behaviour) is Component visual && visual)
                             foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>(true)) Hide(renderer);
                     }
                 }
@@ -159,6 +154,7 @@ namespace IPA.Desktop
             }
             foreach (var dead in disabled.Keys.Where(behaviour => behaviour == null).ToArray()) disabled.Remove(dead);
             pointers.RemoveAll(pointer => pointer == null);
+            if (visualSource != null) foreach (var pointer in pointers) pointer.BindVisuals(visualSource);
         }
 
         private void SetBoolean(Behaviour owner, string name, bool value)
@@ -225,13 +221,6 @@ namespace IPA.Desktop
             ApplyPose();
             Cursor.lockState = Ready && Application.isFocused && Captured && !editing ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = Cursor.lockState != CursorLockMode.Locked;
-            if (reticle != null)
-            {
-                reticle.SetActive(Ready && Application.isFocused && Captured && !editing);
-                if (Ready) ((RectTransform)reticle.transform).position = Camera.pixelRect.center;
-                Color color = pointers.Any(pointer => pointer.Hovering) ? new Color(0.35f, 1f, 1f) : Color.white;
-                foreach (var line in reticleLines) line.color = color;
-            }
         }
 
         private static float Positive(float value, float fallback) => value > 0f && !float.IsInfinity(value) ? value : fallback;
@@ -263,31 +252,6 @@ namespace IPA.Desktop
             }
         }
 
-        private void BuildReticle()
-        {
-            var canvas = new GameObject("IPA FPFC Pointer", typeof(RectTransform), typeof(Canvas));
-            reticleCanvas = canvas;
-            canvas.transform.SetParent(transform, false);
-            canvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.GetComponent<Canvas>().sortingOrder = short.MaxValue;
-            reticle = new GameObject("Crosshair", typeof(RectTransform));
-            reticle.transform.SetParent(canvas.transform, false);
-            CreateLine("Horizontal shadow", new Vector2(12f, 4f), Color.black);
-            CreateLine("Vertical shadow", new Vector2(4f, 12f), Color.black);
-            reticleLines = new[] { CreateLine("Horizontal", new Vector2(10f, 2f), Color.white), CreateLine("Vertical", new Vector2(2f, 10f), Color.white) };
-        }
-
-        private Image CreateLine(string name, Vector2 size, Color color)
-        {
-            var line = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            line.transform.SetParent(reticle.transform, false);
-            ((RectTransform)line.transform).sizeDelta = size;
-            var image = line.GetComponent<Image>();
-            image.color = color;
-            image.raycastTarget = false;
-            return image;
-        }
-
         private void RestoreCamera()
         {
             if (Camera == null) return;
@@ -298,7 +262,7 @@ namespace IPA.Desktop
             SetAutoTracking(false);
         }
 
-        private static readonly string[] PointerVisuals = { "_cursorTransform", "_leftCursorTransform", "_rightCursorTransform", "_laserPointer", "_leftLaserPointer", "_rightLaserPointer" };
+        private static readonly string[] PointerVisuals = { "_cursorTransform", "_leftCursorTransform", "_rightCursorTransform", "_laserPointerTransform", "_laserPointer", "_leftLaserPointer", "_rightLaserPointer" };
 
         private void SetAutoTracking(bool disable)
         {
@@ -319,7 +283,6 @@ namespace IPA.Desktop
             foreach (var saved in disabled) if (saved.Key != null) saved.Key.enabled = saved.Value;
             foreach (var saved in hidden) if (saved.Key != null) saved.Key.enabled = saved.Value;
             foreach (var restore in restoreMembers) restore();
-            if (reticleCanvas != null) Destroy(reticleCanvas);
             Cursor.lockState = originalLock;
             Cursor.visible = originalCursor;
             if (Instance == this) Instance = null;
