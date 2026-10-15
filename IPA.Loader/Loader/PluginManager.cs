@@ -421,6 +421,7 @@ namespace IPA.Loader
                 try
                 {
                     IPA.Compat3.Runtime.Rewrite(module);
+                    IPA.Data.SaveDataRewriter.Rewrite(module);
                     module.Write(pluginCopy);
                     LoaderCompatibility.RegisterOriginalPath(pluginCopy, s);
                     copiedPlugins.Add(pluginCopy);

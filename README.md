@@ -72,6 +72,36 @@ current feature APIs. New compatibility adapters belong at these binary-contract
 boundaries; copying an old `IPA.Loader.dll` into a mod folder does not provide
 isolated historical loader behavior.
 
+BSIPA stores game data beneath `UserData/Hyperbolic Magnetism/Beat Saber`.
+`Shared` contains portable PlayerPrefs, common graphics/player settings, colors,
+custom difficulty labels and score stores. `Versions/<game-version>/Native`
+contains the files that each game reads and writes. `Backups` retains immutable,
+content-addressed copies of the original AppData files and subsequent saves.
+Existing global AppData is imported without being changed.
+
+Scoring eras are fingerprinted from native scoring code and serialized layouts;
+uncertain formats stay separate. Native DTO metadata projects shared data into
+the running game's fields and enum values. Unsupported difficulties,
+characteristics, labels and unknown fields are retained in
+`Shared/CustomDifficultyLabels.json`, while unsupported score records are kept
+out of the native view. Characteristic getters register names supplied by mods.
+Map metadata labels are also collected independently of game enum serialization.
+Mods can use `IPA.Data.CustomDifficultyLabels.Set/Get` with their level IDs.
+
+Graphics values with matching meanings and player color schemes are shared.
+Legacy graphics preset indices remain version-specific because their numeric
+indices refer to different preset assets. Shared writes are locked and atomic;
+score maxima survive default/reset saves, and play-count deltas merge across
+concurrent sessions. Concurrent copies of the same game version get separate
+native sessions. Unknown mod save files remain in the native version directory.
+
+Game/mod PlayerPrefs calls use `Shared/PlayerPrefs.json`. Existing registry
+values are imported lazily on first read; subsequent writes and deletions go to
+JSON. Unity's native player logs and engine caches retain their own paths.
+Game assemblies are backed up under `IPA/Backups/GameDataRouting` before their
+managed persistence calls are redirected. Restoring those binaries and the
+original AppData files provides the rollback path. Full restart is required.
+
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
 `--no-fpfc` disables IPA flight. Controls: WASD move, Q descends, E ascends,

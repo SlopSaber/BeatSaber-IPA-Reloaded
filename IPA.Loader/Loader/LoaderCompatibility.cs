@@ -213,7 +213,9 @@ namespace IPA.Loader
                 else profile = null;
                 key = file + "|" + profile?.Version;
                 if (PreparedFiles.TryGetValue(key, out prepared)) return prepared;
-                if (!IPA.Compat3.Runtime.Rewrite(module, profile))
+                bool compatibilityChanged = IPA.Compat3.Runtime.Rewrite(module, profile);
+                bool dataRoutingChanged = IPA.Data.SaveDataRewriter.Rewrite(module);
+                if (!compatibilityChanged && !dataRoutingChanged)
                 {
                     PreparedFiles[key] = file;
                     return file;
