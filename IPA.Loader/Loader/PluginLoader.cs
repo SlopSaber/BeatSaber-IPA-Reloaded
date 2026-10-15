@@ -76,7 +76,7 @@ namespace IPA.Loader
 
         internal static void LoadMetadata()
         {
-            string[] plugins = Directory.GetFiles(UnityGame.PluginsPath, "*.dll");
+            string[] plugins = ModFiles.PluginFiles.ToArray();
 
             try
             {
@@ -110,6 +110,7 @@ namespace IPA.Loader
             using var resolver = new CecilLibLoader();
             resolver.AddSearchDirectory(UnityGame.LibraryPath);
             resolver.AddSearchDirectory(UnityGame.PluginsPath);
+            foreach (string directory in ModFiles.Directories(ModFiles.Roots)) resolver.AddSearchDirectory(directory);
             foreach (var plugin in plugins)
             {
                 var metadata = new PluginMetadata
@@ -273,8 +274,7 @@ namespace IPA.Loader
                 }
             }
 
-            IEnumerable<string> bareManifests = Directory.GetFiles(UnityGame.PluginsPath, "*.json");
-            bareManifests = bareManifests.Concat(Directory.GetFiles(UnityGame.PluginsPath, "*.manifest"));
+            IEnumerable<string> bareManifests = ModFiles.Manifests;
             foreach (var manifest in bareManifests)
             {
                 try

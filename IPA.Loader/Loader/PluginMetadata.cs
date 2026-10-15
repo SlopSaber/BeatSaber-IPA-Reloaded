@@ -148,7 +148,7 @@ namespace IPA.Loader
             {
                 manifest = value;
                 AssociatedFiles = value.Files
-                    .Select(f => Path.Combine(UnityGame.InstallPath, f))
+                    .Select(f => ModFiles.ResolveDeclaredFile(this, f))
                     .Select(p => new FileInfo(p)).ToList();
             }
         }

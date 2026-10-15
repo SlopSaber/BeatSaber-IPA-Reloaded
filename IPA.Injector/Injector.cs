@@ -105,6 +105,7 @@ namespace IPA.Injector
 
         private static void EnsureDirectories()
         {
+            Directory.CreateDirectory(Path.Combine(UnityGame.ModsPath, "Core"));
             string path;
             if (!Directory.Exists(path = Path.Combine(UnityGame.InstallPath, "UserData")))
                 _ = Directory.CreateDirectory(path);

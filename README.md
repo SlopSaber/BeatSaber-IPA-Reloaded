@@ -78,3 +78,50 @@ The Doorstop license and source archive accompany the binary under
 The installation check accepts the packaged `doorstop_config.ini`. If another
 file triggers the check, the startup error identifies its path relative to the
 game installation.
+
+Both `Mods` and `Plugins` are searched recursively. Startup creates `Mods/Core`
+for a mod manager to populate; BSIPA does not download core mods automatically.
+For example:
+
+```text
+Beat Saber/
+  IPA/
+  Libs/
+  Mods/
+    Core/
+      BeatSaberMarkupLanguage.dll
+      SiraUtil.dll
+    MyMod.dll
+    Visual/
+      Effects/
+        Effects.dll
+        Libs/Helper.dll
+  Plugins/
+    LegacyPlugin.dll
+    AnotherFolder/AnotherLegacyPlugin.dll
+```
+
+The dependency graph determines load order for all folders, including `Core`.
+Duplicate plugin IDs use the newest plugin version, with a stable path order for
+equal versions. Loader caches, `.git` directories and native-library directories
+are excluded from plugin discovery. Windows directory aliases are deduplicated
+by their resolved directory paths to prevent recursive junction loops. Legacy
+interface plugins use distinct cached copies for each source path, so identical
+filenames in separate folders do not overwrite each other's cache files.
+
+Managed libraries are discovered in both mod trees, root `Libs` and legacy
+`IPA/Libs`. Resolution uses the assembly identity, including culture and public
+key token, rather than requiring the filename to match the assembly name.
+Exact versions are preferred, then libraries near the requesting plugin and
+newer available versions. Renamed compatibility copies retain their source
+location for this lookup. Native DLL directories are added to the search path.
+This does not isolate arbitrary incompatible libraries sharing one identity.
+
+Declared files retain their original game-relative meaning. Existing mod-local
+files and legacy library locations are accepted when a mod is organized into a
+subfolder; a unique relocated library/plugin file can also satisfy an old path.
+Ambiguous or genuinely missing files are still reported. Moving a DLL does not
+rewrite the plugin's own hardcoded asset paths. Mod managers must install its
+complete library and asset dependencies. BSIPA cannot supply an absent third
+party DLL, repair changed game APIs, or promise every historical bug and private
+implementation detail.

@@ -334,22 +334,21 @@ namespace IPA.Loader
             _bsPlugins = new List<PluginExecutor>();
             _ipaPlugins = new List<Old.IPlugin>();
 
-            if (!Directory.Exists(pluginDirectory)) return;
-
             var sw = Stopwatch.StartNew();
 
             // initialize BSIPA plugins first
             PluginLoader.LoadPlugins(_bsPlugins);
 
-            var metadataPaths = new HashSet<string>(PluginLoader.PluginsMetadata.Where(m => !m.IsBare).Select(m => m.File.FullName));
+            var metadataPaths = new HashSet<string>(PluginLoader.PluginsMetadata.Where(m => !m.IsBare).Select(m => m.File.FullName), StringComparer.OrdinalIgnoreCase);
             var ignoredPaths = new HashSet<string>(PluginLoader.ignoredPlugins.Select(m => m.Key.File.FullName)
-                .Concat(PluginLoader.ignoredPlugins.SelectMany(m => m.Key.AssociatedFiles.Select(f => f.FullName))));
-            var disabledPaths = new HashSet<string>(DisabledPlugins.Select(m => m.File.FullName).ToList());
+                .Concat(PluginLoader.ignoredPlugins.SelectMany(m => m.Key.AssociatedFiles.Select(f => f.FullName))), StringComparer.OrdinalIgnoreCase);
+            var disabledPaths = new HashSet<string>(DisabledPlugins.Select(m => m.File.FullName), StringComparer.OrdinalIgnoreCase);
 
             //Copy plugins to .cache
-            string[] originalPlugins = Directory.GetFiles(pluginDirectory, "*.dll");
+            string[] originalPlugins = ModFiles.PluginFiles.ToArray();
 
-            string cacheDir = Path.Combine(pluginDirectory, ".cache");
+            string cacheDir = Path.Combine(pluginDirectory, ".cache", "Legacy", typeof(PluginManager).Module.ModuleVersionId.ToString("N"));
+            var copiedPlugins = new List<string>();
             bool exists = Directory.Exists(cacheDir);
 
             if (exists)
@@ -363,6 +362,9 @@ namespace IPA.Loader
                 if (metadataPaths.Contains(s)) continue;
                 if (ignoredPaths.Contains(s)) continue;
                 if (disabledPaths.Contains(s)) continue;
+                try { _ = AssemblyName.GetAssemblyName(s); }
+                catch (BadImageFormatException) { continue; }
+                catch (IOException error) { Logger.Loader.Warn($"Cannot inspect legacy plugin '{s}': {error.Message}"); continue; }
 
                 if (!exists)
                 {
@@ -370,7 +372,11 @@ namespace IPA.Loader
                     exists = true;
                 }
 
-                string pluginCopy = Path.Combine(cacheDir, Path.GetFileName(s));
+                using var digest = System.Security.Cryptography.SHA256.Create();
+                string sourceKey = BitConverter.ToString(digest.ComputeHash(Encoding.UTF8.GetBytes(s.ToUpperInvariant()))).Replace("-", "");
+                string sourceDirectory = Path.Combine(cacheDir, sourceKey);
+                Directory.CreateDirectory(sourceDirectory);
+                string pluginCopy = Path.Combine(sourceDirectory, Path.GetFileName(s));
 
                 #region Fix assemblies for refactor
 
@@ -408,6 +414,8 @@ namespace IPA.Loader
                 {
                     IPA.Compat3.Runtime.Rewrite(module);
                     module.Write(pluginCopy);
+                    LoaderCompatibility.RegisterOriginalPath(pluginCopy, s);
+                    copiedPlugins.Add(pluginCopy);
                 }
                 catch (NotSupportedException error)
                 {
@@ -421,7 +429,6 @@ namespace IPA.Loader
 
             if (exists)
             {
-                string[] copiedPlugins = Directory.GetFiles(cacheDir, "*.dll");
                 foreach (string s in copiedPlugins)
                 {
                     var result = LoadPluginsFromFile(s);
@@ -436,7 +443,7 @@ namespace IPA.Loader
             Logger.Default.Info($"Running on Unity {Application.unityVersion}");
             Logger.Default.Info($"Game version {UnityGame.GameVersion}");
             Logger.Default.Info("-----------------------------");
-            Logger.Default.Info($"Loading plugins from {Utils.GetRelativePath(pluginDirectory, Environment.CurrentDirectory)} and found {_bsPlugins.Count + _ipaPlugins.Count}");
+            Logger.Default.Info($"Loading plugins recursively from Mods and Plugins; found {_bsPlugins.Count + _ipaPlugins.Count}");
             Logger.Default.Info("-----------------------------");
             foreach (var plugin in _bsPlugins)
             {
@@ -486,7 +493,7 @@ namespace IPA.Loader
                 foreach (Type t in assembly.GetTypes())
                 {
 
-                    var ipaPlugin = OptionalGetPlugin<Old.IPlugin>(t) ?? IPA.Compat3.Runtime.Create(t, file);
+                    var ipaPlugin = OptionalGetPlugin<Old.IPlugin>(t) ?? IPA.Compat3.Runtime.Create(t, LoaderCompatibility.OriginalPath(file));
                     if (ipaPlugin != null)
                     {
                         ipaPlugins.Add(ipaPlugin);
