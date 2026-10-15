@@ -72,6 +72,40 @@ current feature APIs. New compatibility adapters belong at these binary-contract
 boundaries; copying an old `IPA.Loader.dll` into a mod folder does not provide
 isolated historical loader behavior.
 
+`TidyUp` defaults to `true` in `UserData/Beat Saber IPA.json`. Before mod
+loading, it moves legacy Plugins contents into Mods and identifies core mods
+from embedded manifest IDs. `CoreMods` defaults to `BeatSaberMarkupLanguage`,
+`SongCore`, `SiraUtil` and `BS Utils`; these go into `Mods/Core`.
+
+Bundled loader dependencies now live in `IPA/CoreLibraries`. Mod-supplied
+libraries go into `Mods/Libraries`. Bare `.manifest` files retain dependency
+identity/version information and move alongside the library collection. File
+lists in external and embedded manifests are updated to the new locations.
+Libraries without manifests get metadata inferred from their assembly ID and
+informational/assembly version; retain a manifest for different package IDs,
+versions or declared dependencies. Library DLLs are not treated as plugins.
+Legacy library-path getters in prepared mods target `Mods/Libraries`.
+
+The package includes 65 historical DLL providers from upstream BSIPA 3/4 tags
+and runtime NuGet dependencies. `CoreLibraryIndex.json` records source releases,
+package versions and content hashes; `provider-releases.tsv` supplies bootstrap
+routing without requiring a JSON library to load itself. Resolution prefers
+exact assembly identity, then the requesting mod's BSIPA release, nearby files
+and compatible assembly majors. Current loader dependencies remain at the core
+library root. Already-loaded CLR assembly identities retain normal runtime
+binding behavior; this does not provide separate runtimes per mod.
+
+Tidy moves verify content before removing the source. Different versions use
+separate paths; original manifests and mod/loader PDB files are archived under
+`IPA/Backups/TidyUp`, with an operation journal for rollback. Locked files remain
+retryable duplicates until a later launch. Linked source trees are left alone.
+Set `TidyUp` to `false` to stop automatic cleanup; legacy Libs/Plugins paths
+remain readable. Normal package builds use the committed historical archive.
+Regenerate it after restoring packages, with upstream tag history present:
+`python tools/build_core_libraries.py`; runtime projects, transitive packages,
+licenses and package metadata are included, while Unity and development tools
+are excluded.
+
 BSIPA stores game data beneath `UserData/Hyperbolic Magnetism/Beat Saber`.
 `Shared` contains portable PlayerPrefs, common graphics/player settings, colors,
 custom difficulty labels and score stores. `Versions/<game-version>/Native`

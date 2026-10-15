@@ -58,7 +58,8 @@ namespace IPA.Loader
             }
         }
 
-        internal static IEnumerable<string> PluginFiles => Files(Roots, "*.dll");
+        internal static IEnumerable<string> PluginFiles => Files(Roots, "*.dll").Where(file => !Path.GetFullPath(file).StartsWith(
+            Path.GetFullPath(UnityGame.ModLibrariesPath).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase));
         internal static IEnumerable<string> Manifests => Files(Roots, "*.manifest").Concat(Files(Roots, "*.json"));
 
         internal static string ResolveDeclaredFile(PluginMetadata owner, string declared)
@@ -85,7 +86,7 @@ namespace IPA.Loader
             if (existing != null) return Path.GetFullPath(existing);
             if (library || components[0].Equals("Plugins", StringComparison.OrdinalIgnoreCase) || components[0].Equals("Mods", StringComparison.OrdinalIgnoreCase))
             {
-                var roots = Roots.Concat(new[] { Path.Combine(UnityGame.InstallPath, "Libs"), Path.Combine(UnityGame.InstallPath, "IPA", "Libs") });
+                var roots = Roots.Concat(new[] { UnityGame.CoreLibraryPath, UnityGame.ModLibrariesPath, Path.Combine(UnityGame.InstallPath, "Libs"), Path.Combine(UnityGame.InstallPath, "IPA", "Libs") });
                 var matches = Files(roots, Path.GetFileName(relative), true).Distinct(StringComparer.OrdinalIgnoreCase).Take(2).ToArray();
                 if (matches.Length == 1) return matches[0];
             }

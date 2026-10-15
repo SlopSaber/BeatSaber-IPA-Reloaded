@@ -11,11 +11,12 @@ namespace IPA.Data
             if (key == null) throw new ArgumentNullException(nameof(key));
             return SaveDataStore.Transaction("PlayerPrefs.json", data =>
             {
-                var entry = data[key] as JObject;
-                if (entry == null && data["$deletedAll"] == null && UnityEngine.PlayerPrefs.HasKey(key))
+                var entries = data["entries"] as JObject ?? new JObject(); data["entries"] = entries;
+                var entry = entries[key] as JObject;
+                if (entry == null && data["skipRegistryImport"] == null && UnityEngine.PlayerPrefs.HasKey(key))
                 {
                     entry = new JObject { ["kind"] = kind, ["value"] = import(), ["imported"] = true };
-                    data[key] = entry;
+                    entries[key] = entry;
                 }
                 return entry?["kind"]?.Value<string>() == kind ? entry["value"]?.DeepClone() : null;
             });
@@ -23,7 +24,7 @@ namespace IPA.Data
         private static void Set(string key, string kind, JToken value)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
-            SaveDataStore.Transaction("PlayerPrefs.json", data => { data[key] = new JObject { ["kind"] = kind, ["value"] = value }; return 0; });
+            SaveDataStore.Transaction("PlayerPrefs.json", data => { var entries = data["entries"] as JObject ?? new JObject(); entries[key] = new JObject { ["kind"] = kind, ["value"] = value }; data["entries"] = entries; return 0; });
         }
         public static int GetInt(string key) => GetInt(key, 0);
         public static int GetInt(string key, int defaultValue) => Get(key, "int", () => new JValue(UnityEngine.PlayerPrefs.GetInt(key, defaultValue)))?.Value<int>() ?? defaultValue;
@@ -34,10 +35,10 @@ namespace IPA.Data
         public static void SetInt(string key, int value) => Set(key, "int", new JValue(value));
         public static void SetFloat(string key, float value) => Set(key, "float", new JValue(value));
         public static void SetString(string key, string value) => Set(key, "string", new JValue(value ?? ""));
-        public static bool HasKey(string key) => SaveDataStore.Transaction("PlayerPrefs.json", data => data[key] is JObject entry
-            ? entry["kind"]?.Value<string>() != "deleted" : data["$deletedAll"] == null && UnityEngine.PlayerPrefs.HasKey(key));
+        public static bool HasKey(string key) => SaveDataStore.Transaction("PlayerPrefs.json", data => data["entries"]?[key] is JObject entry
+            ? entry["kind"]?.Value<string>() != "deleted" : data["skipRegistryImport"] == null && UnityEngine.PlayerPrefs.HasKey(key));
         public static void DeleteKey(string key) => Set(key, "deleted", JValue.CreateNull());
-        public static void DeleteAll() => SaveDataStore.Transaction("PlayerPrefs.json", data => { data.RemoveAll(); data["$deletedAll"] = true; return 0; });
+        public static void DeleteAll() => SaveDataStore.Transaction("PlayerPrefs.json", data => { data["entries"] = new JObject(); data["skipRegistryImport"] = true; return 0; });
         public static void Save() { /* Set/Delete operations already commit atomically under the shared lock. */ }
     }
 }

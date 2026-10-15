@@ -73,6 +73,13 @@
   </Target>
 
   <Target Name="Assemble" AfterTargets="Build" DependsOnTargets="PrepareDoorstop" Returns="$(OutputPath)">
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.zip.sha256">
+      <Output TaskParameter="Lines" ItemName="HistoricalLibraryDigest" />
+    </ReadLinesFromFile>
+    <GetFileHash Files="$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.zip" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="HistoricalLibraryArchive" />
+    </GetFileHash>
+    <Error Condition="'%(HistoricalLibraryArchive.FileHash)' != '@(HistoricalLibraryDigest)'" Text="Historical core library archive SHA-256 does not match its recorded digest." />
     <Message Text="Packing..." Importance="High" />
     <Message Text="Results will be put in $(OutputPath)" Importance="High" />
     <Error Condition="!Exists('$(InjectorOutputPath)Data\Managed\IPA.Injector.dll') Or !Exists('$(InjectorOutputPath)Data\Managed\IPA.Loader.dll')"
@@ -84,8 +91,10 @@
     </ItemGroup>
     <Delete Files="@(PreviousPackageFiles)" />
     <RemoveDir Directories="$(OutputPath)Libraries" />
+    <RemoveDir Directories="$(OutputPath)Libs" />
     <Copy SourceFiles="@(ManagedFiles)" DestinationFolder="$(OutputPath)IPA\Data\Managed\%(RecursiveDir)" />
-    <Copy SourceFiles="@(LibraryFiles)" DestinationFolder="$(OutputPath)Libs\%(RecursiveDir)" />
+    <Copy SourceFiles="@(LibraryFiles)" DestinationFolder="$(OutputPath)IPA\CoreLibraries\%(RecursiveDir)" />
+    <Unzip SourceFiles="$(MSBuildThisFileDirectory)..\CoreLibraries\HistoricalLibraries.zip" DestinationFolder="$(OutputPath)IPA\CoreLibraries" />
     <Copy SourceFiles="$(DoorstopCache)windows\$(Platform)\winhttp.dll" DestinationFolder="$(OutputPath)" />
     <Copy SourceFiles="$(MSBuildThisFileDirectory)doorstop_config.ini" DestinationFolder="$(OutputPath)" />
     <Copy SourceFiles="$(DoorstopCache)source\UnityDoorstop-$(DoorstopVersion)\LICENSE" DestinationFolder="$(OutputPath)IPA\ThirdParty\Doorstop" />

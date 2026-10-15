@@ -16,6 +16,7 @@ namespace IPA.Data
         internal string Era;
         internal bool Ini;
         internal readonly Dictionary<string, DataShape> Files = new(StringComparer.OrdinalIgnoreCase);
+        internal readonly Dictionary<string, DataShape> IniFields = new(StringComparer.Ordinal);
 
         internal static SaveDataProfile Read(IEnumerable<ModuleDefinition> modules, string version)
         {
@@ -48,6 +49,19 @@ namespace IPA.Data
                 foreach (var method in type.Methods.Where(m => m.HasBody))
                 {
                     if (method.Body.Instructions.Any(i => i.OpCode.Code == Code.Ldstr && Equals(i.Operand, "settings.ini"))) profile.Ini = true;
+                    if (type.Name == "SettingStrings" && method.Name == "WriteProperties")
+                    {
+                        string key = null; TypeReference valueType = null;
+                        foreach (var instruction in method.Body.Instructions)
+                        {
+                            if (instruction.OpCode.Code == Code.Ldstr) { key = instruction.Operand as string; valueType = null; }
+                            if (instruction.Operand is FieldReference field) valueType = field.FieldType;
+                            if (instruction.Operand is MethodReference call && call.Name == "AppendProperty" && key != null && valueType != null)
+                            {
+                                profile.IniFields[key] = DataShape.Read(valueType, new HashSet<string>(), 0); key = null;
+                            }
+                        }
+                    }
                 }
             }
             // Include the score record layout, so equal scoring code cannot combine different save shapes.

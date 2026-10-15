@@ -314,6 +314,38 @@ namespace IPA.Loader
                 }
             }
 
+            foreach (string library in ModFiles.Files(new[] { UnityGame.ModLibrariesPath }, "*.dll"))
+            {
+                try
+                {
+                    using var module = ModuleDefinition.ReadModule(library);
+                    string id = module.Assembly.Name.Name;
+                    if (PluginsMetadata.Any(meta => (!meta.IsBare && meta.Id == id) || (meta.IsBare && meta.Manifest.Files.Any(file =>
+                        string.Equals(ModFiles.ResolveDeclaredFile(meta, file), library, StringComparison.OrdinalIgnoreCase))))) continue;
+                    var assemblyVersion = module.Assembly.Name.Version;
+                    string version = $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{Math.Max(0, assemblyVersion.Build)}";
+                    string? Attribute(string name) => module.Assembly.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == name)?.ConstructorArguments.FirstOrDefault().Value as string;
+                    string? informational = Attribute("System.Reflection.AssemblyInformationalVersionAttribute");
+                    if (informational != null && System.Text.RegularExpressions.Regex.IsMatch(informational, @"^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")) version = informational;
+                    var manifest = new Newtonsoft.Json.Linq.JObject
+                    {
+                        ["id"] = id, ["name"] = id, ["version"] = version,
+                        ["author"] = Attribute("System.Reflection.AssemblyCompanyAttribute") ?? "Unknown",
+                        ["description"] = Attribute("System.Reflection.AssemblyDescriptionAttribute") ?? "Library metadata inferred from its assembly identity.",
+                        ["files"] = new Newtonsoft.Json.Linq.JArray(Utils.GetRelativePath(library, UnityGame.InstallPath).Replace('\\', '/')),
+                        ["features"] = new Newtonsoft.Json.Linq.JArray()
+                    };
+                    var metadata = new PluginMetadata { File = new FileInfo(library), IsSelf = false, IsBare = true,
+                        Manifest = JsonConvert.DeserializeObject<PluginManifest>(manifest.ToString()) ?? throw new JsonException("Inferred library metadata was empty.") };
+                    metadata.TargetLoaderVersion = LoaderCompatibility.GetTargetVersion(module);
+                    if (metadata.TargetLoaderVersion != null) LoaderCompatibility.SelectProfile(metadata, module);
+                    PluginsMetadata.Add(metadata);
+                    Logger.Loader.Debug($"Inferred library metadata for {id} {version}; provide a manifest when its package ID/version differs.");
+                }
+                catch (BadImageFormatException) { /* Native libraries are resolved through PATH, not plugin metadata. */ }
+                catch (Exception error) { Logger.Loader.Warn($"Cannot infer library metadata for '{library}': {error.Message}"); }
+            }
+
             foreach (var meta in PluginsMetadata)
             { // process description include
                 var lines = meta.Manifest.Description.Split('\n');

@@ -96,7 +96,7 @@ namespace IPA.Data
             {
                 var ini = (JObject)result;
                 foreach (var entry in values.Properties().Where(p => !p.Name.StartsWith("player.", StringComparison.Ordinal) && !p.Name.StartsWith("preset.", StringComparison.Ordinal)))
-                    if (ini[entry.Name] != null || Aliases.Values.Contains(entry.Name)) ini[entry.Name] = entry.Value.DeepClone();
+                    if (ini[entry.Name] != null || Aliases.Values.Contains(entry.Name) || profile.IniFields.ContainsKey(entry.Name)) ini[entry.Name] = entry.Value.DeepClone();
             }
             else if (file == "PlayerData.dat")
             {

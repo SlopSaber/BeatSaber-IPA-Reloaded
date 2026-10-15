@@ -70,6 +70,7 @@ namespace IPA.Injector
                 EnsureDirectories();
 
                 SelfConfig.Load();
+                InstallTidy.Apply();
                 DisabledConfig.Load();
 
                 Logging.Logger.Injector.Debug("Prepping bootstrapper");
@@ -113,8 +114,6 @@ namespace IPA.Injector
             Directory.CreateDirectory(Path.Combine(UnityGame.ModsPath, "Core"));
             string path;
             if (!Directory.Exists(path = Path.Combine(UnityGame.InstallPath, "UserData")))
-                _ = Directory.CreateDirectory(path);
-            if (!Directory.Exists(path = Path.Combine(UnityGame.InstallPath, "Plugins")))
                 _ = Directory.CreateDirectory(path);
         }
 

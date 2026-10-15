@@ -138,6 +138,9 @@ namespace IPA.Config
         public bool WriteLogs { get; set; } = true;
 
         public virtual bool ResetGameAssembliesOnVersionChange { get; set; } = true;
+        public virtual bool TidyUp { get; set; } = true;
+        [NonNullable, UseConverter(typeof(CollectionConverter<string, HashSet<string?>>))]
+        public virtual HashSet<string> CoreMods { get; set; } = new() { "BeatSaberMarkupLanguage", "SongCore", "SiraUtil", "BS Utils" };
 
         public virtual bool EnableFPFC { get; set; } = false;
         public virtual float FPFCMoveSpeed { get; set; } = 1.5f;

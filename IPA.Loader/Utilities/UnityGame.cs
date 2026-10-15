@@ -198,15 +198,17 @@ namespace IPA.Utilities
             }
         }
         /// <summary>
-        /// The path to the `Libs` folder. Use only if necessary.
+        /// The path to BSIPA's core libraries.
         /// </summary>
         /// <value>the path to the library directory</value>
         public static string LibraryPath
         {
             get
             {
-                string current = Path.Combine(InstallPath, "Libs");
+                string current = CoreLibraryPath;
                 if (Directory.Exists(current)) return current;
+                string oldRoot = Path.Combine(InstallPath, "Libs");
+                if (Directory.Exists(oldRoot)) return oldRoot;
                 string legacy = Path.Combine(InstallPath, "IPA", "Libs");
                 return Directory.Exists(legacy) ? legacy : current;
             }
@@ -221,6 +223,8 @@ namespace IPA.Utilities
             {
                 string current = Path.Combine(LibraryPath, "Native");
                 if (Directory.Exists(current)) return current;
+                string oldRoot = Path.Combine(InstallPath, "Libs", "Native");
+                if (Directory.Exists(oldRoot)) return oldRoot;
                 string legacy = Path.Combine(InstallPath, "IPA", "Libs", "Native");
                 return Directory.Exists(legacy) ? legacy : current;
             }
@@ -232,6 +236,12 @@ namespace IPA.Utilities
         public static string PluginsPath => Path.Combine(InstallPath, "Plugins");
         /// <summary>Gets the root for organized mod packages, including the Core folder.</summary>
         public static string ModsPath => Path.Combine(InstallPath, "Mods");
+        /// <summary>Gets the directory for BSIPA's bundled dependency versions.</summary>
+        public static string CoreLibraryPath => Path.Combine(InstallPath, "IPA", "CoreLibraries");
+        /// <summary>Gets the directory for libraries supplied by mods.</summary>
+        public static string ModLibrariesPath => Path.Combine(ModsPath, "Libraries");
+        /// <summary>Gets the native library directory for mod-supplied dependencies.</summary>
+        public static string ModNativeLibraryPath => Path.Combine(ModLibrariesPath, "Native");
         internal static string CompatibilityCachePath => Path.Combine(ModsPath, ".compatibility");
         /// <summary>
         /// The path to the `UserData` folder.

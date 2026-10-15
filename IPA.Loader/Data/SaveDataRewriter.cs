@@ -39,6 +39,10 @@ namespace IPA.Data
                 MethodInfo replacement = null;
                 if (call.DeclaringType.FullName == "UnityEngine.Application" && call.Name == "get_persistentDataPath")
                     replacement = typeof(SaveDataStore).GetMethod(nameof(SaveDataStore.GetPersistentDataPath));
+                else if (call.DeclaringType.FullName == "IPA.Utilities.UnityGame" && call.Name == "get_LibraryPath")
+                    replacement = typeof(IPA.Utilities.UnityGame).GetProperty(nameof(IPA.Utilities.UnityGame.ModLibrariesPath)).GetGetMethod();
+                else if (call.DeclaringType.FullName == "IPA.Utilities.UnityGame" && call.Name == "get_NativeLibraryPath")
+                    replacement = typeof(IPA.Utilities.UnityGame).GetProperty(nameof(IPA.Utilities.UnityGame.ModNativeLibraryPath)).GetGetMethod();
                 else
                 {
                     var candidates = call.DeclaringType.FullName == "UnityEngine.PlayerPrefs" ? PrefMethods

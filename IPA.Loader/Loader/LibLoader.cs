@@ -5,6 +5,7 @@ using IPA.Logging;
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -41,8 +42,18 @@ namespace IPA.Loader
         {
             internal string Path = "";
             internal AssemblyName Identity = null!;
+            internal string[] Releases = Array.Empty<string>();
         }
         private static LibraryCandidate[] candidates = Array.Empty<LibraryCandidate>();
+        private static readonly ConcurrentDictionary<string, string> LibraryReleases = new(StringComparer.OrdinalIgnoreCase);
+
+        private static string? RequestRelease(string? requester)
+        {
+            if (requester == null || string.Equals(requester, typeof(LibLoader).Assembly.Location, StringComparison.OrdinalIgnoreCase)) return null;
+            string original = LoaderCompatibility.OriginalPath(requester);
+            string? own = LoaderCompatibility.ProfileForPath(original)?.Version.ToString();
+            return own ?? (LibraryReleases.TryGetValue(requester, out string? inherited) || LibraryReleases.TryGetValue(original, out inherited) ? inherited : null);
+        }
 
         internal static void Configure()
         {
@@ -78,8 +89,16 @@ namespace IPA.Loader
                         var nativeDirectories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                         string installPath = IPA.Utilities.UnityGame.InstallPath;
-                        var roots = new[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                        var roots = new[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, IPA.Utilities.UnityGame.CoreLibraryPath, IPA.Utilities.UnityGame.ModLibrariesPath,
                             Path.Combine(installPath, "Libs"), Path.Combine(installPath, "IPA", "Libs") }.Concat(ModFiles.Roots);
+                        var releaseMap = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+                        string mapPath = Path.Combine(IPA.Utilities.UnityGame.CoreLibraryPath, "provider-releases.tsv");
+                        if (File.Exists(mapPath))
+                            foreach (string line in File.ReadAllLines(mapPath))
+                            {
+                                string[] fields = line.Split('\t');
+                                if (fields.Length == 2) releaseMap[Path.GetFullPath(Path.Combine(IPA.Utilities.UnityGame.CoreLibraryPath, fields[0]))] = fields[1].Split(',');
+                            }
                         var files = ModFiles.Files(roots, "*.dll", true);
 
                         foreach (var file in files)
@@ -90,7 +109,8 @@ namespace IPA.Loader
                             catch (BadImageFormatException) { nativeDirectories.Add(fileInfo.DirectoryName!); continue; }
                             catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
                             { Log(Logger.Level.Warning, $"Cannot inspect library '{fileInfo.FullName}': {error.Message}"); continue; }
-                            discovered.Add(new LibraryCandidate { Path = fileInfo.FullName, Identity = identity });
+                            releaseMap.TryGetValue(fileInfo.FullName, out string[]? releases);
+                            discovered.Add(new LibraryCandidate { Path = fileInfo.FullName, Identity = identity, Releases = releases ?? Array.Empty<string>() });
                             foreach (string alias in new[] { fileInfo.Name, identity.Name + ".dll" }.Distinct(StringComparer.OrdinalIgnoreCase))
                             {
                                 if (!newFilenameLocations.TryGetValue(alias, out var existing) || identity.Version > existing.Version)
@@ -118,7 +138,7 @@ namespace IPA.Loader
                         FilenameLocations = newFilenameLocations;
                         candidates = discovered.ToArray();
 
-                        _ = LoadLibrary(new AssemblyName("Newtonsoft.Json, Version=12.0.0.0, Culture=neutral"));
+                        _ = LoadLibrary(typeof(LibLoader).Assembly.GetReferencedAssemblies().First(name => name.Name == "Newtonsoft.Json"));
                         _ = LoadLibrary(new AssemblyName("netstandard, Version=2.0.0.0, Culture=neutral"));
 
                     }
@@ -145,11 +165,16 @@ namespace IPA.Loader
                 || (requested.Name == "0Harmony.Legacy1" && candidate.Identity.Name == "0Harmony" && candidate.Identity.Version.Major < 2);
             bool Nearby(LibraryCandidate candidate) => directory != null
                 && candidate.Path.StartsWith(directory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+            string? release = RequestRelease(requester);
             return candidates.Where(candidate => NameMatches(candidate)
                     && (token.Length == 0 || token.SequenceEqual(candidate.Identity.GetPublicKeyToken() ?? Array.Empty<byte>()))
                     && string.Equals(requested.CultureName ?? "", candidate.Identity.CultureName ?? "", StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(candidate => requested.Version != null && candidate.Identity.Version == requested.Version)
-                .ThenByDescending(Nearby).ThenByDescending(candidate => candidate.Identity.Version)
+                .ThenByDescending(candidate => release != null && candidate.Releases.Contains(release, StringComparer.OrdinalIgnoreCase))
+                .ThenByDescending(Nearby)
+                .ThenByDescending(candidate => string.Equals(Path.GetDirectoryName(candidate.Path), IPA.Utilities.UnityGame.CoreLibraryPath, StringComparison.OrdinalIgnoreCase))
+                .ThenByDescending(candidate => requested.Version != null && candidate.Identity.Version.Major == requested.Version.Major)
+                .ThenByDescending(candidate => candidate.Identity.Version)
                 .ThenBy(candidate => candidate.Path, StringComparer.OrdinalIgnoreCase).Select(candidate => candidate.Path).FirstOrDefault();
         }
 
@@ -205,7 +230,10 @@ namespace IPA.Loader
                 }
             }
 
-            return Assembly.LoadFrom(LoaderCompatibility.PrepareAssembly(path, LoaderCompatibility.ProfileForPath(requester)));
+            string prepared = LoaderCompatibility.PrepareAssembly(path, LoaderCompatibility.ProfileForPath(requester));
+            string? release = RequestRelease(requester);
+            if (release != null) { LibraryReleases.TryAdd(path, release); LibraryReleases.TryAdd(prepared, release); }
+            return Assembly.LoadFrom(prepared);
         }
 
         internal static void Log(Logger.Level lvl, string message)

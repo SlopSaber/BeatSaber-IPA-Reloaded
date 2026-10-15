@@ -179,6 +179,22 @@ namespace IPA.Data
                     raw = Transaction(Path.Combine("Scores", profile.Era, name + ".json"), saved => Merge(saved, raw, true));
                 JToken result = Transaction("Settings.json", settings => SharedSettings.Apply(name, raw, settings, profile));
                 var preserved = new JObject();
+                if (name == "settings.ini" && profile.IniFields.Count > 0 && result is JObject ini)
+                    foreach (var property in ini.Properties().ToArray())
+                    {
+                        bool supported = profile.IniFields.TryGetValue(property.Name, out var member);
+                        JToken value = property.Value;
+                        bool valid = supported && (member.Kind == "bool" ? value.Type == JTokenType.Boolean
+                            : member.Kind == "integer" ? value.Type == JTokenType.Integer
+                            : member.Kind == "number" ? value.Type == JTokenType.Integer || value.Type == JTokenType.Float
+                            : member.Kind == "string" ? value.Type == JTokenType.String
+                            : member.Kind == "enum" ? value.Type == JTokenType.String && member.EnumValues.ContainsKey((string)value)
+                                || value.Type == JTokenType.Integer && member.EnumValues.ContainsValue((long)value)
+                            : true);
+                        if (!valid) { preserved["/ini/" + property.Name] = value.DeepClone(); property.Remove(); }
+                        else if (member.Kind == "enum" && value.Type == JTokenType.Integer)
+                            property.Value = member.EnumValues.First(e => e.Value == (long)value).Key;
+                    }
                 if (profile.Files.TryGetValue(name, out var shape))
                     result = shape.Project(result, (key, value) => preserved[key] = value.DeepClone());
                 Preserve(name, preserved);
