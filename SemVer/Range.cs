@@ -13,8 +13,7 @@ namespace SemVer
 
         private Range(VersionRange real) => UnderlyingRange = real;
 
-        public Range(string rangeSpec, bool loose = false) : this(new(rangeSpec))
-            => _ = loose; // loose is ignored because Hive doesn't have an equivalent
+        public Range(string rangeSpec, bool loose = false) : this(LegacyVersionParser.ParseRange(rangeSpec, loose)) { }
 
         public static Range ForHiveRange(VersionRange real) => new(real);
 

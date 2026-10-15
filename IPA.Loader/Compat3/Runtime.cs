@@ -36,7 +36,8 @@ namespace IPA.Compat3
             /// <summary>Gets whether metadata has no executable entry point.</summary>
             public bool IsBare { get; internal set; }
             /// <summary>Gets the features enabled for the plugin.</summary>
-            public IReadOnlyList<IPA.Loader.Features.Feature> Features { get; internal set; } = Array.Empty<IPA.Loader.Features.Feature>();
+            public IReadOnlyList<Features.Feature> Features { get; internal set; } = Array.Empty<Features.Feature>();
+            internal IPA.Loader.PluginMetadata CoreMetadata;
         }
         /// <summary>Exposes plugin state through the BSIPA 3 manager contract.</summary>
         public sealed class PluginInfo
@@ -63,8 +64,7 @@ namespace IPA.Compat3
         internal static readonly List<PluginLoader.PluginInfo> Legacy = new List<PluginLoader.PluginInfo>();
         private static IEnumerable<PluginLoader.PluginInfo> All => Legacy.Concat(IPA.Loader.PluginManager.EnabledPlugins.Select(meta => new PluginLoader.PluginInfo
         {
-            Metadata = new PluginLoader.PluginMetadata { Assembly = meta.Assembly, PluginType = meta.PluginType,
-                Name = meta.Name, Id = meta.Id, Version = meta.Version, File = meta.File, IsBare = meta.IsBare, Features = meta.Features }
+            Metadata = Convert(meta)
         })).GroupBy(p => p.Metadata.Id + "|" + p.Metadata.Name).Select(group => group.First());
         /// <summary>Finds a plugin by display name.</summary>
         public static PluginLoader.PluginInfo GetPlugin(string name) => All.FirstOrDefault(x => x.Metadata.Name == name);
@@ -77,8 +77,12 @@ namespace IPA.Compat3
         /// <summary>Gets metadata for disabled legacy and modern plugins.</summary>
         public static IEnumerable<PluginLoader.PluginMetadata> DisabledPlugins => Legacy.Where(p => !p.Active).Select(p => p.Metadata)
             .Concat(IPA.Loader.PluginManager.DisabledPlugins.Select(Convert));
-        private static PluginLoader.PluginMetadata Convert(IPA.Loader.PluginMetadata meta) => new PluginLoader.PluginMetadata
-            { Assembly = meta.Assembly, PluginType = meta.PluginType, Name = meta.Name, Id = meta.Id, Version = meta.Version, File = meta.File, IsBare = meta.IsBare, Features = meta.Features };
+        internal static PluginLoader.PluginMetadata Convert(IPA.Loader.PluginMetadata meta)
+        {
+            if (meta == null) throw new ArgumentNullException(nameof(meta));
+            return new PluginLoader.PluginMetadata
+                { CoreMetadata = meta, Assembly = meta.Assembly, PluginType = meta.PluginType, Name = meta.Name, Id = meta.Id, Version = meta.Version, File = meta.File, IsBare = meta.IsBare, Features = Features.Feature.View(meta.Features) };
+        }
         /// <summary>Finds a disabled plugin by display name.</summary>
         public static PluginLoader.PluginMetadata GetDisabledPlugin(string name) => DisabledPlugins.FirstOrDefault(p => p.Name == name);
         /// <summary>Finds a disabled plugin by manifest identifier.</summary>
@@ -182,9 +186,7 @@ namespace IPA.Compat3
         internal static object CreateModern(IPA.Loader.PluginMetadata meta)
         {
             Type type = meta.Assembly.GetType(meta.PluginType.FullName.Replace('/', '+'), true);
-            var info = new PluginLoader.PluginInfo { HostedByModern = true, Metadata = new PluginLoader.PluginMetadata
-                { Assembly = meta.Assembly, PluginType = meta.PluginType, Name = meta.Name, Id = meta.Id, Version = meta.Version,
-                  File = meta.File, Features = meta.Features }, Factory = () => (IBeatSaberPlugin)Activator.CreateInstance(type) };
+            var info = new PluginLoader.PluginInfo { HostedByModern = true, Metadata = PluginManager.Convert(meta), Factory = () => (IBeatSaberPlugin)Activator.CreateInstance(type) };
             info.Initialize(); PluginManager.Legacy.Add(info); return info;
         }
         internal static System.Threading.Tasks.Task EnableModern(object instance)
@@ -216,17 +218,30 @@ namespace IPA.Compat3
             while (type.DeclaringType != null) type = type.DeclaringType;
             return type.Scope is AssemblyNameReference assembly && assembly.Name == "IPA.Loader";
         }
+        private static Version LoaderScopeVersion(TypeReference type)
+        {
+            while (type.DeclaringType != null) type = type.DeclaringType;
+            return (type.Scope as AssemblyNameReference)?.Version;
+        }
         internal static bool Rewrite(ModuleDefinition module)
         {
             var target = IPA.Loader.LoaderCompatibility.GetTargetVersion(module);
             IPA.Loader.LoaderCompatibility.ValidateTarget(target);
+            foreach (var reference in module.AssemblyReferences.Where(reference => reference.Name == "IPA.Loader"))
+                IPA.Loader.LoaderCompatibility.ValidateTarget(reference.Version);
             // Snapshot names before changing declaring types also changes nested names.
             var references = module.GetTypeReferences().Where(IsLoaderReference)
-                .Select(type => (Type: type, Name: type.FullName, Namespace: type.Namespace)).ToArray();
+                .Select(type => (Type: type, Name: type.FullName, Namespace: type.Namespace, Abi: LoaderScopeVersion(type)?.Major)).ToArray();
             bool legacyManager = target?.Major == 1 || references.Any(entry =>
                 entry.Name == "IPA.Loader.PluginLoader/PluginInfo" || entry.Name == "IPA.Loader.PluginLoader/PluginMetadata");
             bool legacyConfig = target?.Major == 1 || references.Any(entry =>
                 entry.Name == "IPA.Config.IConfigProvider" || entry.Namespace == "IPA.Config.ConfigProviders");
+            bool legacyFeatures = Types(module.Types).Any(type => type.BaseType?.FullName == "IPA.Loader.Features.Feature"
+                && type.Methods.Any(method => method.IsVirtual && method.Name == "Initialize" && method.Parameters.Count == 2 && method.Parameters[1].ParameterType.FullName == "System.String[]")
+                && !type.Methods.Any(method => method.Name == "Initialize" && method.Parameters.Count == 2 && method.Parameters[1].ParameterType.FullName == "Newtonsoft.Json.Linq.JObject"))
+                || module.GetMemberReferences().OfType<MethodReference>().Any(method => method.DeclaringType.FullName == "IPA.Loader.Features.Feature"
+                    && (method.Name == "Evaluate" || method.Name == "BeforeLoad" || method.Name == "RequireLoaded" || method.Name == "get_StoreOnPlugin"
+                        || (method.Name == "BeforeInit" && method.ReturnType.FullName == "System.Boolean")));
             bool changed = false;
             if (module.Assembly.Name.Name == "0Harmony" && module.Assembly.Name.Version.Major < 2)
             {
@@ -242,14 +257,21 @@ namespace IPA.Compat3
             foreach (var entry in references)
             {
                 var reference = entry.Type;
-                if (legacyManager && (entry.Name == "IPA.Loader.PluginLoader" || entry.Name == "IPA.Loader.PluginManager"
+                if ((entry.Abi == 1 || (entry.Abi != 2 && legacyManager)) && (entry.Name == "IPA.Loader.PluginLoader" || entry.Name == "IPA.Loader.PluginManager"
                     || entry.Name == "IPA.Loader.PluginInitInjector")) { reference.Namespace = "IPA.Compat3"; changed = true; }
-                if (legacyConfig && (entry.Name == "IPA.Config.Config" || entry.Name == "IPA.Config.IConfigProvider"
+                if ((entry.Abi == 1 || (entry.Abi != 2 && legacyConfig)
+                    || references.Any(candidate => candidate.Abi == entry.Abi && (candidate.Name == "IPA.Config.IConfigProvider" || candidate.Namespace == "IPA.Config.ConfigProviders")))
+                    && (entry.Name == "IPA.Config.Config" || entry.Name == "IPA.Config.IConfigProvider"
                     || entry.Namespace == "IPA.Config.ConfigProviders"))
                 { reference.Namespace = "IPA.Compat3.Config" + (entry.Namespace.EndsWith("ConfigProviders", StringComparison.Ordinal) ? ".ConfigProviders" : ""); changed = true; }
+                if ((entry.Abi == 1 || legacyFeatures) && entry.Name == "IPA.Loader.Features.Feature")
+                { reference.Namespace = entry.Abi == 1 ? "IPA.Compat3.Features" : "IPA.Compat4.Features"; changed = true; }
             }
             foreach (var method in module.GetMemberReferences().OfType<MethodReference>())
             {
+                if (IsLoaderReference(method.DeclaringType) && method.ReturnType.FullName.Contains("IPA.Compat4.Features.Feature")
+                    && method.DeclaringType.FullName == "IPA.Loader.PluginMetadata" && method.Name == "get_Features")
+                { method.Name = "get_LegacyFeatures4"; changed = true; }
                 if (IsLoaderReference(method.DeclaringType) && method.DeclaringType.FullName == "IPA.Utilities.AlmostVersion"
                     && method.Name == "get_SemverValue" && method.ReturnType.FullName == "SemVer.Version")
                 { method.Name = "get_LegacySemverValue"; changed = true; }
@@ -264,7 +286,7 @@ namespace IPA.Compat3
                 using (var reader = new StreamReader(type.Assembly.GetManifestResourceStream(resource))) { manifest = JObject.Parse(reader.ReadToEnd()); break; }
             var meta = new PluginLoader.PluginMetadata { Assembly = type.Assembly, File = new FileInfo(file),
                 Name = (string)manifest?["name"] ?? type.Name, Id = (string)manifest?["id"],
-                Version = new SemVer.Version((string)manifest?["version"] ?? "0.0.0") };
+                Version = new SemVer.Version((string)manifest?["version"] ?? "0.0.0", true) };
             var info = new PluginLoader.PluginInfo { Metadata = meta,
                 Factory = () => (IBeatSaberPlugin)Activator.CreateInstance(type),
                 Active = !IPA.Loader.DisabledConfig.Instance.DisabledModIds.Contains(meta.Id ?? meta.Name) };

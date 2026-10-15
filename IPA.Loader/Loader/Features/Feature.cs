@@ -69,11 +69,14 @@ namespace IPA.Loader.Features
         {
             featureTypes = new()
             {
-                { "IPA.DefineFeature", typeof(DefineFeature) }
+                { "IPA.DefineFeature", typeof(DefineFeature) },
+                { "IPA.Legacy.Print", typeof(LegacyPrintFeature) }, { "IPA.Legacy.Debug", typeof(LegacyPrintFeature) }, { "IPA.Legacy.Warn", typeof(LegacyPrintFeature) },
+                { "IPA.Legacy.NoUpdate", typeof(LegacyNoUpdateFeature) }, { "IPA.Legacy.InitInjector", typeof(LegacyInitInjectorFeature) }
             };
             featureDelcarers = new()
             {
-                { "IPA.DefineFeature", null }
+                { "IPA.DefineFeature", null },
+                { "IPA.Legacy.Print", null }, { "IPA.Legacy.Debug", null }, { "IPA.Legacy.Warn", null }, { "IPA.Legacy.NoUpdate", null }, { "IPA.Legacy.InitInjector", null }
             };
         }
 

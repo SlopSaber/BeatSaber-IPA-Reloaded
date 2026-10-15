@@ -9,7 +9,7 @@ namespace IPA.JsonConverters
     internal class SemverRangeConverter : JsonConverter<VersionRange?>
     {
         public override VersionRange? ReadJson(JsonReader reader, Type objectType, VersionRange? existingValue, bool hasExistingValue, JsonSerializer serializer)
-            => reader.Value is not string s ? existingValue : new VersionRange(s);
+            => reader.Value is not string s ? existingValue : SemVer.LegacyVersionParser.ParseRange(s, true);
 
         public override void WriteJson(JsonWriter writer, VersionRange? value, JsonSerializer serializer)
         {

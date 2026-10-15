@@ -13,8 +13,7 @@ namespace SemVer
 
         public static Version ForHiveVersion(HVersion real) => new(real);
 
-        public Version(string input, bool loose = false) : this(new HVersion(input))
-            => _ = loose; // specifically unused because Hive has no equivalent (by design)
+        public Version(string input, bool loose = false) : this(LegacyVersionParser.Parse(input, loose)) { }
         public Version(int major, int minor, int patch, string? preRelease = null, string? build = null)
             : this(new HVersion(major, minor, patch,
                 preRelease is null ? Enumerable.Empty<string>() : preRelease.Split('.'),

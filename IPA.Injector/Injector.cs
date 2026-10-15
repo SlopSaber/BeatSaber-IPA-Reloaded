@@ -86,7 +86,7 @@ namespace IPA.Injector
                 Loader.LibLoader.SetupAssemblyFilenames(true);
 
                 pluginAsyncLoadTask = PluginLoader.LoadTask();
-                permissionFixTask = PermissionFix.FixPermissions(new DirectoryInfo(Environment.CurrentDirectory));
+                permissionFixTask = PermissionFix.FixPermissions(new DirectoryInfo(UnityGame.InstallPath));
             }
             catch (Exception e)
             {
@@ -106,9 +106,9 @@ namespace IPA.Injector
         private static void EnsureDirectories()
         {
             string path;
-            if (!Directory.Exists(path = Path.Combine(Environment.CurrentDirectory, "UserData")))
+            if (!Directory.Exists(path = Path.Combine(UnityGame.InstallPath, "UserData")))
                 _ = Directory.CreateDirectory(path);
-            if (!Directory.Exists(path = Path.Combine(Environment.CurrentDirectory, "Plugins")))
+            if (!Directory.Exists(path = Path.Combine(UnityGame.InstallPath, "Plugins")))
                 _ = Directory.CreateDirectory(path);
         }
 
@@ -134,7 +134,7 @@ namespace IPA.Injector
             var backupPath = Path.Combine(Environment.CurrentDirectory, "IPA", "Backups", gameName);
             var bkp = BackupManager.FindLatestBackup(backupPath);
             if (bkp == null)
-                Logging.Logger.Injector.Warn("No backup found! Was BSIPA installed using the installer?");
+                Logging.Logger.Injector.Debug("No existing bootstrap backup; a backup will be created before modifying the engine assembly.");
 
             var readerParameters = new ReaderParameters
             {

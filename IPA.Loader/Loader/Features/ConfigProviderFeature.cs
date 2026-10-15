@@ -30,6 +30,7 @@ namespace IPA.Loader.Features
             Type getType;
             try
             {
+                PluginLoader.Load(meta);
                 getType = meta.Assembly.GetType(data.TypeName);
             }
             catch (ArgumentException)
@@ -64,7 +65,8 @@ namespace IPA.Loader.Features
 
             try
             {
-                Config.Config.Register(getType);
+                if (typeof(IPA.Compat3.Config.IConfigProvider).IsAssignableFrom(getType)) IPA.Compat3.Config.Config.Register(getType);
+                else Config.Config.Register(getType);
                 return true;
             }
             catch (Exception e)

@@ -21,14 +21,24 @@ BSIPA 4 plugins keep the modern manager and configuration APIs. Old
 while current calls keep their `Hive.Versioning.Version` return type. Compatibility
 rewriting applies only to types from `IPA.Loader`, including dependent libraries.
 
-BSIPA dependencies are checked against the selected 3.13.7, 4.3.7 or 5.0.0 API
-profile in the binary's family. A bare manifest can request those profiles without
-an assembly reference. Plugins requiring an older exact version can declare
-`"misc": { "ipa-version": "4.1.6" }`. The declaration must agree with the binary
-family and `dependsOn.BSIPA`; it selects the existing family adapters, rather than
-emulating every historical implementation detail. Future API profiles and future
-binary contracts are rejected rather than rewritten as supported. An unrelated
-legacy range no longer bypasses dependency checks.
+BSIPA dependencies select the newest matching recorded release profile in the
+binary's family, including bounded ranges for older releases. A known IPA binary
+without `dependsOn.BSIPA` gets an inferred loader dependency instead of being
+discarded. A bare manifest can select a profile through its dependency range.
+`"misc": { "ipa-version": "4.1.6" }` can request an exact API profile. It must agree
+with the binary family and dependency range. A profile uses the retained family
+adapters; it does not run a complete historical loader beside the current one.
+Future API profiles and binary contracts are rejected.
+
+Legacy version parsing accepts historical loose forms, including `1.8.0.1` as
+`1.8.0-1`, while the SemVer facade's strict constructor remains strict. Legacy
+feature arrays are parsed, including empty arrays, feature declarations, config
+providers, parameter injectors and diagnostic features. The BSIPA 3 and early
+BSIPA 4 feature facades preserve positional arguments and Boolean load/init
+hooks. Cached type/member references select these contracts without changing
+current feature APIs. New compatibility adapters belong at these binary-contract
+boundaries; copying an old `IPA.Loader.dll` into a mod folder does not provide
+isolated historical loader behavior.
 
 The bootstrap locates the game's managed engine assembly and inserts its call
 without replacing an existing camera initializer. Game data directories are

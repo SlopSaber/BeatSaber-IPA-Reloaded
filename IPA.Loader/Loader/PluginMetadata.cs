@@ -90,6 +90,9 @@ namespace IPA.Loader
         /// <value>the list of features requested by the plugin</value>
         public IReadOnlyList<Feature> Features => InternalFeatures;
 
+        /// <summary>Gets features through the early BSIPA 4 binary contract.</summary>
+        public IReadOnlyList<IPA.Compat4.Features.Feature> LegacyFeatures4 => IPA.Compat4.Features.Feature.View(InternalFeatures);
+
         internal readonly List<Feature> InternalFeatures = new();
 
         internal readonly HashSet<Feature.Instance> UnloadedFeatures = new();

@@ -83,7 +83,7 @@ namespace IPA.Loader
                 var selfMeta = new PluginMetadata
                 {
                     Assembly = Assembly.GetExecutingAssembly(),
-                    File = new FileInfo(Path.Combine(Directory.EnumerateDirectories(UnityGame.InstallPath, "*_Data").First(), "IPA.Loader.dll")),
+                    File = new FileInfo(Assembly.GetExecutingAssembly().Location),
                     PluginType = null,
                     IsSelf = true
                 };
@@ -114,7 +114,7 @@ namespace IPA.Loader
             {
                 var metadata = new PluginMetadata
                 {
-                    File = new FileInfo(Path.Combine(UnityGame.PluginsPath, plugin)),
+                    File = new FileInfo(plugin),
                     IsSelf = false
                 };
 
@@ -177,13 +177,14 @@ namespace IPA.Loader
                     }
 
                     metadata.Manifest = pluginManifest;
-                    LoaderCompatibility.SelectProfile(metadata);
 
                     bool TryPopulatePluginType(TypeDefinition type, PluginMetadata meta)
                     {
                         if (metadata.IsInterface3 && IPA.Compat3.Runtime.IsEntryType(type))
                         {
                             meta.PluginType = type;
+                            meta.TargetLoaderVersion = type.Interfaces.Select(implemented => LoaderCompatibility.GetTargetVersion(implemented.InterfaceType))
+                                .FirstOrDefault(version => version != null) ?? meta.TargetLoaderVersion;
                             meta.RuntimeOptions = RuntimeOptions.DynamicInit;
                             return true;
                         }
@@ -218,6 +219,8 @@ namespace IPA.Loader
 
                         meta.RuntimeOptions = (RuntimeOptions)rtOptionsValInt;
                         meta.PluginType = type;
+                        meta.IsInterface3 = false;
+                        meta.TargetLoaderVersion = LoaderCompatibility.GetTargetVersion(attr.Constructor.DeclaringType) ?? meta.TargetLoaderVersion;
                         return true;
                     }
 
@@ -250,8 +253,13 @@ namespace IPA.Loader
                         continue;
                     }
 
+                    LoaderCompatibility.SelectProfile(metadata);
                     Logger.Loader.Debug($"Adding info for {Path.GetFileName(plugin)}");
                     PluginsMetadata.Add(metadata);
+                }
+                catch (BadImageFormatException)
+                {
+                    Logger.Loader.Debug($"Skipping non-managed plugin file {Path.GetFileName(plugin)}");
                 }
                 catch (Exception e)
                 {
@@ -273,12 +281,21 @@ namespace IPA.Loader
                 {
                     var metadata = new PluginMetadata
                     {
-                        File = new FileInfo(Path.Combine(UnityGame.PluginsPath, manifest)),
+                        File = new FileInfo(manifest),
                         IsSelf = false,
                         IsBare = true,
                     };
 
-                    var manifestObj = JsonConvert.DeserializeObject<PluginManifest>(File.ReadAllText(manifest));
+                    string manifestText = File.ReadAllText(manifest);
+                    if (Path.GetExtension(manifest).Equals(".json", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Newtonsoft.Json.Linq.JToken candidate;
+                        try { candidate = Newtonsoft.Json.Linq.JToken.Parse(manifestText); }
+                        catch (JsonReaderException) when (!Path.GetFileName(manifest).EndsWith(".manifest.json", StringComparison.OrdinalIgnoreCase)) { continue; }
+                        if (candidate is not Newtonsoft.Json.Linq.JObject data || data["name"] == null || data["version"] == null
+                            || data["id"] == null || data["author"] == null || data["description"] == null) continue;
+                    }
+                    var manifestObj = JsonConvert.DeserializeObject<PluginManifest>(manifestText);
                     if (manifestObj is null)
                     {
                         Logger.Loader.Error($"Bare manifest {Path.GetFileName(manifest)} deserialized to null");
@@ -499,7 +516,12 @@ namespace IPA.Loader
             Logger.Loader.Debug(string.Join(", ", PluginsMetadata));
 #endif
 
-            PluginsMetadata.Sort((a, b) => b.HVersion.CompareTo(a.HVersion));
+            PluginsMetadata.Sort((a, b) =>
+            {
+                if (a.IsSelf != b.IsSelf) return a.IsSelf ? -1 : 1;
+                int version = b.HVersion.CompareTo(a.HVersion);
+                return version != 0 ? version : StringComparer.OrdinalIgnoreCase.Compare(a.File.FullName, b.File.FullName);
+            });
 
 #if DEBUG
             // print base resolution order
@@ -684,7 +706,14 @@ namespace IPA.Loader
 
                     // first load dependencies
                     var dependsOnSelf = false;
-                    foreach (var (id, range) in plugin.Manifest.Dependencies)
+                    IEnumerable<KeyValuePair<string, VersionRange>> dependencies = plugin.Manifest.Dependencies;
+                    if (!plugin.IsSelf && !plugin.IsBare && !plugin.Manifest.Dependencies.ContainsKey(SelfMeta.Id)
+                        && (plugin.TargetLoaderVersion != null || plugin.IsInterface3) && plugin.TargetIpaVersion != null)
+                    {
+                        dependencies = dependencies.Append(new KeyValuePair<string, VersionRange>(SelfMeta.Id, VersionRange.ForVersion(plugin.TargetIpaVersion)));
+                        Logger.Loader.Debug($"'{plugin.Id}' has no explicit BSIPA dependency; using its inferred {plugin.TargetIpaVersion} API profile.");
+                    }
+                    foreach (var (id, range) in dependencies)
                     {
                         if (id == SelfMeta.Id)
                             dependsOnSelf = true;
@@ -896,9 +925,6 @@ namespace IPA.Loader
             if (meta.Manifest.GameVersion is { } gv && gv != UnityGame.GameVersion)
                 Logger.Loader.Warn($"Mod {meta.Name} developed for game version {gv}, so it may not work properly.");
 
-            if (meta.IsSelf)
-                return new PluginExecutor(meta, PluginExecutor.Special.Self);
-
             foreach (var dep in meta.Dependencies)
             {
                 if (alreadyLoaded.Contains(dep)) continue;
@@ -932,7 +958,9 @@ namespace IPA.Loader
             try
             {
                 Load(meta);
-                exec = new PluginExecutor(meta);
+                foreach (var feature in meta.Features.OfType<IPA.Compat4.Features.Feature>())
+                    if (!feature.BeforeLoad(meta)) return RejectLegacyFeature(meta, feature, "BeforeLoad");
+                exec = new PluginExecutor(meta, meta.IsSelf ? PluginExecutor.Special.Self : PluginExecutor.Special.None);
             }
             catch (Exception e)
             {
@@ -945,7 +973,11 @@ namespace IPA.Loader
             {
                 try
                 {
-                    feature.BeforeInit(meta);
+                    if (feature is IPA.Compat4.Features.Feature legacy)
+                    {
+                        if (!legacy.BeforeInit(meta)) return RejectLegacyFeature(meta, feature, "BeforeInit");
+                    }
+                    else feature.BeforeInit(meta);
                 }
                 catch (Exception e)
                 {
@@ -997,6 +1029,14 @@ namespace IPA.Loader
                 }
 
             return exec;
+        }
+
+        private static PluginExecutor? RejectLegacyFeature(PluginMetadata metadata, Feature feature, string stage)
+        {
+            string message = $"Legacy feature {feature.GetType().FullName} rejected '{metadata.Id}' in {stage}: {feature.InvalidMessage}";
+            Logger.Features.Warn(message);
+            ignoredPlugins[metadata] = new IgnoreReason(Reason.Feature) { ReasonText = message };
+            return null;
         }
 
         internal static bool IsFirstLoadComplete { get; private set; }

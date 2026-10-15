@@ -57,7 +57,7 @@ namespace IPA.Loader
         private void PrepareDelegates()
         { // TODO: use custom exception types or something
             PluginLoader.Load(Metadata);
-            var type = Metadata.Assembly.GetType(Metadata.PluginType.FullName);
+            var type = Metadata.Assembly.GetType(Metadata.PluginType.FullName.Replace('/', '+'));
 
             CreatePlugin = MakeCreateFunc(type, Metadata.Name);
             LifecycleEnable = MakeLifecycleEnableFunc(type, Metadata.Name);
