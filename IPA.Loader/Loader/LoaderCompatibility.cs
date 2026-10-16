@@ -213,24 +213,25 @@ namespace IPA.Loader
                 else profile = null;
                 key = file + "|" + profile?.Version;
                 if (PreparedFiles.TryGetValue(key, out prepared)) return prepared;
-                bool compatibilityChanged = LegacyPluginRewriter.Rewrite(module);
-                compatibilityChanged |= IPA.Compat3.Runtime.Rewrite(module, profile);
-                bool dataRoutingChanged = IPA.Data.SaveDataRewriter.Rewrite(module);
-                if (!compatibilityChanged && !dataRoutingChanged)
-                {
-                    PreparedFiles[key] = file;
-                    return file;
-                }
-
                 using var hash = SHA256.Create();
                 string digest = BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "");
-                string source = BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(file.ToUpperInvariant()))).Replace("-", "");
+                // A single full-length hash keeps source/content isolation without deep cache paths.
+                string cacheKey = BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(file.ToUpperInvariant() + "\0" + digest))).Replace("-", "");
                 string directory = Path.Combine(IPA.Utilities.UnityGame.CompatibilityCachePath,
-                    typeof(LoaderCompatibility).Module.ModuleVersionId.ToString("N"), profile?.Version.ToString() ?? "binary", source, digest);
-                Directory.CreateDirectory(directory);
+                    typeof(LoaderCompatibility).Module.ModuleVersionId.ToString("N"), profile?.Version.ToString() ?? "binary", cacheKey);
                 prepared = Path.Combine(directory, Path.GetFileName(file));
                 if (!File.Exists(prepared))
                 {
+                    bool compatibilityChanged = LegacyPluginRewriter.Rewrite(module);
+                    compatibilityChanged |= IPA.Compat3.Runtime.Rewrite(module, profile);
+                    bool dataRoutingChanged = IPA.Data.SaveDataRewriter.Rewrite(module);
+                    if (!compatibilityChanged && !dataRoutingChanged)
+                    {
+                        PreparedFiles[key] = file;
+                        return file;
+                    }
+
+                    Directory.CreateDirectory(directory);
                     string temporary = prepared + ".tmp";
                     try { module.Write(temporary); File.Move(temporary, prepared); }
                     finally { if (File.Exists(temporary)) File.Delete(temporary); }

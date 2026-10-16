@@ -77,6 +77,7 @@ namespace IPA.Loader
         internal static void LoadMetadata()
         {
             string[] plugins = ModFiles.PluginFiles.ToArray();
+            var scanTimer = new Stopwatch();
 
             try
             {
@@ -122,7 +123,10 @@ namespace IPA.Loader
 
                 try
                 {
-                    var scanResult = AntiMalwareEngine.Engine.ScanFile(metadata.File);
+                    ScanResult scanResult;
+                    scanTimer.Start();
+                    try { scanResult = AntiMalwareEngine.Engine.ScanFile(metadata.File); }
+                    finally { scanTimer.Stop(); }
                     if (scanResult is ScanResult.Detected)
                     {
                         Logger.Loader.Warn($"Scan of {plugin} found malware; not loading");
@@ -406,6 +410,7 @@ namespace IPA.Loader
                     meta.Manifest.Description = description;
                 }
             }
+            Logger.Loader.Info($"Antimalware scans during metadata loading took {scanTimer.Elapsed}");
         }
     }
 

@@ -73,7 +73,8 @@ namespace IPA.Data
                     if (!supported) continue;
                     Logger.Default.Debug($"Reconciling native save {name}.");
                     string eraPath = EraPath(name);
-                    if (File.Exists(path)) RecordWrite(path); // Reconcile a save left by a failed master-store write.
+                    bool existed = File.Exists(path);
+                    if (existed) RecordWrite(path); // Reconcile a save left by a failed master-store write.
                     else if (File.Exists(eraPath)) File.Copy(eraPath, path);
                     else if (File.Exists(source))
                     {
@@ -105,7 +106,7 @@ namespace IPA.Data
                     }
                     if (File.Exists(path))
                     {
-                        RecordWrite(path);
+                        if (!existed) RecordWrite(path);
                         File.WriteAllText(path, PrepareRead(path, File.ReadAllText(path)), new UTF8Encoding(false));
                     }
                 }
