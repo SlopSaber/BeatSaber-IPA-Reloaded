@@ -138,8 +138,8 @@ namespace IPA.Loader
                         FilenameLocations = newFilenameLocations;
                         candidates = discovered.ToArray();
 
-                        _ = LoadLibrary(typeof(LibLoader).Assembly.GetReferencedAssemblies().First(name => name.Name == "Newtonsoft.Json"));
                         _ = LoadLibrary(new AssemblyName("netstandard, Version=2.0.0.0, Culture=neutral"));
+                        _ = LoadLibrary(typeof(LibLoader).Assembly.GetReferencedAssemblies().First(name => name.Name == "Newtonsoft.Json"));
 
                     }
                     finally { thisThreadIsInitializing = false; }
@@ -157,9 +157,28 @@ namespace IPA.Loader
             return LoadLibrary(asmName, requester, optionalProbe);
         }
 
+        private static string? FindRuntimeNetstandardPath(AssemblyName requested)
+        {
+            if (requested.Name != "netstandard") return null;
+            string? directory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            if (string.IsNullOrEmpty(directory)) return null;
+            string path = Path.Combine(directory, "netstandard.dll");
+            if (!File.Exists(path)) return null;
+
+            var identity = AssemblyName.GetAssemblyName(path);
+            byte[] token = requested.GetPublicKeyToken() ?? Array.Empty<byte>();
+            // The facade must match the host runtime, even for older plugin references.
+            return identity.Name == requested.Name
+                && (token.Length == 0 || token.SequenceEqual(identity.GetPublicKeyToken() ?? Array.Empty<byte>()))
+                && string.Equals(requested.CultureName ?? "", identity.CultureName ?? "", StringComparison.OrdinalIgnoreCase)
+                ? path : null;
+        }
+
         internal static string? FindLibraryPath(AssemblyName requested, string? requester = null)
         {
             SetupAssemblyFilenames();
+            string? runtimeLibrary = FindRuntimeNetstandardPath(requested);
+            if (runtimeLibrary != null) return runtimeLibrary;
             string? directory = string.IsNullOrEmpty(requester) ? null : Path.GetDirectoryName(LoaderCompatibility.OriginalPath(requester!));
             byte[] token = requested.GetPublicKeyToken() ?? Array.Empty<byte>();
             bool NameMatches(LibraryCandidate candidate) => string.Equals(candidate.Identity.Name, requested.Name, StringComparison.OrdinalIgnoreCase)
@@ -195,6 +214,12 @@ namespace IPA.Loader
                 asmName = new AssemblyName(asmName.FullName) { Name = "0Harmony.Legacy1" };
             }
             Log(Logger.Level.Debug, $"Looking for file {asmName.Name}.dll");
+            string? runtimeLibrary = FindRuntimeNetstandardPath(asmName);
+            if (runtimeLibrary != null)
+            {
+                Log(Logger.Level.Debug, $"Using runtime library {asmName.Name} from {runtimeLibrary}");
+                return Assembly.LoadFrom(runtimeLibrary);
+            }
             string? library = FindLibraryPath(asmName, requester);
             if (library != null)
             {
