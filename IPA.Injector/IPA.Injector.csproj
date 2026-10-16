@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Remove="Nullable" />
     <ProjectReference Include="..\IPA.Loader\IPA.Loader.csproj" />
   </ItemGroup>
 
