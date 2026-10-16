@@ -18,6 +18,7 @@ namespace IPA.Loader
     public class PluginMetadata
     {
         internal bool IsInterface3;
+        internal Version[] RuntimeVersions = Array.Empty<Version>();
         internal Compatibility.CompatibilityProfile? CompatibilityProfile;
         internal string CompatibilitySelection = "";
 

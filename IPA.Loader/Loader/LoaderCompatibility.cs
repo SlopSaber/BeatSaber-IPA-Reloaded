@@ -24,7 +24,8 @@ namespace IPA.Loader
 
         internal static bool MatchesDependency(PluginMetadata plugin, PluginMetadata dependency, VersionRange requirement)
         {
-            if (!dependency.IsSelf) return requirement.Matches(dependency.HVersion);
+            if (!dependency.IsSelf) return requirement.Matches(dependency.HVersion)
+                || dependency.RuntimeVersions.Any(requirement.Matches);
 
             var compatibleVersion = plugin.TargetIpaVersion ?? dependency.HVersion;
             if (!requirement.Matches(compatibleVersion)) return false;
@@ -224,6 +225,7 @@ namespace IPA.Loader
                 {
                     bool compatibilityChanged = LegacyPluginRewriter.Rewrite(module);
                     compatibilityChanged |= IPA.Compat3.Runtime.Rewrite(module, profile);
+                    compatibilityChanged |= MonoRuntimeRewriter.Rewrite(module);
                     bool dataRoutingChanged = IPA.Data.SaveDataRewriter.Rewrite(module);
                     if (!compatibilityChanged && !dataRoutingChanged)
                     {

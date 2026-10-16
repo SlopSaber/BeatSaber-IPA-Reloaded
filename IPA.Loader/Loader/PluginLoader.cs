@@ -388,6 +388,14 @@ namespace IPA.Loader
                     }
 
                     metadata.Manifest = manifestObj;
+                    var embeddedPlugin = PluginsMetadata.FirstOrDefault(existing => !existing.IsBare && existing.Id == metadata.Id);
+                    if (embeddedPlugin != null)
+                    {
+                        if (embeddedPlugin.HVersion.CompareTo(metadata.HVersion) == 0)
+                            embeddedPlugin.Manifest.Files = embeddedPlugin.Manifest.Files.Concat(metadata.Manifest.Files).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+                        Logger.Loader.Debug($"Using embedded metadata for '{metadata.Id}'; sidecar {Path.GetFileName(manifest)} is not another plugin.");
+                        continue;
+                    }
                     LoaderCompatibility.SelectProfile(metadata);
                     if (PluginsMetadata.Any(existing => existing.IsBare && existing.Id == metadata.Id && existing.HVersion.ToString() == metadata.HVersion.ToString())) continue;
 
@@ -405,19 +413,34 @@ namespace IPA.Loader
                 }
             }
 
-            foreach (string library in ModFiles.Files(new[] { UnityGame.ModLibrariesPath }, "*.dll"))
+            var runtimeLibraries = new HashSet<string>(LibLoader.RuntimeLibraryPaths, StringComparer.OrdinalIgnoreCase);
+            var libraries = runtimeLibraries.Concat(Directory.GetFiles(UnityGame.CoreLibraryPath, "*.dll"))
+                .Concat(ModFiles.Files(new[] { UnityGame.ModLibrariesPath }, "*.dll")).Distinct(StringComparer.OrdinalIgnoreCase);
+            foreach (string library in libraries)
             {
                 try
                 {
                     using var module = ModuleDefinition.ReadModule(library);
                     string id = module.Assembly.Name.Name;
-                    if (PluginsMetadata.Any(meta => (!meta.IsBare && meta.Id == id) || (meta.IsBare && meta.Manifest.Files.Any(file =>
+                    if (PluginsMetadata.Any(meta => ((!meta.IsBare || meta.RuntimeVersions.Length > 0) && meta.Id == id) || (meta.IsBare && meta.Manifest.Files.Any(file =>
                         string.Equals(ModFiles.ResolveDeclaredFile(meta, file), library, StringComparison.OrdinalIgnoreCase))))) continue;
                     var assemblyVersion = module.Assembly.Name.Version;
                     string version = $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{Math.Max(0, assemblyVersion.Build)}";
                     string? Attribute(string name) => module.Assembly.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == name)?.ConstructorArguments.FirstOrDefault().Value as string;
                     string? informational = Attribute("System.Reflection.AssemblyInformationalVersionAttribute");
                     if (informational != null && System.Text.RegularExpressions.Regex.IsMatch(informational, @"^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")) version = informational;
+                    var runtimeVersions = new List<Hive.Versioning.Version>();
+                    if (runtimeLibraries.Contains(library))
+                    {
+                        runtimeVersions.Add(new Hive.Versioning.Version(version));
+                        runtimeVersions.Add(new Hive.Versioning.Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{Math.Max(0, assemblyVersion.Build)}"));
+                        var fileVersion = FileVersionInfo.GetVersionInfo(library);
+                        if (fileVersion.FileMajorPart > 0)
+                        {
+                            version = $"{fileVersion.FileMajorPart}.{fileVersion.FileMinorPart}.{fileVersion.FileBuildPart}";
+                            runtimeVersions.Add(new Hive.Versioning.Version(version));
+                        }
+                    }
                     var manifest = new Newtonsoft.Json.Linq.JObject
                     {
                         ["id"] = id, ["name"] = id, ["version"] = version,
@@ -426,7 +449,7 @@ namespace IPA.Loader
                         ["files"] = new Newtonsoft.Json.Linq.JArray(Utils.GetRelativePath(library, UnityGame.InstallPath).Replace('\\', '/')),
                         ["features"] = new Newtonsoft.Json.Linq.JArray()
                     };
-                    var metadata = new PluginMetadata { File = new FileInfo(library), IsSelf = false, IsBare = true,
+                    var metadata = new PluginMetadata { File = new FileInfo(library), IsSelf = false, IsBare = true, RuntimeVersions = runtimeVersions.ToArray(),
                         Manifest = JsonConvert.DeserializeObject<PluginManifest>(manifest.ToString()) ?? throw new JsonException("Inferred library metadata was empty.") };
                     metadata.TargetLoaderVersion = LoaderCompatibility.GetTargetVersion(module);
                     if (metadata.TargetLoaderVersion != null) LoaderCompatibility.SelectProfile(metadata, module);
@@ -636,12 +659,7 @@ namespace IPA.Loader
             Logger.Loader.Debug(string.Join(", ", PluginsMetadata));
 #endif
 
-            PluginsMetadata.Sort((a, b) =>
-            {
-                if (a.IsSelf != b.IsSelf) return a.IsSelf ? -1 : 1;
-                int version = b.HVersion.CompareTo(a.HVersion);
-                return version != 0 ? version : StringComparer.OrdinalIgnoreCase.Compare(a.File.FullName, b.File.FullName);
-            });
+            PluginsMetadata.Sort(CompareCandidates);
 
 #if DEBUG
             // print base resolution order
@@ -840,10 +858,11 @@ namespace IPA.Loader
                         if (!TryResolveId(id, out var depMeta, out var depDisabled, out var depIgnored)
                             || !LoaderCompatibility.MatchesDependency(plugin, depMeta, range))
                         {
-                            Logger.Loader.Warn($"'{plugin.Id}' is missing dependency '{id}@{range}'; ignoring");
+                            string problem = depMeta == null ? "not found" : $"installed version {depMeta.HVersion} does not satisfy {range}";
+                            Logger.Loader.Warn($"'{plugin.Id}' cannot use dependency '{id}@{range}': {problem}; ignoring");
                             ignoredPlugins.Add(plugin, new(Reason.Dependency)
                             {
-                                ReasonText = $"Dependency '{id}@{range}' not found",
+                                ReasonText = $"Dependency '{id}@{range}': {problem}",
                             });
                             ignored = true;
                             return;
@@ -958,7 +977,8 @@ namespace IPA.Loader
 
         internal static void InitFeatures()
         {
-            foreach (var meta in PluginsMetadata)
+            PluginsMetadata.Sort(CompareCandidates);
+            foreach (var meta in PluginsMetadata.GroupBy(plugin => plugin.Id).Select(group => group.First()))
             {
                 foreach (var feature in meta.Manifest.Features
                     .SelectMany(f => f.Value.Select(o => (f.Key, o)))
@@ -1005,6 +1025,15 @@ namespace IPA.Loader
                     }
                 }
             }
+        }
+
+        private static int CompareCandidates(PluginMetadata a, PluginMetadata b)
+        {
+            if (a.IsSelf != b.IsSelf) return a.IsSelf ? -1 : 1;
+            bool aRuntime = a.RuntimeVersions.Length > 0, bRuntime = b.RuntimeVersions.Length > 0;
+            if (aRuntime != bRuntime) return aRuntime ? -1 : 1;
+            int version = b.HVersion.CompareTo(a.HVersion);
+            return version != 0 ? version : StringComparer.OrdinalIgnoreCase.Compare(a.File.FullName, b.File.FullName);
         }
 
         internal static void ReleaseAll(bool full = false)

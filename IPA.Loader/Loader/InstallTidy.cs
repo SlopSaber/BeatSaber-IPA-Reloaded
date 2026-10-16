@@ -272,7 +272,8 @@ namespace IPA.Loader
                 string destination = moves.TryGetValue(source, out string target) && File.Exists(target) ? target : source;
                 if (!File.Exists(destination)) continue;
                 try { UpdateEmbeddedManifest(source, destination, moves, removals); }
-                catch (Exception error) when (error is IOException || error is UnauthorizedAccessException || error is BadImageFormatException)
+                catch (BadImageFormatException) { /* Native DLLs have no managed manifest. */ }
+                catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
                 { Logger.Loader.Warn($"Cannot update embedded file paths in '{destination}': {error.Message}"); }
             }
             foreach (string file in (tidy ? files.Concat(Walk(UnityGame.CoreLibraryPath)) : Array.Empty<string>()).Where(p => File.Exists(p) && Path.GetExtension(p).Equals(".pdb", StringComparison.OrdinalIgnoreCase)))

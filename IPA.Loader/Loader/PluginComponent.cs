@@ -2,6 +2,7 @@
 using IPA.Loader.Composite;
 using IPA.Utilities;
 using IPA.Utilities.Async;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -113,20 +114,18 @@ namespace IPA.Loader
             quitting = true;
         }
 
-        internal void OnLevelWasLoaded(int level)
-        {
-            ipaPlugins.OnLevelWasLoaded(level);
-        }
-
-        internal void OnLevelWasInitialized(int level)
-        {
-            ipaPlugins.OnLevelWasInitialized(level);
-        }
-
         private void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
+            ipaPlugins.OnLevelWasLoaded(scene.buildIndex);
             bsPlugins.OnSceneLoaded(scene, sceneMode);
             IPA.Compat3.Runtime.SceneLoaded(scene, sceneMode);
+            StartCoroutine(NotifyLegacySceneInitialized(scene));
+        }
+
+        private IEnumerator NotifyLegacySceneInitialized(Scene scene)
+        {
+            yield return null;
+            if (!quitting && scene.isLoaded) ipaPlugins.OnLevelWasInitialized(scene.buildIndex);
         }
 
         private void OnSceneUnloaded(Scene scene) {
