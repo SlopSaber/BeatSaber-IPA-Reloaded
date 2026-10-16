@@ -151,7 +151,24 @@ Regenerate it after restoring packages, with upstream tag history present:
 licenses and package metadata are included, while Unity and development tools
 are excluded.
 
-BSIPA stores game data beneath `UserData/Hyperbolic Magnetism/Beat Saber`.
+BSIPA stores game data beneath `AppData/Hyperbolic Magnetism/Beat Saber` in the
+game installation. Link the root `AppData` directory to share saves independently
+of `UserData`, which continues to hold mod/loader configuration. Mods can query
+the root through `IPA.Utilities.UnityGame.AppDataPath`.
+
+On first startup with the new location, an existing
+`UserData/Hyperbolic Magnetism` directory moves into `AppData`. If a cross-volume
+directory link prevents renaming, BSIPA stages and verifies a copy beside the
+new destination before publishing it, retaining the original for rollback. If
+possible, that retained copy is renamed to
+`UserData/Hyperbolic Magnetism.bsipa-backup-<id>` after publication. Migration
+waits while a previous save session is active. If
+`AppData/Hyperbolic Magnetism` already exists, it is authoritative and the old
+directory is retained with a reconciliation warning; the stores are not blindly
+overwritten. Failed copies defer migration and continue using the previous
+location for that launch. To roll back a completed move, close the game and move
+the company directory back to `UserData`, or use the retained original copy.
+
 `Shared` contains portable PlayerPrefs, common graphics/player settings, colors,
 custom difficulty labels and score stores. `Versions/<game-version>/Native`
 contains the files that each game reads and writes. `Backups` retains immutable,

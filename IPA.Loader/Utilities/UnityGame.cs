@@ -248,6 +248,8 @@ namespace IPA.Utilities
         /// </summary>
         /// <value>the path to the user data directory</value>
         public static string UserDataPath => Path.Combine(InstallPath, "UserData");
+        /// <summary>Gets the game-local AppData root, which can be linked independently of mod configuration.</summary>
+        public static string AppDataPath => Path.Combine(InstallPath, "AppData");
 
         private static bool CheckIsSteam()
         {

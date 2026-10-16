@@ -29,12 +29,12 @@ namespace IPA.Data
         public static string ObserveCharacteristic(string name) { if (name != null) lock (Gate) Characteristics.Add(name); return name; }
         internal static bool SupportsCharacteristic(string name) { lock (Gate) return Characteristics.Contains(name); }
 
-        internal static void Initialize(string userData, string original, SaveDataProfile current)
+        internal static void Initialize(string appData, string userData, string original, SaveDataProfile current)
         {
             lock (Gate)
             {
                 if (profile != null) return;
-                root = Path.Combine(userData, "Hyperbolic Magnetism", "Beat Saber");
+                root = Path.Combine(GameDataLocation.Resolve(appData, userData), "Beat Saber");
                 Directory.CreateDirectory(Path.Combine(root, "Shared"));
                 Directory.CreateDirectory(Path.Combine(root, "Backups"));
                 string versionRoot = Path.Combine(root, "Versions", current.Version);
@@ -110,7 +110,7 @@ namespace IPA.Data
                     }
                 }
                 AppDomain.CurrentDomain.ProcessExit += (_, __) => { CustomDifficultyLabels.Flush(); lease?.Dispose(); };
-                Logger.Default.Info($"Game saves redirected to UserData/Hyperbolic Magnetism/Beat Saber/Versions/{current.Version}; scoring era {current.Era}. Original AppData retained.");
+                Logger.Default.Info($"Game saves redirected to '{native}'; scoring era {current.Era}. Original Windows AppData retained.");
             }
         }
 
