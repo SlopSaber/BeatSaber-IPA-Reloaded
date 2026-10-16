@@ -81,6 +81,7 @@ namespace IPA.Injector
                 GameVersionEarly.Load();
                 SelfConfig.Instance.CheckVersionBoundary();
 
+                DesktopVrPatcher.Apply();
                 GameDataPatcher.Apply();
 
                 var legacyGameProfile = LoaderCompatibility.LegacyGameAssemblyProfile();

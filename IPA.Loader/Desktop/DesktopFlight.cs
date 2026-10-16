@@ -47,9 +47,7 @@ namespace IPA.Desktop
 
         internal static void Install(GameObject host)
         {
-            string[] args = Environment.GetCommandLineArgs();
-            bool requested = SelfConfig.Instance.EnableFPFC || args.Any(argument => argument == "fpfc" || argument == "-fpfc" || argument == "--fpfc");
-            if (!requested || args.Contains("--no-fpfc") || Instance != null) return;
+            if (!DesktopMode.Requested || Instance != null) return;
             try { host.AddComponent<DesktopFlight>(); }
             catch (Exception error) { Logger.Default.Error($"Could not initialize IPA FPFC: {error}"); }
         }

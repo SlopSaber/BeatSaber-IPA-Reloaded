@@ -22,6 +22,10 @@
     <DoorstopSourceArchive>$(DoorstopCache)doorstop-source-$(DoorstopVersion).zip</DoorstopSourceArchive>
     <DoorstopArchiveHash>7BB953E8D883C8BDE76CED96F6D0E45660AD6E0151880D8AB5856BF4F532B147</DoorstopArchiveHash>
     <DoorstopSourceHash>7F0C963104AA08BF5FEFEF8FF85E7FECD8306838F5AF3101487D9DB4E9188D63</DoorstopSourceHash>
+    <NativeBootstrapSource>$(MSBuildThisFileDirectory)..\NativeBootstrap\</NativeBootstrapSource>
+    <NativeBootstrapBuild>$(DoorstopCache)bsipa-$(Platform)\</NativeBootstrapBuild>
+    <NativeBootstrapArchitecture Condition="'$(Platform)' == 'x64'">x64</NativeBootstrapArchitecture>
+    <NativeBootstrapArchitecture Condition="'$(Platform)' == 'x86'">Win32</NativeBootstrapArchitecture>
 
     <IsVerbose>false</IsVerbose>
     <IsVerbose Condition="'$(Configuration)' == 'Verbose' Or '$(Configuration)' == 'Verbose_Release'">true</IsVerbose>
@@ -108,7 +112,14 @@
     <Touch Files="$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)\version-layout.stamp" AlwaysCreate="true" />
   </Target>
 
-  <Target Name="GatherPackageInputs" DependsOnTargets="PrepareDoorstop;PrepareHistoricalLibraries;PrepareVersionLayout">
+  <Target Name="PrepareNativeBootstrap" DependsOnTargets="PrepareDoorstop"
+          Inputs="$(DoorstopSourceArchive);$(NativeBootstrapSource)CMakeLists.txt;$(NativeBootstrapSource)fpfc.c;$(NativeBootstrapSource)fpfc.h;$(MSBuildProjectFullPath)"
+          Outputs="$(NativeBootstrapBuild)$(Configuration)\winhttp.dll">
+    <Exec Command="cmake -S &quot;$(NativeBootstrapSource).&quot; -B &quot;$(NativeBootstrapBuild).&quot; -A $(NativeBootstrapArchitecture) -DDOORSTOP_SOURCE_DIR=&quot;$(DoorstopCache)source/UnityDoorstop-$(DoorstopVersion)&quot;" />
+    <Exec Command="cmake --build &quot;$(NativeBootstrapBuild).&quot; --config $(Configuration) --parallel" />
+  </Target>
+
+  <Target Name="GatherPackageInputs" DependsOnTargets="PrepareNativeBootstrap;PrepareHistoricalLibraries;PrepareVersionLayout">
     <GetFileHash Files="@(BootstrapLibrary->'$(InjectorOutputPath)Libs\%(Identity)')" Algorithm="SHA256">
       <Output TaskParameter="Items" ItemName="BootstrapLibraryHash" />
     </GetFileHash>
@@ -126,10 +137,12 @@
         <TargetPath>IPA\CoreLibraries\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
       </PackageFile>
       <PackageFile Include="@(HistoricalLibrary->'$(HistoricalCache)%(Source)')" />
-      <PackageFile Include="$(DoorstopCache)windows\$(Platform)\winhttp.dll"><TargetPath>winhttp.dll</TargetPath></PackageFile>
+      <PackageFile Include="$(NativeBootstrapBuild)$(Configuration)\winhttp.dll"><TargetPath>winhttp.dll</TargetPath></PackageFile>
       <PackageFile Include="$(MSBuildThisFileDirectory)doorstop_config.ini"><TargetPath>doorstop_config.ini</TargetPath></PackageFile>
       <PackageFile Include="$(DoorstopCache)source\UnityDoorstop-$(DoorstopVersion)\LICENSE"><TargetPath>IPA\ThirdParty\Doorstop\LICENSE</TargetPath></PackageFile>
       <PackageFile Include="$(DoorstopSourceArchive)"><TargetPath>IPA\ThirdParty\Doorstop\doorstop-source-$(DoorstopVersion).zip</TargetPath></PackageFile>
+      <BootstrapSource Include="$(NativeBootstrapSource)*" />
+      <PackageFile Include="@(BootstrapSource)"><TargetPath>IPA\ThirdParty\Doorstop\BSIPA\%(Filename)%(Extension)</TargetPath></PackageFile>
       <ExpectedPackageFiles Include="@(PackageFile->'$(OutputPath)%(TargetPath)')" />
       <ObsoletePackageFiles Include="$(OutputPath)**\*" Exclude="@(ExpectedPackageFiles->'%(FullPath)')" />
       <MissingPackageFiles Include="@(ExpectedPackageFiles)" Condition="!Exists('%(ExpectedPackageFiles.FullPath)')" />

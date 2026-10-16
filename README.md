@@ -213,6 +213,30 @@ the cursor. Movement uses unscaled time, so flight also works while paused.
 `FPFCMoveSpeed` (default 1.5 metres/second) and `FPFCLookSensitivity` (default 0.2)
 tune movement and look. Text fields suppress flight and look controls while
 keeping the cursor locked.
+
+FPFC also selects non-VR startup in the native bootstrap, before Unity starts
+its VR backend. Doorstop's startup hooks supply `-vrmode None` and a
+process-specific boot configuration with native VR disabled and the OpenXR
+pre-initialization library omitted. Other boot settings are copied from the
+original (or an explicitly configured Doorstop override). The original boot
+file and SteamVR installation are unchanged. `--no-fpfc` preserves normal VR
+startup even when the configuration enables FPFC.
+
+On XR Plug-in Management builds, conditional guards make the managed OpenXR,
+Oculus and OpenVR loaders report initialization unavailable for that desktop
+process. Their original initialization runs on normal VR launches. Changed XR
+assemblies are backed up under `IPA/Backups/DesktopVR`; the guards remain on disk
+and select behavior from the process's native startup marker. Install the whole
+package, including `winhttp.dll`, to enable early suppression. A managed-only
+update logs a warning when the native guard is unavailable. This controls the
+game's XR startup; a launcher explicitly starting SteamVR or a mod launching it
+separately is outside that path. Existing SteamVR processes are left running.
+Temporary boot copies live under `IPA/Boot` and are deleted on normal shutdown.
+
+See Unity's [VR startup device selection](https://docs.unity3d.com/2018.4/Documentation/Manual/VROverview.html)
+and [XR loader lifecycle](https://docs.unity3d.com/Packages/com.unity.xr.management@4.4/manual/EndUser.html)
+for the two initialization paths.
+
 Camera binding preserves the game's world spawn pose. An untracked head near
 local floor level receives 1.6 m of standing height in its parent rig's space,
 including when a legacy room offset places it below world zero. Parent rigs
@@ -302,6 +326,10 @@ an unchanged build keeps the existing ZIP.
 
 Packaging downloads the official [Unity Doorstop 4.5.0](https://github.com/NeighTools/UnityDoorstop/releases/tag/v4.5.0) Windows release and source
 archive, verifies both pinned SHA-256 values, and caches them under `BSIPA-Meta/obj`.
+It builds the native bootstrap from that pinned source with the FPFC extension
+in `NativeBootstrap`, using CMake 3.21+ and Visual Studio's C++ desktop workload.
+The package includes the upstream source archive, license, and BSIPA extension
+sources/build instructions under `IPA/ThirdParty/Doorstop`.
 Its configuration invokes `Doorstop.Entrypoint.Start` in `IPA.Injector.dll`.
 The Doorstop license and source archive accompany the binary under
 `IPA/ThirdParty/Doorstop`. Package generation does not install or launch the game.
