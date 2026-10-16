@@ -15,37 +15,35 @@ namespace IPA.Logging
         private static SafeFileHandle outHandle;
         private static SafeFileHandle inHandle;
 
-        public static bool UseVTEscapes { get; private set; } = true;
+        public static bool UseVTEscapes { get; private set; }
 
-        internal static IntPtr OutHandle => outHandle.DangerousGetHandle();
-        internal static IntPtr InHandle => inHandle.DangerousGetHandle();
+        internal static IntPtr OutHandle => outHandle == null || outHandle.IsClosed || outHandle.IsInvalid ? IntPtr.Zero : outHandle.DangerousGetHandle();
+        internal static IntPtr InHandle => inHandle == null || inHandle.IsClosed || inHandle.IsInvalid ? IntPtr.Zero : inHandle.DangerousGetHandle();
 
         internal static bool IsInitialized;
+        private static bool ownsConsole;
 
         public static void Initialize(int processId, bool alwaysCreateNewConsole = false)
         {
-            bool consoleAttached;
-            if (alwaysCreateNewConsole || !(consoleAttached = AttachConsole(processId)))
-            {
-                consoleAttached = AllocConsole();
-            }
+            if (IsInitialized) return;
+            if (alwaysCreateNewConsole || !AttachConsole(processId))
+                ownsConsole |= AllocConsole();
 
-            if (consoleAttached)
-            {
-                InitializeStreams();
-                IsInitialized = true;
-            }
+            // An already attached process can fail both AttachConsole and AllocConsole.
+            IsInitialized = InitializeStreams();
         }
 
-        private static void InitializeStreams()
+        private static bool InitializeStreams()
         {
-            InitializeOutStream();
+            if (!InitializeOutStream()) return false;
             InitializeInStream();
+            return true;
         }
 
-        private static void InitializeOutStream()
+        private static bool InitializeOutStream()
         {
-            var fs = CreateFileStream("CONOUT$", GenericWrite, FileShareWrite, FileAccess.Write, out outHandle);
+            var fs = CreateFileStream("CONOUT$", GenericRead | GenericWrite, FileShareRead | FileShareWrite, FileAccess.Write, out outHandle)
+                ?? CreateFileStream("CONOUT$", GenericWrite, FileShareRead | FileShareWrite, FileAccess.Write, out outHandle);
             if (fs != null)
             {
                 var writer = new StreamWriter(fs) { AutoFlush = true };
@@ -53,31 +51,36 @@ namespace IPA.Logging
                 Console.SetOut(writer);
                 Console.SetError(writer);
 
-                var handle = GetStdHandle(-11); // get stdout handle (should be CONOUT$ at this point)
+                var handle = OutHandle;
                 if (GetConsoleMode(handle, out var mode))
                 {
-                    mode |= EnableVTProcessing;
-                    if (!SetConsoleMode(handle, mode))
+                    mode |= EnableProcessedOutput | EnableVTProcessing;
+                    UseVTEscapes = SetConsoleMode(handle, mode);
+                    if (!UseVTEscapes)
                     {
-                        UseVTEscapes = false;
-                        Console.Error.WriteLine("Could not enable VT100 escape code processing (maybe you're running an old Windows?): " +
+                        Console.Error.WriteLine("VT console output unavailable; using plain output: " +
                             new Win32Exception(Marshal.GetLastWin32Error()).Message);
                     }
                 }
                 else
                 {
                     UseVTEscapes = false;
-                    Console.Error.WriteLine("Could not enable VT100 escape code processing (maybe you're running an old Windows?): " +
+                    Console.Error.WriteLine("VT console output unavailable; using plain output: " +
                         new Win32Exception(Marshal.GetLastWin32Error()).Message);
                 }
+                return true;
             }
+            return false;
         }
 
         private static void InitializeInStream()
         {
-            var fs = CreateFileStream("CONIN$", GenericRead, FileShareRead, FileAccess.Read, out inHandle);
+            var fs = CreateFileStream("CONIN$", GenericRead | GenericWrite, FileShareRead | FileShareWrite, FileAccess.Read, out inHandle)
+                ?? CreateFileStream("CONIN$", GenericRead, FileShareRead | FileShareWrite, FileAccess.Read, out inHandle);
             if (fs != null)
             {
+                if (ownsConsole && GetConsoleMode(InHandle, out var mode))
+                    _ = SetConsoleMode(InHandle, (mode | EnableExtendedFlags) & ~EnableQuickEdit);
                 Console.SetIn(ConIn = new StreamReader(fs));
             }
         }
@@ -93,6 +96,7 @@ namespace IPA.Logging
                 return fs;
             }
 
+            file.Dispose();
             handle = null;
             return null;
         }
@@ -107,7 +111,7 @@ namespace IPA.Logging
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool AttachConsole(int dwProcessId);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr CreateFile(string lpFileName, uint dwDesiredAccess, uint dwShareMode,
             IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, IntPtr hTemplateFile);
@@ -120,11 +124,10 @@ namespace IPA.Logging
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
-        [DllImport("kernel32.dll")]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern IntPtr GetStdHandle(int nStdHandle);
-
+        private const uint EnableProcessedOutput = 0x0001;
         private const uint EnableVTProcessing = 0x0004;
+        private const uint EnableQuickEdit = 0x0040;
+        private const uint EnableExtendedFlags = 0x0080;
 
         private const uint GenericWrite = 0x40000000;
         private const uint GenericRead = 0x80000000;

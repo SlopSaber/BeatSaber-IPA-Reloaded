@@ -110,6 +110,7 @@ namespace IPA.Injector
             Default.Debug($"Command-line: \"{string.Join(" ", args)}\"");
             Default.Debug($"Current time: {DateTimeOffset.Now}");
             Default.Debug($"Current culture: {CultureInfo.CurrentCulture.Name}");
+            Default.Debug($"Operating system: {Environment.OSVersion.VersionString}; CLR {Environment.Version}; {IntPtr.Size * 8}-bit process.");
             Default.Debug($"Current OpenXR runtime: {runtime ?? "null"}, exists: {File.Exists(runtime)}");
         }
 
