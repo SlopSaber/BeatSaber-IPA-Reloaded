@@ -27,6 +27,57 @@ namespace IPA.Loader
     {
         internal static PluginMetadata SelfMeta = null!;
 
+        private sealed class MetadataScan
+        {
+            internal ScanResult Result;
+            internal Exception? Error;
+            internal TimeSpan Elapsed;
+            internal long Length;
+            internal DateTime LastWriteTimeUtc;
+        }
+
+        private static Dictionary<string, Task<MetadataScan>>? metadataScans;
+
+        internal static void BeginMetadataScan()
+        {
+            // Version-boundary moves must finish before files can be scanned.
+            if (metadataScans != null || (SelfConfig.YeetMods_ && UnityGame.IsGameVersionBoundary)) return;
+            string[] files = ModFiles.PluginFiles.ToArray();
+            var scans = files.ToDictionary(path => path,
+                _ => new TaskCompletionSource<MetadataScan>(TaskCreationOptions.RunContinuationsAsynchronously), StringComparer.OrdinalIgnoreCase);
+            metadataScans = scans.ToDictionary(pair => pair.Key, pair => pair.Value.Task, StringComparer.OrdinalIgnoreCase);
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    // This worker owns its scanner; library resolution uses a separate context.
+                    var scanner = AntiMalwareEngine.CreateEngine();
+                    using var lifetime = scanner as IDisposable;
+                    foreach (string path in files) scans[path].SetResult(ScanMetadataFile(scanner, path));
+                }
+                catch (Exception error)
+                {
+                    foreach (var pending in scans.Values) pending.TrySetResult(new MetadataScan { Error = error });
+                }
+            });
+        }
+
+        private static MetadataScan ScanMetadataFile(IAntiMalware scanner, string path)
+        {
+            var timer = Stopwatch.StartNew();
+            var scan = new MetadataScan();
+            try
+            {
+                var file = new FileInfo(path);
+                scan.Length = file.Length;
+                scan.LastWriteTimeUtc = file.LastWriteTimeUtc;
+                scan.Result = scanner.ScanFile(file);
+            }
+            catch (Exception error) { scan.Error = error; }
+            scan.Elapsed = timer.Elapsed;
+            return scan;
+        }
+
         internal static Task LoadTask() =>
             Task.Run(() =>
         {
@@ -77,7 +128,8 @@ namespace IPA.Loader
         internal static void LoadMetadata()
         {
             string[] plugins = ModFiles.PluginFiles.ToArray();
-            var scanTimer = new Stopwatch();
+            var scanWait = new Stopwatch();
+            var scanTime = TimeSpan.Zero;
 
             try
             {
@@ -123,10 +175,25 @@ namespace IPA.Loader
 
                 try
                 {
-                    ScanResult scanResult;
-                    scanTimer.Start();
-                    try { scanResult = AntiMalwareEngine.Engine.ScanFile(metadata.File); }
-                    finally { scanTimer.Stop(); }
+                    MetadataScan scan;
+                    scanWait.Start();
+                    try
+                    {
+                        scan = metadataScans != null && metadataScans.TryGetValue(plugin, out var pending)
+                            ? pending.GetAwaiter().GetResult() : ScanMetadataFile(AntiMalwareEngine.Engine, plugin);
+                    }
+                    finally { scanWait.Stop(); }
+                    scanTime += scan.Elapsed;
+                    metadata.File.Refresh();
+                    if (scan.Error == null && (metadata.File.Length != scan.Length || metadata.File.LastWriteTimeUtc != scan.LastWriteTimeUtc))
+                    {
+                        scanWait.Start();
+                        try { scan = ScanMetadataFile(AntiMalwareEngine.Engine, plugin); }
+                        finally { scanWait.Stop(); }
+                        scanTime += scan.Elapsed;
+                    }
+                    if (scan.Error != null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(scan.Error).Throw();
+                    ScanResult scanResult = scan.Result;
                     if (scanResult is ScanResult.Detected)
                     {
                         Logger.Loader.Warn($"Scan of {plugin} found malware; not loading");
@@ -140,7 +207,7 @@ namespace IPA.Loader
 
                     var pluginModule = AssemblyDefinition.ReadAssembly(metadata.File.FullName, new ReaderParameters
                     {
-                        ReadingMode = ReadingMode.Immediate,
+                        ReadingMode = ReadingMode.Deferred,
                         ReadWrite = false,
                         AssemblyResolver = resolver
                     }).MainModule;
@@ -410,7 +477,8 @@ namespace IPA.Loader
                     meta.Manifest.Description = description;
                 }
             }
-            Logger.Loader.Info($"Antimalware scans during metadata loading took {scanTimer.Elapsed}");
+            metadataScans = null;
+            Logger.Loader.Info($"Plugin antimalware scans took {scanTime}; metadata waited {scanWait.Elapsed}");
         }
     }
 

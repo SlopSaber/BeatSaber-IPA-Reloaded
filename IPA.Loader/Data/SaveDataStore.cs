@@ -115,7 +115,7 @@ namespace IPA.Data
             }
         }
 
-        internal static T Transaction<T>(string relative, Func<JObject, T> operation)
+        internal static T Transaction<T>(string relative, Func<JObject, T> operation, bool readOnly = false)
         {
             if (root == null) throw new InvalidOperationException("The BSIPA shared data store is not initialized.");
             string shared = Path.Combine(root, "Shared");
@@ -124,9 +124,9 @@ namespace IPA.Data
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             using var owned = Acquire(Path.Combine(shared, ".write-lock"));
             JObject data = File.Exists(path) ? JObject.Parse(File.ReadAllText(path)) : new JObject();
-            string before = data.ToString(Formatting.None);
+            string before = readOnly ? null : data.ToString(Formatting.None);
             T result = operation(data);
-            if (before != data.ToString(Formatting.None)) Atomic(path, data.ToString(Formatting.Indented));
+            if (!readOnly && before != data.ToString(Formatting.None)) Atomic(path, data.ToString(Formatting.Indented));
             return result;
         }
 
@@ -178,8 +178,8 @@ namespace IPA.Data
                 JToken raw = name == "settings.ini" ? SharedSettings.ParseIni(text) : Parse(text);
                 if (raw == null) return text;
                 if (name.EndsWith(".dat", StringComparison.OrdinalIgnoreCase))
-                    raw = Transaction(Path.Combine("Scores", profile.Era, name + ".json"), saved => Merge(saved, raw, true));
-                JToken result = Transaction("Settings.json", settings => SharedSettings.Apply(name, raw, settings, profile));
+                    raw = Transaction(Path.Combine("Scores", profile.Era, name + ".json"), saved => Merge(saved, raw, true), readOnly: true);
+                JToken result = Transaction("Settings.json", settings => SharedSettings.Apply(name, raw, settings, profile), readOnly: true);
                 var preserved = new JObject();
                 if (name == "settings.ini" && profile.IniFields.Count > 0 && result is JObject ini)
                     foreach (var property in ini.Properties().ToArray())

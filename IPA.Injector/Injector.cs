@@ -81,6 +81,7 @@ namespace IPA.Injector
                 GameVersionEarly.Load();
                 SelfConfig.Instance.CheckVersionBoundary();
 
+                PluginLoader.BeginMetadataScan();
                 DesktopVrPatcher.Apply();
                 GameDataPatcher.Apply();
 
