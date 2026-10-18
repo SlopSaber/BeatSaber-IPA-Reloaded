@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Linq;
 using Microsoft.Win32.SafeHandles;
 
 namespace IPA.Logging
@@ -22,15 +23,40 @@ namespace IPA.Logging
 
         internal static bool IsInitialized;
         private static bool ownsConsole;
+        private static bool defaultTerminalRequested;
+        private static bool viewerAttempted;
+        internal static bool MirrorFileLog { get; private set; }
 
         public static void Initialize(int processId, bool alwaysCreateNewConsole = false)
         {
-            if (IsInitialized) return;
+            if (IsInitialized || defaultTerminalRequested) return;
+            var args = Environment.GetCommandLineArgs();
+            if (!alwaysCreateNewConsole && processId == AttachParent && !args.Contains("--legacy-console")
+                && !args.Contains("--no-logs") && DefaultTerminalLogViewer.IsAvailable)
+            {
+                defaultTerminalRequested = true;
+                return;
+            }
             if (alwaysCreateNewConsole || !AttachConsole(processId))
                 ownsConsole |= AllocConsole();
 
             // An already attached process can fail both AttachConsole and AllocConsole.
             IsInitialized = InitializeStreams();
+        }
+
+        internal static void ShowLogFile(string path)
+        {
+            if (!defaultTerminalRequested || viewerAttempted) return;
+            viewerAttempted = true;
+            if (DefaultTerminalLogViewer.TryOpen(path)) return;
+            defaultTerminalRequested = false;
+            var stdout = Console.Out;
+            var stderr = Console.Error;
+            ownsConsole = AllocConsole();
+            IsInitialized = InitializeStreams();
+            Console.SetOut(stdout);
+            Console.SetError(stderr);
+            MirrorFileLog = IsInitialized;
         }
 
         private static bool InitializeStreams()
@@ -80,7 +106,7 @@ namespace IPA.Logging
             if (fs != null)
             {
                 if (ownsConsole && GetConsoleMode(InHandle, out var mode))
-                    _ = SetConsoleMode(InHandle, (mode | EnableExtendedFlags) & ~EnableQuickEdit);
+                    _ = SetConsoleMode(InHandle, mode | EnableExtendedFlags | EnableQuickEdit);
                 Console.SetIn(ConIn = new StreamReader(fs));
             }
         }
