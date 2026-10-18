@@ -23,40 +23,21 @@ namespace IPA.Logging
 
         internal static bool IsInitialized;
         private static bool ownsConsole;
-        private static bool defaultTerminalRequested;
-        private static bool viewerAttempted;
-        internal static bool MirrorFileLog { get; private set; }
 
         public static void Initialize(int processId, bool alwaysCreateNewConsole = false)
         {
-            if (IsInitialized || defaultTerminalRequested) return;
+            if (IsInitialized) return;
             var args = Environment.GetCommandLineArgs();
             if (!alwaysCreateNewConsole && processId == AttachParent && !args.Contains("--legacy-console")
-                && !args.Contains("--no-logs") && DefaultTerminalLogViewer.IsAvailable)
-            {
-                defaultTerminalRequested = true;
-                return;
-            }
-            if (alwaysCreateNewConsole || !AttachConsole(processId))
+                && DefaultTerminalConsole.TryAttach())
+                ownsConsole = true;
+            else if (alwaysCreateNewConsole || !AttachConsole(processId))
                 ownsConsole |= AllocConsole();
 
             // An already attached process can fail both AttachConsole and AllocConsole.
             IsInitialized = InitializeStreams();
-        }
-
-        internal static void ShowLogFile(string path)
-        {
-            if (!defaultTerminalRequested || viewerAttempted) return;
-            viewerAttempted = true;
-            if (DefaultTerminalLogViewer.TryOpen(path)) return;
-            defaultTerminalRequested = false;
-            var stdout = Console.Out;
-            var stderr = Console.Error;
-            ownsConsole = AllocConsole();
-            IsInitialized = InitializeStreams();
-            Console.SetOut(stdout);
-            Console.SetError(stderr);
-            MirrorFileLog = IsInitialized;
+            if (IsInitialized && DefaultTerminalConsole.FailureReason != null)
+                Console.Error.WriteLine("Using the original console: " + DefaultTerminalConsole.FailureReason);
         }
 
         private static bool InitializeStreams()
@@ -76,6 +57,8 @@ namespace IPA.Logging
                 ConOut = writer;
                 Console.SetOut(writer);
                 Console.SetError(writer);
+                _ = SetStdHandle(-11, OutHandle);
+                _ = SetStdHandle(-12, OutHandle);
 
                 var handle = OutHandle;
                 if (GetConsoleMode(handle, out var mode))
@@ -108,6 +91,7 @@ namespace IPA.Logging
                 if (ownsConsole && GetConsoleMode(InHandle, out var mode))
                     _ = SetConsoleMode(InHandle, mode | EnableExtendedFlags | EnableQuickEdit);
                 Console.SetIn(ConIn = new StreamReader(fs));
+                _ = SetStdHandle(-10, InHandle);
             }
         }
 
@@ -149,6 +133,10 @@ namespace IPA.Logging
         [DllImport("kernel32.dll", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        private static extern bool SetStdHandle(int standardHandle, IntPtr handle);
 
         private const uint EnableProcessedOutput = 0x0001;
         private const uint EnableVTProcessing = 0x0004;

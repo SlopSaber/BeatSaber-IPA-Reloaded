@@ -35,12 +35,18 @@
     <NoVerboseConfig Condition="'$(IsVerbose)' == 'true' And '$(Configuration)' == 'Verbose_Release'">Release</NoVerboseConfig>
 
     <InjectorOutputPath>$(MSBuildThisFileDirectory)..\IPA.Injector\bin\$(NoVerboseConfig)\net472\</InjectorOutputPath>
+    <ConsoleHostOutputPath>$(MSBuildThisFileDirectory)..\IPA.Console\bin\$(NoVerboseConfig)\net472\</ConsoleHostOutputPath>
     <PackageExcludes Condition="'$(NoVerboseConfig)' == 'Release'">$(InjectorOutputPath)**\*.pdb</PackageExcludes>
   </PropertyGroup>
 
   <Import Project="..\CoreLibraries\HistoricalLibraries.props" />
 
   <ItemGroup>
+    <ProjectReference Include="..\IPA.Console\IPA.Console.csproj" ReferenceOutputAssembly="false" Private="false">
+      <SetConfiguration>Configuration=$(NoVerboseConfig)</SetConfiguration>
+      <SetPlatform>Platform=AnyCPU</SetPlatform>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+    </ProjectReference>
     <ProjectReference Include="..\IPA.Injector\IPA.Injector.csproj" ReferenceOutputAssembly="false" Private="false">
       <SetConfiguration>Configuration=$(NoVerboseConfig)</SetConfiguration>
       <SetPlatform>Platform=AnyCPU</SetPlatform>
@@ -113,13 +119,17 @@
   </Target>
 
   <Target Name="PrepareNativeBootstrap" DependsOnTargets="PrepareDoorstop"
-          Inputs="$(DoorstopSourceArchive);$(NativeBootstrapSource)CMakeLists.txt;$(NativeBootstrapSource)fpfc.c;$(NativeBootstrapSource)fpfc.h;$(MSBuildProjectFullPath)"
+          Inputs="$(DoorstopSourceArchive);$(NativeBootstrapSource)CMakeLists.txt;$(NativeBootstrapSource)fpfc.c;$(NativeBootstrapSource)fpfc.h"
           Outputs="$(NativeBootstrapBuild)$(Configuration)\winhttp.dll">
     <Exec Command="cmake -S &quot;$(NativeBootstrapSource).&quot; -B &quot;$(NativeBootstrapBuild).&quot; -A $(NativeBootstrapArchitecture) -DDOORSTOP_SOURCE_DIR=&quot;$(DoorstopCache)source/UnityDoorstop-$(DoorstopVersion)&quot;" />
     <Exec Command="cmake --build &quot;$(NativeBootstrapBuild).&quot; --config $(Configuration) --parallel" />
   </Target>
 
   <Target Name="GatherPackageInputs" DependsOnTargets="PrepareNativeBootstrap;PrepareHistoricalLibraries;PrepareVersionLayout">
+    <ItemGroup>
+      <ConsoleHostFile Include="$(ConsoleHostOutputPath)IPA.Console.exe*" />
+      <PackageFile Include="@(ConsoleHostFile)"><TargetPath>IPA\Data\Managed\%(ConsoleHostFile.Filename)%(ConsoleHostFile.Extension)</TargetPath></PackageFile>
+    </ItemGroup>
     <GetFileHash Files="@(BootstrapLibrary->'$(InjectorOutputPath)Libs\%(Identity)')" Algorithm="SHA256">
       <Output TaskParameter="Items" ItemName="BootstrapLibraryHash" />
     </GetFileHash>

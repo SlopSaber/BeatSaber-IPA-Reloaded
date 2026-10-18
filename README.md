@@ -203,13 +203,14 @@ Game assemblies are backed up under `IPA/Backups/GameDataRouting` before their
 managed persistence calls are redirected. Restoring those binaries and the
 original AppData files provides the rollback path. Full restart is required.
 
-`--verbose` opens a live log viewer through Windows' default terminal application.
-The viewer reads the session's log file, so selecting text or closing the viewer
-does not interrupt the game. It exits when the game does. Windows PowerShell is
-used without profiles; if unavailable, IPA uses an attached console instead.
-`--legacy-console` keeps the attached console, with mouse selection enabled.
-`--verbose <processId>` still attaches to the specified process's console, and
-`--no-logs` uses an attached console because no log file is available to follow.
+`--verbose` launches `IPA.Console.exe` through Windows' default terminal
+application and attaches the game to that console. Logs use the normal console
+printers directly, including when `--no-logs` disables file logging. No PowerShell
+or file-following viewer is used. The console host exits when the game does.
+Because the console is shared with the game, closing its window can also close
+the game. `--legacy-console` uses the original console allocation path, with mouse
+selection enabled. `--verbose <processId>` still attaches to the specified
+process's console. If the host cannot start or attach, IPA uses the original path.
 
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
