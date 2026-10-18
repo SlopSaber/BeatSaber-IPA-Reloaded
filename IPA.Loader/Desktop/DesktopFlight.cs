@@ -16,7 +16,7 @@ namespace IPA.Desktop
         internal static DesktopFlight Instance { get; private set; }
         internal DesktopInput Input { get; private set; }
         internal Camera Camera { get; private set; }
-        internal bool Ready => !stopping && Camera != null && Camera.isActiveAndEnabled;
+        internal bool Ready => !stopping && !yielding && Camera != null && Camera.isActiveAndEnabled;
         internal bool Captured => Ready && Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
         internal bool CanInteract { get; private set; }
         internal Vector2 MouseMotion { get; private set; }
@@ -37,6 +37,8 @@ namespace IPA.Desktop
         private CursorLockMode originalLock;
         private bool originalCursor;
         private bool stopping;
+        private bool yielding;
+        private Behaviour siraController;
         private bool applicationQuitting;
         private bool focusedLastFrame;
         private MethodInfo autoTracking;
@@ -83,6 +85,8 @@ namespace IPA.Desktop
             dirty = false;
             nextScan = Time.unscaledTime + 0.75f;
             Camera candidate = UnityEngine.Camera.main;
+            var external = DesktopGameHooks.ActiveSiraController(candidate);
+            if (external != null) { YieldToSira(external); return; }
             if (candidate != Camera)
             {
                 RestoreCamera();
@@ -126,7 +130,6 @@ namespace IPA.Desktop
                 Type type = behaviour.GetType();
                 string name = type.Name;
                 if (name == "FirstPersonFlyingController" || name == "VRController" || name == "VRPointer"
-                    || (name == "SimpleCameraController" && type.Namespace == "SiraUtil.Tools.FPFC")
                     || (name == "TrackedPoseDriver" && (Camera.transform.IsChildOf(behaviour.transform) || behaviour.transform.IsChildOf(Camera.transform)))
                     || (name == "SmoothCamera" && behaviour.gameObject == Camera.gameObject)) Disable(behaviour);
                 if (behaviour is BaseInputModule module && !(module is DesktopPointerInput)) Disable(module);
@@ -199,7 +202,18 @@ namespace IPA.Desktop
         private void Update()
         {
             if (Input == null) return;
+            if (yielding)
+            {
+                if (siraController != null && siraController.isActiveAndEnabled) return;
+                yielding = false;
+                siraController = null;
+                originalLock = Cursor.lockState;
+                originalCursor = Cursor.visible;
+                dirty = true;
+                Logger.Default.Info("SiraUtil FPFC released controls; IPA FPFC resumed.");
+            }
             if (dirty || !Ready || Time.unscaledTime >= nextScan) Scan();
+            if (yielding) return;
             // Ignore the focus/capture transition click and any cursor-warp look delta.
             CanInteract = focusedLastFrame && Captured;
             ApplyCapture();
@@ -237,6 +251,7 @@ namespace IPA.Desktop
         private void LateUpdate() { ApplyPose(); if (Input != null && !stopping) ApplyCapture(); }
         private void ApplyCapture()
         {
+            if (yielding) return;
             bool capture = Ready && Application.isFocused;
             Cursor.lockState = capture ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !capture;
@@ -251,6 +266,7 @@ namespace IPA.Desktop
         {
             focusedLastFrame = false;
             CanInteract = false;
+            if (yielding) return;
             if (focused) return;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -291,6 +307,36 @@ namespace IPA.Desktop
         private void OnApplicationQuit() { applicationQuitting = true; }
         private void OnDisable() { Shutdown(); }
         private void OnDestroy() { Shutdown(); }
+
+        internal void YieldToSira(Behaviour controller)
+        {
+            siraController = controller;
+            if (yielding || stopping) return;
+            yielding = true;
+            ReleaseControl();
+            Logger.Default.Info("IPA FPFC yielded camera, pointer and cursor controls to SiraUtil FPFC.");
+        }
+
+        private void ReleaseControl()
+        {
+            CanInteract = false;
+            MouseMotion = Vector2.zero;
+            focusedLastFrame = false;
+            RestoreCamera();
+            Camera = null;
+            autoTracking = null;
+            foreach (var pointer in pointers) if (pointer != null) { pointer.enabled = false; Destroy(pointer); }
+            pointers.Clear();
+            foreach (var saved in disabled) if (saved.Key != null) saved.Key.enabled = saved.Value;
+            disabled.Clear();
+            foreach (var saved in hidden) if (saved.Key != null) saved.Key.enabled = saved.Value;
+            hidden.Clear();
+            foreach (var restore in restoreMembers) restore();
+            restoreMembers.Clear();
+            Cursor.lockState = originalLock;
+            Cursor.visible = originalCursor;
+        }
+
         private void Shutdown()
         {
             if (stopping || Input == null) return;
@@ -298,16 +344,11 @@ namespace IPA.Desktop
             SceneManager.sceneLoaded -= SceneLoaded;
             // At quit, native pointer/controller dependencies may already be destroyed.
             // Restore gameplay ownership only when disabling FPFC during a live session.
-            if (!applicationQuitting)
+            if (!yielding)
             {
-                RestoreCamera();
-                foreach (var pointer in pointers) if (pointer != null) { pointer.enabled = false; Destroy(pointer); }
-                foreach (var saved in disabled) if (saved.Key != null) saved.Key.enabled = saved.Value;
-                foreach (var saved in hidden) if (saved.Key != null) saved.Key.enabled = saved.Value;
-                foreach (var restore in restoreMembers) restore();
+                if (!applicationQuitting) ReleaseControl();
+                else { Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
             }
-            Cursor.lockState = originalLock;
-            Cursor.visible = originalCursor;
             if (Instance == this) Instance = null;
         }
     }

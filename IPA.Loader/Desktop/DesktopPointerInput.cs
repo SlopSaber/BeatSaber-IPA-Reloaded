@@ -37,7 +37,7 @@ namespace IPA.Desktop
 
         public override void UpdateModule()
         {
-            if (Flight == null) return;
+            if (Flight == null || !Flight.Ready) return;
             foreach (var module in GetComponents<BaseInputModule>()) if (module != this) Flight.Disable(module);
         }
 

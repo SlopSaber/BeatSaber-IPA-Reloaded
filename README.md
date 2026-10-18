@@ -214,6 +214,10 @@ the cursor. Movement uses unscaled time, so flight also works while paused.
 tune movement and look. Text fields suppress flight and look controls while
 keeping the cursor locked.
 
+When SiraUtil's FPFC controller activates, IPA releases its camera, pointer and
+cursor controls before SiraUtil takes over. IPA resumes when that controller is
+disabled or destroyed. SiraUtil builds without FPFC controls retain IPA flight.
+
 FPFC also selects non-VR startup in the native bootstrap, before Unity starts
 its VR backend. Doorstop's startup hooks supply `-vrmode None` and a
 process-specific boot configuration with native VR disabled and the OpenXR

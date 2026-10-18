@@ -11,6 +11,38 @@ namespace IPA.Desktop
     {
         private static readonly Harmony Patches = new("BSIPA.DesktopFlight");
         private static readonly HashSet<MethodInfo> PointerGetters = new();
+        private static Type siraControllerType;
+
+        internal static void BindSiraControls()
+        {
+            try
+            {
+                var assembly = Loader.PluginManager.GetPluginFromId("SiraUtil")?.Assembly;
+                siraControllerType = assembly?.GetType("SiraUtil.Tools.FPFC.SimpleCameraController", false);
+                if (siraControllerType == null || !typeof(Behaviour).IsAssignableFrom(siraControllerType))
+                {
+                    siraControllerType = null;
+                    if (assembly != null) Logger.Default.Debug("SiraUtil has no FPFC controller; IPA desktop controls remain available.");
+                    return;
+                }
+                var onEnable = siraControllerType.GetMethod("OnEnable", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+                if (onEnable == null) return;
+                Patches.Patch(onEnable, prefix: new HarmonyMethod(typeof(DesktopGameHooks), nameof(SiraControllerEnabling)));
+            }
+            catch (Exception error) { Logger.Default.Warn($"SiraUtil FPFC handoff hook unavailable: {error.Message}"); }
+        }
+
+        private static void SiraControllerEnabling(Behaviour __instance)
+        {
+            try { DesktopFlight.Instance?.YieldToSira(__instance); }
+            catch (Exception error) { Logger.Default.Warn($"Could not fully restore IPA controls during SiraUtil FPFC handoff: {error}"); }
+        }
+
+        internal static Behaviour ActiveSiraController(Camera camera)
+        {
+            if (camera == null || siraControllerType == null) return null;
+            return camera.GetComponent(siraControllerType) is Behaviour controller && controller.isActiveAndEnabled ? controller : null;
+        }
 
         internal static void BindPointer(Behaviour pointer)
         {
