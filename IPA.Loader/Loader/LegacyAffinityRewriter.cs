@@ -30,12 +30,16 @@ namespace IPA.Loader
                     // Explicit overloads and argument variations require their own signature matching.
                     if (patch.ConstructorArguments.Skip(3).Any(argument => argument.Value != null
                         && (argument.Value is not CustomAttributeArgument[] values || values.Length != 0))) continue;
+                    int argumentTypes = -1;
+                    for (int i = 3; i < patch.Constructor.Parameters.Count; i++)
+                        if (patch.Constructor.Parameters[i].ParameterType.FullName == "System.Type[]") argumentTypes = i;
+                    if (argumentTypes < 0 || argumentTypes >= patch.ConstructorArguments.Count) continue;
                     var target = FindInheritedTarget(requestedType, name);
                     if (target == null) continue;
                     var instance = callback.Parameters.FirstOrDefault(parameter => parameter.Name == "__instance");
                     if (instance != null && instance.ParameterType.FullName != requestedType.FullName
                         && instance.ParameterType.FullName != target.DeclaringType.FullName && instance.ParameterType.FullName != "System.Object") continue;
-                    Wrap(module, callback, patch, requestedType, target.DeclaringType, instance);
+                    Wrap(module, callback, patch, requestedType, target.DeclaringType, instance, argumentTypes);
                     changed = true;
                 }
                 catch (AssemblyResolutionException error)
@@ -65,10 +69,10 @@ namespace IPA.Loader
         }
 
         private static void Wrap(ModuleDefinition module, MethodDefinition callback, CustomAttribute patch,
-            TypeReference requestedType, TypeReference declaredType, ParameterDefinition originalInstance)
+            TypeReference requestedType, TypeReference declaredType, ParameterDefinition originalInstance, int argumentTypes)
         {
             var wrapper = new MethodDefinition("__BSIPA_InheritedAffinity_" + callback.MetadataToken.ToInt32().ToString("x8"),
-                MethodAttributes.Private | MethodAttributes.HideBySig, module.TypeSystem.Void);
+                (callback.Attributes & MethodAttributes.MemberAccessMask) | MethodAttributes.HideBySig, module.TypeSystem.Void);
             var declared = module.ImportReference(declaredType);
             ParameterDefinition instance = null;
             foreach (var parameter in callback.Parameters)
@@ -97,7 +101,7 @@ namespace IPA.Loader
                 if (callback.Parameters[i] == originalInstance)
                     il.Emit(OpCodes.Castclass, module.ImportReference(originalInstance.ParameterType));
             }
-            il.Emit(OpCodes.Call, callback);
+            il.Emit(callback.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, callback);
             il.Append(done);
             foreach (var attribute in callback.CustomAttributes.Where(attribute => attribute.AttributeType.Namespace == "SiraUtil.Affinity").ToArray())
             {
@@ -105,6 +109,9 @@ namespace IPA.Loader
                 wrapper.CustomAttributes.Add(attribute);
             }
             patch.ConstructorArguments[0] = new CustomAttributeArgument(patch.ConstructorArguments[0].Type, declared);
+            // DeclaredMethod does not use Method's parameterless fallback for ambiguous overloads.
+            patch.ConstructorArguments[argumentTypes] = new CustomAttributeArgument(
+                patch.ConstructorArguments[argumentTypes].Type, Array.Empty<CustomAttributeArgument>());
             callback.DeclaringType.Methods.Add(wrapper);
             Logging.Logger.Loader.Debug($"Prepared inherited Affinity target {requestedType.FullName}.{(string)patch.ConstructorArguments[1].Value} on {declared.FullName}, retaining its instance scope.");
         }
