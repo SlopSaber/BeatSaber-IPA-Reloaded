@@ -208,6 +208,9 @@ namespace IPA.Loader
                     if (!assembly.IsDynamic && !string.IsNullOrEmpty(assembly.Location))
                         resolver.AddSearchDirectory(Path.GetDirectoryName(assembly.Location));
                 using var module = ModuleDefinition.ReadModule(input, new ReaderParameters { AssemblyResolver = resolver });
+                if (module.AssemblyReferences.Any(reference => reference.Name == "SiraUtil"))
+                    foreach (string modDirectory in ModFiles.Directories(ModFiles.Roots))
+                        resolver.AddSearchDirectory(modDirectory);
                 ValidateTarget(GetTargetVersion(module));
                 if (GetTargetVersion(module) != null)
                     profile = ResolveAssemblyProfile(file, module, profile);
@@ -224,6 +227,7 @@ namespace IPA.Loader
                 if (!File.Exists(prepared))
                 {
                     bool compatibilityChanged = LegacyPluginRewriter.Rewrite(module);
+                    compatibilityChanged |= LegacyAffinityRewriter.Rewrite(module);
                     compatibilityChanged |= IPA.Compat3.Runtime.Rewrite(module, profile);
                     compatibilityChanged |= MonoRuntimeRewriter.Rewrite(module);
                     bool dataRoutingChanged = IPA.Data.SaveDataRewriter.Rewrite(module);

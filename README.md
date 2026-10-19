@@ -212,6 +212,12 @@ the game. `--legacy-console` uses the original console allocation path, with mou
 selection enabled. `--verbose <processId>` still attaches to the specified
 process's console. If the host cannot start or attach, IPA uses the original path.
 
+Legacy SiraUtil Affinity callbacks targeting inherited parameterless methods
+are prepared against the method's declaring type. Void prefixes and postfixes
+retain their original instance-type restriction through a generated wrapper;
+the installed mod DLL is unchanged. Transpilers, finalizers and explicit
+overload signatures retain their original preparation behavior.
+
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
 `--no-fpfc` disables IPA flight. Controls: WASD move, Q descends, E ascends,
