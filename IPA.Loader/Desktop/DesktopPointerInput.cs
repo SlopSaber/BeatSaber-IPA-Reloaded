@@ -12,6 +12,9 @@ namespace IPA.Desktop
         private float lastClickTime;
         private DesktopPointerVisuals visuals;
         private static DesktopPointerInput currentPointer;
+        private static PointerEventData raycastPointer;
+
+        internal static bool IsDesktopRaycast(PointerEventData data) => ReferenceEquals(raycastPointer, data);
 
         internal static bool TryGetWorldPosition(out Vector3 position)
         {
@@ -56,7 +59,10 @@ namespace IPA.Desktop
             // The game's VR raycasters read this seed as a world ray, including curved canvases.
             Ray ray = new(Flight.Camera.transform.position, Flight.Camera.transform.forward);
             pointer.pointerCurrentRaycast = new RaycastResult { worldPosition = ray.origin, worldNormal = ray.direction };
-            eventSystem.RaycastAll(pointer, m_RaycastResultCache);
+            var previousRaycastPointer = raycastPointer;
+            raycastPointer = pointer;
+            try { eventSystem.RaycastAll(pointer, m_RaycastResultCache); }
+            finally { raycastPointer = previousRaycastPointer; }
             pointer.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
             currentPointer = this;
             m_RaycastResultCache.Clear();

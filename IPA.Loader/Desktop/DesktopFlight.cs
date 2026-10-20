@@ -135,6 +135,7 @@ namespace IPA.Desktop
                 Type type = behaviour.GetType();
                 DesktopCameraCompatibility.Suppress(behaviour);
                 string name = type.Name;
+                if (name == "VRGraphicRaycaster") DesktopGameHooks.BindRaycaster(behaviour);
                 if (name == "FirstPersonFlyingController" || name == "VRController" || name == "VRPointer"
                     || (name == "TrackedPoseDriver" && (Camera.transform.IsChildOf(behaviour.transform) || behaviour.transform.IsChildOf(Camera.transform)))
                     || (name == "SmoothCamera" && behaviour.gameObject == Camera.gameObject)) Disable(behaviour);

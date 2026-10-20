@@ -30,6 +30,7 @@ namespace IPA.Desktop
             Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "Awake", nameof(ExternalControllerStarting));
             Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "OnEnable", nameof(ExternalControllerStarting));
             Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "Update", nameof(ExternalControllerUpdating));
+            Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "GetInputTranslationDirection", nameof(ExternalTranslation), postfix: true);
             var camera2 = Loader.PluginManager.GetPluginFromId("Camera2")?.Assembly;
             camera2Type = camera2?.GetType("Camera2.Behaviours.Cam2", false);
             Patch(camera2, "Camera2.Behaviours.Cam2", "LateUpdate", nameof(AllowExternalCamera));
@@ -88,6 +89,15 @@ namespace IPA.Desktop
         {
             ExternalControllerStarting(__instance);
             return AllowExternalCamera();
+        }
+
+        private static void ExternalTranslation(Behaviour __instance, ref Vector3 __result)
+        {
+            var flight = DesktopFlight.Instance;
+            if (flight == null || PreferBSIPA || !Application.isFocused || !IsExternalActive(__instance) || __result.y != 0f) return;
+            // Extend WASD-only controllers without adding another transform writer or
+            // doubling vertical input in controllers that already implement it.
+            __result.y = 2f * ((flight.Input.Key("e") ? 1 : 0) - (flight.Input.Key("q") ? 1 : 0));
         }
 
         internal static bool IsExternalActive(Behaviour controller)

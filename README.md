@@ -251,6 +251,13 @@ keeping the cursor locked.
 
 SiraUtil builds without FPFC controllers retain IPA flight. Camera2's presence
 alone does not trigger a handoff; a working external FPFC controller must activate.
+Legacy SiraUtil controllers with WASD-only translation gain Q/E descent/ascent
+at twice the normal movement speed through their existing input method. Controllers
+that already supply vertical input retain it.
+
+BSIPA pointer events bypass world-physics blocking in supported native VR UI
+raycasters. Native UI graphic, canvas and modal filtering remains in effect;
+other input modules retain the original physics blocking mask.
 
 FPFC also selects non-VR startup in the native bootstrap, before Unity starts
 its VR backend. Doorstop's startup hooks supply `-vrmode None` and a

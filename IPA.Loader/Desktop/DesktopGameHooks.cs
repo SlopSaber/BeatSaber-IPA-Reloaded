@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace IPA.Desktop
 {
@@ -11,6 +12,42 @@ namespace IPA.Desktop
     {
         private static readonly Harmony Patches = new("BSIPA.DesktopFlight");
         private static readonly HashSet<MethodInfo> PointerGetters = new();
+        private static readonly HashSet<MethodInfo> Raycasters = new();
+
+        private struct BlockingState
+        {
+            internal bool Changed;
+            internal LayerMask Mask;
+        }
+
+        internal static void BindRaycaster(Behaviour raycaster)
+        {
+            var type = raycaster.GetType();
+            if (type.GetField("_blockingMask", BindingFlags.Instance | BindingFlags.NonPublic)?.FieldType != typeof(LayerMask)) return;
+            var method = type.GetMethod("Raycast", new[] { typeof(PointerEventData), typeof(List<RaycastResult>) });
+            if (method == null || Raycasters.Contains(method)) return;
+            try
+            {
+                Patches.Patch(method, prefix: new HarmonyMethod(typeof(DesktopGameHooks), nameof(DesktopRaycastBeginning)),
+                    finalizer: new HarmonyMethod(typeof(DesktopGameHooks), nameof(DesktopRaycastEnded)));
+                Raycasters.Add(method);
+                Logger.Default.Info("BSIPA pointer uses native UI raycasts without world-physics blockers; other pointer events retain their blocking masks.");
+            }
+            catch (Exception error) { Logger.Default.Warn($"FPFC UI raycast hook unavailable: {error.Message}"); }
+        }
+
+        private static void DesktopRaycastBeginning(PointerEventData __0, ref LayerMask ____blockingMask, out BlockingState __state)
+        {
+            __state = default;
+            if (!DesktopPointerInput.IsDesktopRaycast(__0)) return;
+            __state = new BlockingState { Changed = true, Mask = ____blockingMask };
+            ____blockingMask = 0;
+        }
+
+        private static void DesktopRaycastEnded(ref LayerMask ____blockingMask, BlockingState __state)
+        {
+            if (__state.Changed) ____blockingMask = __state.Mask;
+        }
 
         internal static void BindPointer(Behaviour pointer)
         {
