@@ -143,6 +143,8 @@ namespace IPA.Config
         public virtual HashSet<string> CoreMods { get; set; } = new() { "BeatSaberMarkupLanguage", "SongCore", "SiraUtil", "BS Utils" };
 
         public virtual bool EnableFPFC { get; set; } = false;
+        [SerializedName("preferBSIPAFPFC"), JsonProperty("preferBSIPAFPFC")]
+        public virtual bool PreferBSIPAFPFC { get; set; } = false;
         public virtual float FPFCMoveSpeed { get; set; } = 1.5f;
         public virtual float FPFCLookSensitivity { get; set; } = 0.2f;
 

@@ -12,21 +12,31 @@ namespace IPA.Desktop
     {
         private static readonly Harmony Patches = new("BSIPA.DesktopCameraCompatibility");
         private static Type camera2Type;
-        private static bool OwnsCamera => DesktopFlight.Instance != null && DesktopFlight.Instance.OwnsCamera;
+        private static Type siraControllerType;
+        private static PropertyInfo siraAllowInput;
+        internal static bool PreferBSIPA { get; private set; }
+        private static bool OwnsCamera => PreferBSIPA && DesktopFlight.Instance != null && DesktopFlight.Instance.OwnsCamera;
 
         internal static void Install()
         {
+            PreferBSIPA = Config.SelfConfig.Instance.PreferBSIPAFPFC;
             var sira = Loader.PluginManager.GetPluginFromId("SiraUtil")?.Assembly;
+            siraControllerType = sira?.GetType("SiraUtil.Tools.FPFC.SimpleCameraController", false);
+            if (siraControllerType != null && !typeof(Behaviour).IsAssignableFrom(siraControllerType)) siraControllerType = null;
+            siraAllowInput = siraControllerType?.GetProperty("AllowInput", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             Patch(sira, "SiraUtil.Tools.FPFC.SiraFullFPFCInstaller", "InstallBindings", nameof(SiraArguments), transpiler: true);
             Patch(sira, "SiraUtil.Tools.FPFC.FPFCSettingsController", "get_Enabled", nameof(SiraEnabled));
-            Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "Update", nameof(AllowExternalCamera));
+            Patch(sira, "SiraUtil.Tools.FPFC.FPFCToggle", "EnableFPFC", nameof(SiraActivating));
+            Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "Awake", nameof(ExternalControllerStarting));
+            Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "OnEnable", nameof(ExternalControllerStarting));
+            Patch(sira, "SiraUtil.Tools.FPFC.SimpleCameraController", "Update", nameof(ExternalControllerUpdating));
             var camera2 = Loader.PluginManager.GetPluginFromId("Camera2")?.Assembly;
             camera2Type = camera2?.GetType("Camera2.Behaviours.Cam2", false);
             Patch(camera2, "Camera2.Behaviours.Cam2", "LateUpdate", nameof(AllowExternalCamera));
             Patch(camera2, "Camera2.Behaviours.Cam2", "PrepareMiddlewaredRender", nameof(AllowExternalCamera));
             Patch(camera2, "Camera2.Behaviours.CamerasViewport", "Update", nameof(AllowExternalCamera));
             Patch(camera2, "Camera2.Behaviours.CamerasViewport", "Awake", nameof(ViewportCreated), postfix: true);
-            Logger.Default.Info("BSIPA FPFC retains camera and pointer ownership; SiraUtil and Camera2 standdown hooks installed where available.");
+            Logger.Default.Info($"FPFC camera preference: preferBSIPAFPFC={PreferBSIPA.ToString().ToLowerInvariant()}; {(PreferBSIPA ? "BSIPA owns camera and pointer controls" : "active SiraUtil/Camera2 FPFC controllers take priority")}.");
         }
 
         private static void Patch(Assembly assembly, string type, string method, string callback, bool transpiler = false, bool postfix = false)
@@ -62,6 +72,32 @@ namespace IPA.Desktop
         }
 
         private static bool AllowExternalCamera() => !OwnsCamera;
+
+        private static void ExternalControllerStarting(Behaviour __instance)
+        {
+            if (!PreferBSIPA && IsExternalActive(__instance)) DesktopFlight.Instance?.YieldToExternal(__instance);
+        }
+
+        private static void SiraActivating(Behaviour ____simpleCameraController)
+        {
+            if (!PreferBSIPA && ____simpleCameraController != null && ____simpleCameraController.isActiveAndEnabled)
+                DesktopFlight.Instance?.YieldToExternal(____simpleCameraController);
+        }
+
+        private static bool ExternalControllerUpdating(Behaviour __instance)
+        {
+            ExternalControllerStarting(__instance);
+            return AllowExternalCamera();
+        }
+
+        internal static bool IsExternalActive(Behaviour controller)
+            => controller != null && controller.isActiveAndEnabled && controller.gameObject.scene.IsValid()
+                && controller.gameObject.scene.isLoaded && (siraAllowInput?.PropertyType != typeof(bool)
+                    || (bool)siraAllowInput.GetValue(controller, null));
+
+        internal static Behaviour FindExternalController()
+            => PreferBSIPA || siraControllerType == null ? null
+                : Resources.FindObjectsOfTypeAll(siraControllerType).OfType<Behaviour>().FirstOrDefault(IsExternalActive);
 
         private static bool SiraEnabled(ref bool __result)
         {

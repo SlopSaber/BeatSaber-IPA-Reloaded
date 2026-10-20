@@ -16,7 +16,7 @@ namespace IPA.Desktop
         internal static DesktopFlight Instance { get; private set; }
         internal DesktopInput Input { get; private set; }
         internal Camera Camera { get; private set; }
-        internal bool OwnsCamera => !stopping && isActiveAndEnabled && Input != null;
+        internal bool OwnsCamera => !stopping && !yielding && isActiveAndEnabled && Input != null;
         internal bool Ready => OwnsCamera && Camera != null && Camera.isActiveAndEnabled;
         internal bool Captured => Ready && Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
         internal bool CanInteract { get; private set; }
@@ -38,6 +38,8 @@ namespace IPA.Desktop
         private CursorLockMode originalLock;
         private bool originalCursor;
         private bool stopping;
+        private bool yielding;
+        private Behaviour externalController;
         private bool applicationQuitting;
         private bool focusedLastFrame;
         private MethodInfo autoTracking;
@@ -83,6 +85,8 @@ namespace IPA.Desktop
         {
             dirty = false;
             nextScan = Time.unscaledTime + 0.75f;
+            var external = DesktopCameraCompatibility.FindExternalController();
+            if (external != null) { YieldToExternal(external); return; }
             Camera candidate = UnityEngine.Camera.main;
             if (DesktopCameraCompatibility.IsCamera2Camera(candidate))
                 candidate = Resources.FindObjectsOfTypeAll<Camera>().FirstOrDefault(camera => camera.isActiveAndEnabled
@@ -204,7 +208,19 @@ namespace IPA.Desktop
         private void Update()
         {
             if (Input == null) return;
+            if (yielding)
+            {
+                if (!DesktopCameraCompatibility.IsExternalActive(externalController))
+                    externalController = DesktopCameraCompatibility.FindExternalController();
+                if (externalController != null) return;
+                yielding = false;
+                originalLock = Cursor.lockState;
+                originalCursor = Cursor.visible;
+                dirty = true;
+                Logger.Default.Info("External FPFC released controls; BSIPA FPFC resumed.");
+            }
             if (dirty || !Ready || Time.unscaledTime >= nextScan) Scan();
+            if (yielding) return;
             // Ignore the focus/capture transition click and any cursor-warp look delta.
             CanInteract = focusedLastFrame && Captured;
             ApplyCapture();
@@ -242,7 +258,7 @@ namespace IPA.Desktop
         private void LateUpdate() { ApplyPose(); if (Input != null && !stopping) ApplyCapture(); }
         private void ApplyCapture()
         {
-            if (stopping) return;
+            if (stopping || yielding) return;
             bool capture = Ready && Application.isFocused;
             Cursor.lockState = capture ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !capture;
@@ -257,7 +273,7 @@ namespace IPA.Desktop
         {
             focusedLastFrame = false;
             CanInteract = false;
-            if (stopping) return;
+            if (stopping || yielding) return;
             if (focused) return;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -299,6 +315,16 @@ namespace IPA.Desktop
         private void OnDisable() { Shutdown(); }
         private void OnDestroy() { Shutdown(); }
 
+        internal void YieldToExternal(Behaviour controller)
+        {
+            if (stopping || DesktopCameraCompatibility.PreferBSIPA) return;
+            externalController = controller;
+            if (yielding) return;
+            yielding = true;
+            ReleaseControl();
+            Logger.Default.Info("BSIPA FPFC yielded camera, pointer and cursor controls to external FPFC.");
+        }
+
         private void ReleaseControl()
         {
             CanInteract = false;
@@ -326,8 +352,11 @@ namespace IPA.Desktop
             SceneManager.sceneLoaded -= SceneLoaded;
             // At quit, native pointer/controller dependencies may already be destroyed.
             // Restore gameplay ownership only when disabling FPFC during a live session.
-            if (!applicationQuitting) ReleaseControl();
-            else { Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
+            if (!yielding)
+            {
+                if (!applicationQuitting) ReleaseControl();
+                else { Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
+            }
             if (Instance == this) Instance = null;
         }
     }

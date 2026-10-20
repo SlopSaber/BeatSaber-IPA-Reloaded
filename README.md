@@ -226,10 +226,17 @@ Shared window mode and resolution are applied at the first Unity bootstrap callb
 before plugin initialization. Explicit Unity display arguments take priority. The
 native splash window can appear before managed display settings take effect.
 
-While BSIPA FPFC is active, BSIPA owns the game camera and pointer. Legacy
-SiraUtil uses its disabled FPFC settings binding, and Camera2's desktop viewport,
-camera rendering and editing input stand down. Saved camera layouts remain intact;
-VR launches use normal mod behavior.
+`preferBSIPAFPFC` in `UserData/Beat Saber IPA.json` selects FPFC ownership.
+The default, `false`, gives active SiraUtil FPFC controllers priority, including
+controllers used with Camera2. BSIPA releases camera, pointer and cursor control,
+then resumes when those controllers stop accepting input, are disabled or are
+destroyed. Without an active
+external controller, BSIPA provides fallback flight. Detection covers active
+controllers throughout loaded scenes, including those outside the main camera.
+Set `preferBSIPAFPFC` to `true` to give BSIPA ownership: legacy SiraUtil uses its
+disabled FPFC settings binding, while Camera2's desktop rendering and editing
+input stand down. Restart the game after changing the preference. Saved camera
+layouts remain intact; VR launches use normal mod behavior.
 
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
@@ -242,9 +249,8 @@ the cursor. Movement uses unscaled time, so flight also works while paused.
 tune movement and look. Text fields suppress flight and look controls while
 keeping the cursor locked.
 
-When SiraUtil's FPFC controller activates, IPA releases its camera, pointer and
-cursor controls before SiraUtil takes over. IPA resumes when that controller is
-disabled or destroyed. SiraUtil builds without FPFC controls retain IPA flight.
+SiraUtil builds without FPFC controllers retain IPA flight. Camera2's presence
+alone does not trigger a handoff; a working external FPFC controller must activate.
 
 FPFC also selects non-VR startup in the native bootstrap, before Unity starts
 its VR backend. Doorstop's startup hooks supply `-vrmode None` and a
