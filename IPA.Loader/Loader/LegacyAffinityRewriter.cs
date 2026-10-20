@@ -39,7 +39,7 @@ namespace IPA.Loader
                     var instance = callback.Parameters.FirstOrDefault(parameter => parameter.Name == "__instance");
                     if (instance != null && instance.ParameterType.FullName != requestedType.FullName
                         && instance.ParameterType.FullName != target.DeclaringType.FullName && instance.ParameterType.FullName != "System.Object") continue;
-                    Wrap(module, callback, patch, requestedType, target.DeclaringType, instance, argumentTypes);
+                    Wrap(module, callback, patch, requestedType, target, instance, argumentTypes);
                     changed = true;
                 }
                 catch (AssemblyResolutionException error)
@@ -61,19 +61,22 @@ namespace IPA.Loader
                 if (type == null || type.HasGenericParameters) return null;
                 var candidates = type.Methods.Where(method => method.Name == name).ToArray();
                 if (candidates.Length == 0) continue;
-                // AccessTools.Method falls back to the parameterless overload on ambiguity.
-                return candidates.SingleOrDefault(method => !method.IsStatic && !method.IsAbstract
-                    && !method.HasGenericParameters && method.Parameters.Count == 0);
+                // With no signature, AccessTools.Method selects a unique method or falls back
+                // to a parameterless overload on ambiguity. Pin that same signature explicitly.
+                var target = candidates.Length == 1 ? candidates[0]
+                    : candidates.SingleOrDefault(method => method.Parameters.Count == 0 && !method.HasGenericParameters);
+                return target != null && !target.IsStatic && !target.IsAbstract && !target.HasGenericParameters
+                    && target.Parameters.All(parameter => !parameter.ParameterType.ContainsGenericParameter) ? target : null;
             }
             return null;
         }
 
         private static void Wrap(ModuleDefinition module, MethodDefinition callback, CustomAttribute patch,
-            TypeReference requestedType, TypeReference declaredType, ParameterDefinition originalInstance, int argumentTypes)
+            TypeReference requestedType, MethodDefinition target, ParameterDefinition originalInstance, int argumentTypes)
         {
             var wrapper = new MethodDefinition("__BSIPA_InheritedAffinity_" + callback.MetadataToken.ToInt32().ToString("x8"),
                 (callback.Attributes & MethodAttributes.MemberAccessMask) | MethodAttributes.HideBySig, module.TypeSystem.Void);
-            var declared = module.ImportReference(declaredType);
+            var declared = module.ImportReference(target.DeclaringType);
             ParameterDefinition instance = null;
             foreach (var parameter in callback.Parameters)
             {
@@ -109,9 +112,11 @@ namespace IPA.Loader
                 wrapper.CustomAttributes.Add(attribute);
             }
             patch.ConstructorArguments[0] = new CustomAttributeArgument(patch.ConstructorArguments[0].Type, declared);
-            // DeclaredMethod does not use Method's parameterless fallback for ambiguous overloads.
+            // DeclaredMethod needs the resolved signature to avoid overload ambiguity.
+            var argumentType = ((ArrayType)patch.ConstructorArguments[argumentTypes].Type).ElementType;
             patch.ConstructorArguments[argumentTypes] = new CustomAttributeArgument(
-                patch.ConstructorArguments[argumentTypes].Type, Array.Empty<CustomAttributeArgument>());
+                patch.ConstructorArguments[argumentTypes].Type, target.Parameters.Select(parameter =>
+                    new CustomAttributeArgument(argumentType, module.ImportReference(parameter.ParameterType))).ToArray());
             callback.DeclaringType.Methods.Add(wrapper);
             Logging.Logger.Loader.Debug($"Prepared inherited Affinity target {requestedType.FullName}.{(string)patch.ConstructorArguments[1].Value} on {declared.FullName}, retaining its instance scope.");
         }

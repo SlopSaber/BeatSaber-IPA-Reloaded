@@ -212,11 +212,13 @@ the game. `--legacy-console` uses the original console allocation path, with mou
 selection enabled. `--verbose <processId>` still attaches to the specified
 process's console. If the host cannot start or attach, IPA uses the original path.
 
-Legacy SiraUtil Affinity callbacks targeting inherited parameterless methods
+Legacy SiraUtil Affinity callbacks targeting inherited methods without explicit signatures
 are prepared against the method's declaring type. Void prefixes and postfixes
 retain their original instance-type restriction through a generated wrapper;
 the installed mod DLL is unchanged. Transpilers, finalizers and explicit
-overload signatures retain their original preparation behavior.
+overload signatures retain their original preparation behavior. Preparation selects a
+unique inherited method, or its parameterless overload when the name is ambiguous,
+and records the resolved parameter types for SiraUtil.
 
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
