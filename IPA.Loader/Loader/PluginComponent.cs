@@ -38,7 +38,7 @@ namespace IPA.Loader
                 StartupDiagnostics.Install();
 
                 PluginManager.Load();
-                if (Desktop.DesktopFlight.Instance != null) Desktop.DesktopGameHooks.BindSiraControls();
+                if (Desktop.DesktopFlight.Instance != null) Desktop.DesktopCameraCompatibility.Install();
 
                 bsPlugins = new CompositeBSPlugin(PluginManager.BSMetas);
 #pragma warning disable 618

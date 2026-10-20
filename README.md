@@ -226,6 +226,11 @@ Shared window mode and resolution are applied at the first Unity bootstrap callb
 before plugin initialization. Explicit Unity display arguments take priority. The
 native splash window can appear before managed display settings take effect.
 
+While BSIPA FPFC is active, BSIPA owns the game camera and pointer. Legacy
+SiraUtil uses its disabled FPFC settings binding, and Camera2's desktop viewport,
+camera rendering and editing input stand down. Saved camera layouts remain intact;
+VR launches use normal mod behavior.
+
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.
 `--no-fpfc` disables IPA flight. Controls: WASD move, Q descends, E ascends,

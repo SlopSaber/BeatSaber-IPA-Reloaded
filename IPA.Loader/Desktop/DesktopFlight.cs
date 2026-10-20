@@ -16,7 +16,8 @@ namespace IPA.Desktop
         internal static DesktopFlight Instance { get; private set; }
         internal DesktopInput Input { get; private set; }
         internal Camera Camera { get; private set; }
-        internal bool Ready => !stopping && !yielding && Camera != null && Camera.isActiveAndEnabled;
+        internal bool OwnsCamera => !stopping && isActiveAndEnabled && Input != null;
+        internal bool Ready => OwnsCamera && Camera != null && Camera.isActiveAndEnabled;
         internal bool Captured => Ready && Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
         internal bool CanInteract { get; private set; }
         internal Vector2 MouseMotion { get; private set; }
@@ -37,8 +38,6 @@ namespace IPA.Desktop
         private CursorLockMode originalLock;
         private bool originalCursor;
         private bool stopping;
-        private bool yielding;
-        private Behaviour siraController;
         private bool applicationQuitting;
         private bool focusedLastFrame;
         private MethodInfo autoTracking;
@@ -85,8 +84,10 @@ namespace IPA.Desktop
             dirty = false;
             nextScan = Time.unscaledTime + 0.75f;
             Camera candidate = UnityEngine.Camera.main;
-            var external = DesktopGameHooks.ActiveSiraController(candidate);
-            if (external != null) { YieldToSira(external); return; }
+            if (DesktopCameraCompatibility.IsCamera2Camera(candidate))
+                candidate = Resources.FindObjectsOfTypeAll<Camera>().FirstOrDefault(camera => camera.isActiveAndEnabled
+                    && camera.gameObject.scene.IsValid() && camera.gameObject.scene.isLoaded
+                    && !DesktopCameraCompatibility.IsCamera2Camera(camera) && camera.CompareTag("MainCamera"));
             if (candidate != Camera)
             {
                 RestoreCamera();
@@ -128,6 +129,7 @@ namespace IPA.Desktop
             {
                 if (behaviour == null || !behaviour.gameObject.scene.IsValid() || !behaviour.gameObject.scene.isLoaded) continue;
                 Type type = behaviour.GetType();
+                DesktopCameraCompatibility.Suppress(behaviour);
                 string name = type.Name;
                 if (name == "FirstPersonFlyingController" || name == "VRController" || name == "VRPointer"
                     || (name == "TrackedPoseDriver" && (Camera.transform.IsChildOf(behaviour.transform) || behaviour.transform.IsChildOf(Camera.transform)))
@@ -202,18 +204,7 @@ namespace IPA.Desktop
         private void Update()
         {
             if (Input == null) return;
-            if (yielding)
-            {
-                if (siraController != null && siraController.isActiveAndEnabled) return;
-                yielding = false;
-                siraController = null;
-                originalLock = Cursor.lockState;
-                originalCursor = Cursor.visible;
-                dirty = true;
-                Logger.Default.Info("SiraUtil FPFC released controls; IPA FPFC resumed.");
-            }
             if (dirty || !Ready || Time.unscaledTime >= nextScan) Scan();
-            if (yielding) return;
             // Ignore the focus/capture transition click and any cursor-warp look delta.
             CanInteract = focusedLastFrame && Captured;
             ApplyCapture();
@@ -251,7 +242,7 @@ namespace IPA.Desktop
         private void LateUpdate() { ApplyPose(); if (Input != null && !stopping) ApplyCapture(); }
         private void ApplyCapture()
         {
-            if (yielding) return;
+            if (stopping) return;
             bool capture = Ready && Application.isFocused;
             Cursor.lockState = capture ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !capture;
@@ -266,7 +257,7 @@ namespace IPA.Desktop
         {
             focusedLastFrame = false;
             CanInteract = false;
-            if (yielding) return;
+            if (stopping) return;
             if (focused) return;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -308,15 +299,6 @@ namespace IPA.Desktop
         private void OnDisable() { Shutdown(); }
         private void OnDestroy() { Shutdown(); }
 
-        internal void YieldToSira(Behaviour controller)
-        {
-            siraController = controller;
-            if (yielding || stopping) return;
-            yielding = true;
-            ReleaseControl();
-            Logger.Default.Info("IPA FPFC yielded camera, pointer and cursor controls to SiraUtil FPFC.");
-        }
-
         private void ReleaseControl()
         {
             CanInteract = false;
@@ -344,11 +326,8 @@ namespace IPA.Desktop
             SceneManager.sceneLoaded -= SceneLoaded;
             // At quit, native pointer/controller dependencies may already be destroyed.
             // Restore gameplay ownership only when disabling FPFC during a live session.
-            if (!yielding)
-            {
-                if (!applicationQuitting) ReleaseControl();
-                else { Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
-            }
+            if (!applicationQuitting) ReleaseControl();
+            else { Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
             if (Instance == this) Instance = null;
         }
     }
