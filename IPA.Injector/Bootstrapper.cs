@@ -11,6 +11,7 @@ namespace IPA.Injector
 
         public void Awake()
         {
+            IPA.Data.StartupWindowSettings.Apply();
         }
 
         public void Start()

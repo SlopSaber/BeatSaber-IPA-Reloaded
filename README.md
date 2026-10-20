@@ -219,6 +219,12 @@ the installed mod DLL is unchanged. Transpilers, finalizers and explicit
 overload signatures retain their original preparation behavior. Preparation selects a
 unique inherited method, or its parameterless overload when the name is ambiguous,
 and records the resolved parameter types for SiraUtil.
+Older Affinity generators that discard empty signatures use a scoped lookup
+fallback to the parameterless overload when the declared method name is ambiguous.
+
+Shared window mode and resolution are applied at the first Unity bootstrap callback,
+before plugin initialization. Explicit Unity display arguments take priority. The
+native splash window can appear before managed display settings take effect.
 
 IPA provides desktop flight in menus and levels, including versions before 1.0.
 Launch with `fpfc`, `-fpfc` or `--fpfc`, or set `EnableFPFC` in the IPA config.

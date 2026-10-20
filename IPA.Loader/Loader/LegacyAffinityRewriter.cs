@@ -11,6 +11,7 @@ namespace IPA.Loader
 
         internal static bool Rewrite(ModuleDefinition module)
         {
+            if (module.Assembly.Name.Name == "SiraUtil") return RewriteGenerator(module);
             if (!module.AssemblyReferences.Any(reference => reference.Name == "SiraUtil")) return false;
             bool changed = false;
             foreach (var type in module.GetTypes().Where(type => !type.HasGenericParameters).ToArray())
@@ -46,6 +47,25 @@ namespace IPA.Loader
                 {
                     Logging.Logger.Loader.Debug($"Cannot prepare inherited Affinity target for {callback.FullName}: {error.Message}");
                 }
+            }
+            return changed;
+        }
+
+        private static bool RewriteGenerator(ModuleDefinition module)
+        {
+            var generator = module.GetType("SiraUtil.Affinity.Harmony.Generator.DynamicHarmonyPatchGenerator");
+            if (generator == null) return false;
+            bool changed = false;
+            foreach (var method in generator.Methods.Where(method => method.Name == "Patch" && method.HasBody))
+            foreach (var instruction in method.Body.Instructions)
+            {
+                if (instruction.OpCode != OpCodes.Call || instruction.Operand is not MethodReference call
+                    || call.DeclaringType.FullName != "HarmonyLib.AccessTools" || call.Name != "DeclaredMethod"
+                    || call.ReturnType.FullName != "System.Reflection.MethodInfo"
+                    || !call.Parameters.Select(parameter => parameter.ParameterType.FullName).SequenceEqual(
+                        new[] { "System.Type", "System.String", "System.Type[]", "System.Type[]" })) continue;
+                instruction.Operand = module.ImportReference(typeof(LegacyAffinityMethods).GetMethod(nameof(LegacyAffinityMethods.DeclaredMethod)));
+                changed = true;
             }
             return changed;
         }
