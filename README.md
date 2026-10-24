@@ -295,6 +295,9 @@ the transition click and mouse-warp delta.
 
 A single camera-aligned pointer uses the game's existing world and curved UI
 raycasters. Left click, dragging and scrolling work in menus and pause screens.
+Hit selection uses the native VR input module's comparer when available, so
+nearer UI takes priority over farther overlapping graphics. Earlier games
+without that comparer retain their original Unity hit ordering.
 The laser and hit dot use the running game's native menu prefabs, including their
 materials and newer laser fading. Controller hilts stay hidden during FPFC. The
 beam begins at the camera's exact position and shares the UI input ray; there is

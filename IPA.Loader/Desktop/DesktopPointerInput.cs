@@ -1,5 +1,8 @@
+using System;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Logger = IPA.Logging.Logger;
 
 namespace IPA.Desktop
 {
@@ -11,6 +14,8 @@ namespace IPA.Desktop
         private GameObject lastClick;
         private float lastClickTime;
         private DesktopPointerVisuals visuals;
+        private Type raycastComparerOwner;
+        private Comparison<RaycastResult> raycastComparer;
         private static DesktopPointerInput currentPointer;
         private static PointerEventData raycastPointer;
 
@@ -41,7 +46,31 @@ namespace IPA.Desktop
         public override void UpdateModule()
         {
             if (Flight == null || !Flight.Ready) return;
-            foreach (var module in GetComponents<BaseInputModule>()) if (module != this) Flight.Disable(module);
+            foreach (var module in GetComponents<BaseInputModule>())
+            {
+                if (module == this) continue;
+                BindRaycastComparer(module);
+                Flight.Disable(module);
+            }
+        }
+
+        private void BindRaycastComparer(BaseInputModule module)
+        {
+            Type type = module.GetType();
+            if (type.Name != "VRInputModule" || type == raycastComparerOwner) return;
+            raycastComparerOwner = type;
+            raycastComparer = null;
+            try
+            {
+                MethodInfo comparer = type.GetMethod("RaycastComparer", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
+                    null, new[] { typeof(RaycastResult), typeof(RaycastResult) }, null);
+                // Earlier game versions use Unity's ordering without a comparer.
+                if (comparer == null) return;
+                if (comparer.ReturnType != typeof(int))
+                    throw new MissingMethodException(type.FullName, "RaycastComparer(RaycastResult, RaycastResult)");
+                raycastComparer = (Comparison<RaycastResult>)Delegate.CreateDelegate(typeof(Comparison<RaycastResult>), comparer);
+            }
+            catch (Exception error) { Logger.Default.Warn($"FPFC native UI hit ordering unavailable: {error.Message}"); }
         }
 
         public override void Process()
@@ -63,6 +92,8 @@ namespace IPA.Desktop
             raycastPointer = pointer;
             try { eventSystem.RaycastAll(pointer, m_RaycastResultCache); }
             finally { raycastPointer = previousRaycastPointer; }
+            // Native world-space UI ranks distance before overlapping graphic depth.
+            if (raycastComparer != null) m_RaycastResultCache.Sort(raycastComparer);
             pointer.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
             currentPointer = this;
             m_RaycastResultCache.Clear();
