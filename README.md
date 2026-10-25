@@ -249,10 +249,19 @@ the cursor. Movement uses unscaled time, so flight also works while paused.
 tune movement and look. Text fields suppress flight and look controls while
 keeping the cursor locked.
 
+Flight position and look are stored relative to the camera's parent. Moving,
+rotating or scaling the player origin carries the desktop camera with it,
+including first-person camera views that follow that camera.
+
 Desktop FPFC sessions enable monitor VSync by default, synchronizing rendering
 to one display refresh per frame. This uses the presenting monitor's refresh
 cadence, including monitor or refresh-rate changes, through Unity's
 [VSync setting](https://docs.unity3d.com/ScriptReference/QualitySettings-vSyncCount.html).
+If Unity reports broken VSync, or sustained frame cadence exceeds the monitor's
+refresh rate, BSIPA disables ineffective VSync and applies a software FPS limit
+using the current game window's monitor. Display changes are checked twice per
+second. This fallback limits rendering; tear-free presentation still depends
+on the graphics driver and display. Frame timing detection uses a monotonic clock.
 Add `--vsync-off` to disable VSync and remove the software frame limit for that
 FPFC launch. BSIPA reapplies the selected pacing after graphics-settings changes
 and retains it during replays and camera-controller handoffs. The previous frame

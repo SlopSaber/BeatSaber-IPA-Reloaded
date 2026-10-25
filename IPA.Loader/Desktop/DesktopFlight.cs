@@ -107,17 +107,20 @@ namespace IPA.Desktop
                     originalPosition = Camera.transform.localPosition;
                     originalRotation = Camera.transform.localRotation;
                     originalStereo = Camera.stereoTargetEye;
-                    position = Camera.transform.position;
+                    position = Camera.transform.localPosition;
                     // Legacy room offsets can put an untracked head below world zero.
                     // Supply standing height in tracking space, retaining room translation/rotation.
-                    if (Mathf.Abs(originalPosition.y) < 0.1f && position.y < 1f)
+                    if (Mathf.Abs(originalPosition.y) < 0.1f && Camera.transform.position.y < 1f)
                     {
-                        Vector3 standing = originalPosition;
-                        standing.y = 1.6f;
-                        position = Camera.transform.parent != null ? Camera.transform.parent.TransformPoint(standing) : standing;
+                        position.y = 1.6f;
                     }
-                    else if (position.y < 0.1f) position.y = 1.6f;
-                    Vector3 angles = Camera.transform.eulerAngles;
+                    else if (Camera.transform.position.y < 0.1f)
+                    {
+                        Vector3 standing = Camera.transform.position;
+                        standing.y = 1.6f;
+                        position = Camera.transform.parent != null ? Camera.transform.parent.InverseTransformPoint(standing) : standing;
+                    }
+                    Vector3 angles = Camera.transform.localEulerAngles;
                     yaw = angles.y;
                     pitch = Mathf.DeltaAngle(0f, angles.x);
                     rotation = Quaternion.Euler(pitch, yaw, 0f);
@@ -274,7 +277,8 @@ namespace IPA.Desktop
         {
             if (!Ready) return;
             Camera.stereoTargetEye = StereoTargetEyeMask.None;
-            Camera.transform.SetPositionAndRotation(position, rotation);
+            Camera.transform.localPosition = position;
+            Camera.transform.localRotation = rotation;
         }
         private void OnApplicationFocus(bool focused)
         {
