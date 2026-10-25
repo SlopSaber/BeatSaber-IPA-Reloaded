@@ -318,8 +318,10 @@ raycasters. Left click, dragging and scrolling work in menus and pause screens.
 Hit selection uses the native VR input module's comparer when available, so
 nearer UI takes priority over farther overlapping graphics. Earlier games
 without that comparer retain their original Unity hit ordering.
-The pointer is a six-pixel circular dot with a contrasting edge, centered on the
-camera viewport. Its screen overlay stays visible while the desktop camera is
+The pointer has a six-pixel bright core with a soft glow halo, using the native
+cursor material's color and emission tint when available. The glow is included
+in the overlay, so it remains visible with post-processing disabled. The dot is
+centered on the camera viewport. Its overlay stays visible while the desktop camera is
 ready, including when no UI is hit or input capture is released. It does not
 participate in raycasting. Hit testing still uses the center camera ray, and
 click/drag capture rules are unchanged. Controller hilts stay hidden during FPFC.

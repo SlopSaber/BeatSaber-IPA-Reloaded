@@ -39,6 +39,7 @@ namespace IPA.Desktop
         {
             DesktopGameHooks.BindPointer(source);
             EnsureVisuals();
+            visuals?.UseNativeCursorStyle(source);
         }
 
         private void EnsureVisuals()

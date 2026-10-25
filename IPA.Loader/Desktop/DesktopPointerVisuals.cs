@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 using Logger = IPA.Logging.Logger;
@@ -11,7 +12,10 @@ namespace IPA.Desktop
         private readonly GameObject root;
         private readonly Canvas canvas;
         private readonly RectTransform dot;
-        private readonly Texture2D texture;
+        private readonly RawImage image;
+        private Texture2D texture;
+        private Color coreColor;
+        private Color glowColor;
 
         internal bool IsAlive => root != null;
 
@@ -41,29 +45,68 @@ namespace IPA.Desktop
                 imageObject.transform.SetParent(root.transform, false);
                 dot = imageObject.GetComponent<RectTransform>();
                 dot.anchorMin = dot.anchorMax = dot.pivot = new Vector2(0.5f, 0.5f);
-                dot.sizeDelta = new Vector2(6f, 6f);
+                dot.sizeDelta = new Vector2(24f, 24f);
                 dot.anchoredPosition = Vector2.zero;
-                texture = CreateDotTexture();
-                var image = imageObject.GetComponent<RawImage>();
-                image.texture = texture;
+                image = imageObject.GetComponent<RawImage>();
                 image.raycastTarget = false;
                 image.maskable = false;
+                SetColors(new Color(0f, 0.5f, 1f), new Color(0.22f, 0.55f, 1f));
                 Hide();
             }
             catch { Dispose(); throw; }
         }
 
-        private static Texture2D CreateDotTexture()
+        internal void UseNativeCursorStyle(Behaviour source)
         {
-            const int size = 32;
+            try
+            {
+                var prefab = source.GetType().GetField("_cursorPrefab", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(source) as Component;
+                var renderer = prefab != null ? prefab.GetComponentInChildren<Renderer>(true) : null;
+                var material = renderer != null ? renderer.sharedMaterial : null;
+                if (material == null) return;
+                Color color = material.HasProperty("_Color") ? material.GetColor("_Color")
+                    : material.HasProperty("_BaseColor") ? material.GetColor("_BaseColor") : new Color(0f, 0.5f, 1f);
+                Color emission = material.HasProperty("_EmissionColor") ? material.GetColor("_EmissionColor") : color;
+                if (emission.maxColorComponent <= 0f) emission = color;
+                SetColors(color, emission);
+            }
+            catch (Exception error) { Logger.Default.Debug($"Native FPFC cursor style unavailable: {error.Message}"); }
+        }
+
+        private static Color NormalizeColor(Color color)
+        {
+            float scale = Mathf.Max(1f, color.maxColorComponent);
+            return new Color(Mathf.Clamp01(color.r / scale), Mathf.Clamp01(color.g / scale), Mathf.Clamp01(color.b / scale), 1f);
+        }
+
+        private void SetColors(Color color, Color emission)
+        {
+            Color core = Color.Lerp(NormalizeColor(color), Color.white, 0.85f);
+            Color glow = NormalizeColor(emission);
+            if (texture != null && core == coreColor && glow == glowColor) return;
+            Texture2D replacement = CreateDotTexture(core, glow);
+            try { image.texture = replacement; }
+            catch { Object.Destroy(replacement); throw; }
+            Texture2D previous = texture;
+            texture = replacement;
+            coreColor = core;
+            glowColor = glow;
+            if (previous != null) Object.Destroy(previous);
+        }
+
+        private static Texture2D CreateDotTexture(Color core, Color glow)
+        {
+            const int size = 96;
             var pixels = new Color32[size * size];
             for (int y = 0; y < size; y++)
             for (int x = 0; x < size; x++)
             {
-                float distance = new Vector2(x + 0.5f - size * 0.5f, y + 0.5f - size * 0.5f).magnitude;
-                byte shade = (byte)(255f * Mathf.Clamp01(size * 0.3f - distance));
-                byte alpha = (byte)(255f * Mathf.Clamp01(size * 0.5f - distance));
-                pixels[y * size + x] = new Color32(shade, shade, shade, alpha);
+                float radius = new Vector2(x + 0.5f - size * 0.5f, y + 0.5f - size * 0.5f).magnitude / (size * 0.5f);
+                float center = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.21f, 0.27f, radius));
+                float halo = 0.55f * Mathf.Exp(-5.5f * radius * radius) * Mathf.Clamp01((1f - radius) * 6f);
+                Color pixel = Color.Lerp(glow, core, center);
+                pixel.a = center + halo * (1f - center);
+                pixels[y * size + x] = pixel;
             }
             var result = new Texture2D(size, size, TextureFormat.RGBA32, false)
             {
