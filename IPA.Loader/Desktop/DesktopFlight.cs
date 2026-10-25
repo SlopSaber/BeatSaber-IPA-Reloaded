@@ -28,6 +28,9 @@ namespace IPA.Desktop
         private readonly List<Action> restoreMembers = new();
         private Vector3 position;
         private Quaternion rotation;
+        private bool poseInitializationPending;
+        private Vector3 initialWorldPosition;
+        private Quaternion initialWorldRotation;
         private Vector3 originalPosition;
         private Quaternion originalRotation;
         private StereoTargetEyeMask originalStereo;
@@ -98,32 +101,20 @@ namespace IPA.Desktop
                 candidate = Resources.FindObjectsOfTypeAll<Camera>().FirstOrDefault(camera => camera.isActiveAndEnabled
                     && camera.gameObject.scene.IsValid() && camera.gameObject.scene.isLoaded
                     && !DesktopCameraCompatibility.IsCamera2Camera(camera) && camera.CompareTag("MainCamera"));
-            if (candidate != Camera)
+            bool cameraChanged = candidate != Camera;
+            if (cameraChanged)
             {
                 RestoreCamera();
                 Camera = candidate;
+                poseInitializationPending = Camera != null;
                 if (Camera != null)
                 {
                     originalPosition = Camera.transform.localPosition;
                     originalRotation = Camera.transform.localRotation;
                     originalStereo = Camera.stereoTargetEye;
-                    position = Camera.transform.localPosition;
-                    // Legacy room offsets can put an untracked head below world zero.
-                    // Supply standing height in tracking space, retaining room translation/rotation.
-                    if (Mathf.Abs(originalPosition.y) < 0.1f && Camera.transform.position.y < 1f)
-                    {
-                        position.y = 1.6f;
-                    }
-                    else if (Camera.transform.position.y < 0.1f)
-                    {
-                        Vector3 standing = Camera.transform.position;
-                        standing.y = 1.6f;
-                        position = Camera.transform.parent != null ? Camera.transform.parent.InverseTransformPoint(standing) : standing;
-                    }
-                    Vector3 angles = Camera.transform.localEulerAngles;
-                    yaw = angles.y;
-                    pitch = Mathf.DeltaAngle(0f, angles.x);
-                    rotation = Quaternion.Euler(pitch, yaw, 0f);
+                    initialWorldPosition = Camera.transform.position;
+                    if (initialWorldPosition.y < 1f) initialWorldPosition.y = 1.6f;
+                    initialWorldRotation = Camera.transform.rotation;
                     Camera.stereoTargetEye = StereoTargetEyeMask.None;
                     Camera.ResetProjectionMatrix();
                     autoTracking = AppDomain.CurrentDomain.GetAssemblies()
@@ -179,6 +170,19 @@ namespace IPA.Desktop
                     pauseProperty = type.GetProperty("pause");
                     pausedField = type.GetField("_paused", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 }
+            }
+            if (poseInitializationPending && Ready)
+            {
+                // Native flight teardown resets the origin before relative pose ownership begins.
+                Transform parent = Camera.transform.parent;
+                position = parent != null ? parent.InverseTransformPoint(initialWorldPosition) : initialWorldPosition;
+                Quaternion localRotation = parent != null ? Quaternion.Inverse(parent.rotation) * initialWorldRotation : initialWorldRotation;
+                Vector3 angles = localRotation.eulerAngles;
+                yaw = angles.y;
+                pitch = Mathf.DeltaAngle(0f, angles.x);
+                rotation = Quaternion.Euler(pitch, yaw, 0f);
+                poseInitializationPending = false;
+                Logger.Default.Debug($"FPFC initial pose: camera={Camera.name}, parent={(parent != null ? parent.name : "none")}, world={initialWorldPosition}, local={position}.");
             }
             foreach (var dead in disabled.Keys.Where(behaviour => behaviour == null).ToArray()) disabled.Remove(dead);
             pointers.RemoveAll(pointer => pointer == null);
@@ -343,6 +347,7 @@ namespace IPA.Desktop
             focusedLastFrame = false;
             RestoreCamera();
             Camera = null;
+            poseInitializationPending = false;
             autoTracking = null;
             foreach (var pointer in pointers) if (pointer != null) { pointer.enabled = false; Destroy(pointer); }
             pointers.Clear();

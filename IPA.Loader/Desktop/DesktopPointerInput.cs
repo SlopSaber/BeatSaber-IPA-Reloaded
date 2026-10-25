@@ -14,6 +14,7 @@ namespace IPA.Desktop
         private GameObject lastClick;
         private float lastClickTime;
         private DesktopPointerVisuals visuals;
+        private float nextVisualsAttempt;
         private Type raycastComparerOwner;
         private Comparison<RaycastResult> raycastComparer;
         private static DesktopPointerInput currentPointer;
@@ -37,7 +38,15 @@ namespace IPA.Desktop
         internal void BindVisuals(Behaviour source)
         {
             DesktopGameHooks.BindPointer(source);
-            if (visuals == null || !visuals.IsAlive) visuals = DesktopPointerVisuals.Create(source);
+            EnsureVisuals();
+        }
+
+        private void EnsureVisuals()
+        {
+            if (visuals != null && visuals.IsAlive) return;
+            if (Time.unscaledTime < nextVisualsAttempt) return;
+            nextVisualsAttempt = Time.unscaledTime + 1f;
+            visuals = DesktopPointerVisuals.Create();
         }
 
         public override bool IsModuleSupported() => Flight != null && Flight.Ready;
@@ -102,7 +111,6 @@ namespace IPA.Desktop
                 pointer.position = pointer.pointerCurrentRaycast.screenPosition;
             pointer.delta = pointer.position - previousPosition;
             GameObject current = pointer.pointerCurrentRaycast.gameObject;
-            visuals?.Draw(Flight.Camera, ray, pointer.pointerCurrentRaycast);
             HandlePointerExitAndEnter(pointer, current);
             if (Flight.Input.Mouse(0, 1)) Press(current);
             if (pointer.pointerDrag != null && Flight.Input.Mouse(0))
@@ -168,7 +176,9 @@ namespace IPA.Desktop
         public override void DeactivateModule() { CancelPointer(); base.DeactivateModule(); }
         private void LateUpdate()
         {
-            if (EventSystem.current != eventSystem || !ShouldActivateModule() || !Flight.CanInteract) visuals?.Hide();
+            if (EventSystem.current != eventSystem || Flight == null || !Flight.Ready) { visuals?.Hide(); return; }
+            EnsureVisuals();
+            visuals?.Draw(Flight.Camera);
         }
         protected override void OnDisable()
         {

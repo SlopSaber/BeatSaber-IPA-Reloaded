@@ -1,115 +1,100 @@
 using System;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using Logger = IPA.Logging.Logger;
 using Object = UnityEngine.Object;
 
 namespace IPA.Desktop
 {
-    // Use the game's own materials and meshes, without running a second input/controller writer.
     internal sealed class DesktopPointerVisuals : IDisposable
     {
         private readonly GameObject root;
-        private readonly Transform laser;
-        private readonly Transform cursor;
-        private readonly float width;
-        private readonly float defaultLength;
-        private readonly Action<Vector3> setLaserPosition;
-        private readonly Action<Vector3> setLaserScale;
-        private readonly Action<float> setFadeDistance;
+        private readonly Canvas canvas;
+        private readonly RectTransform dot;
+        private readonly Texture2D texture;
 
         internal bool IsAlive => root != null;
 
-        internal static DesktopPointerVisuals Create(Behaviour source)
+        internal static DesktopPointerVisuals Create()
         {
-            try
-            {
-                var laserPrefab = Field(source, "_laserPointerPrefab") as Component;
-                var cursorPrefab = Field(source, "_cursorPrefab") as Component;
-                if (laserPrefab == null && cursorPrefab == null) return null;
-                return new DesktopPointerVisuals(source, laserPrefab, cursorPrefab);
-            }
+            try { return new DesktopPointerVisuals(); }
             catch (Exception error)
             {
-                Logger.Default.Debug($"Native FPFC pointer assets unavailable: {error.Message}");
+                Logger.Default.Debug($"FPFC reticle unavailable: {error.Message}");
                 return null;
             }
         }
 
-        private DesktopPointerVisuals(Behaviour source, Component laserPrefab, Component cursorPrefab)
+        private DesktopPointerVisuals()
         {
-            root = new GameObject("IPA FPFC Menu Pointer");
-            // Keep world-unit dimensions even when the EventSystem is below a scaled canvas.
-            // The owning input module disposes this root on disable or scene unload.
-            Object.DontDestroyOnLoad(root);
-            width = Field(source, "_laserPointerWidth") is float w && w > 0f ? w : 0.01f;
-            defaultLength = Field(source, "_defaultLaserPointerLength") is float length && length > 0f ? length : 10f;
+            root = new GameObject("IPA FPFC Reticle", typeof(RectTransform), typeof(Canvas));
             try
             {
-                if (laserPrefab != null)
-                {
-                    laser = Object.Instantiate(laserPrefab.transform, root.transform, false);
-                    laser.name = "Native menu laser";
-                    // Older versions expose a Transform; newer versions adjust their renderer child.
-                    var component = laser.GetComponent(laserPrefab.GetType());
-                    setLaserPosition = Bind<Vector3>(component, "SetLocalPosition");
-                    setLaserScale = Bind<Vector3>(component, "SetLocalScale");
-                    setFadeDistance = Bind<float>(component, "SetFadeDistance");
-                }
-                if (cursorPrefab != null)
-                {
-                    cursor = Object.Instantiate(cursorPrefab.transform, root.transform, false);
-                    cursor.name = "Native menu dot";
-                }
+                Object.DontDestroyOnLoad(root);
+                root.layer = 5;
+                canvas = root.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.sortingOrder = short.MaxValue;
+                canvas.pixelPerfect = true;
+                var imageObject = new GameObject("Dot", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+                imageObject.layer = 5;
+                imageObject.transform.SetParent(root.transform, false);
+                dot = imageObject.GetComponent<RectTransform>();
+                dot.anchorMin = dot.anchorMax = dot.pivot = new Vector2(0.5f, 0.5f);
+                dot.sizeDelta = new Vector2(6f, 6f);
+                dot.anchoredPosition = Vector2.zero;
+                texture = CreateDotTexture();
+                var image = imageObject.GetComponent<RawImage>();
+                image.texture = texture;
+                image.raycastTarget = false;
+                image.maskable = false;
                 Hide();
             }
-            catch { Object.Destroy(root); throw; }
+            catch { Dispose(); throw; }
         }
 
-        private static object Field(Behaviour source, string name)
-            => source.GetType().GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(source);
-
-        private static Action<T> Bind<T>(Component component, string name)
+        private static Texture2D CreateDotTexture()
         {
-            var method = component?.GetType().GetMethod(name, new[] { typeof(T) });
-            return method == null ? null : (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), component, method);
+            const int size = 32;
+            var pixels = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float distance = new Vector2(x + 0.5f - size * 0.5f, y + 0.5f - size * 0.5f).magnitude;
+                byte shade = (byte)(255f * Mathf.Clamp01(size * 0.3f - distance));
+                byte alpha = (byte)(255f * Mathf.Clamp01(size * 0.5f - distance));
+                pixels[y * size + x] = new Color32(shade, shade, shade, alpha);
+            }
+            var result = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = "IPA FPFC Dot",
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            try
+            {
+                result.SetPixels32(pixels);
+                result.Apply(false, true);
+                return result;
+            }
+            catch { Object.Destroy(result); throw; }
         }
 
-        internal void Draw(Camera camera, Ray ray, RaycastResult hit)
+        internal void Draw(Camera camera)
         {
-            if (root == null) return;
-            bool hasHit = hit.gameObject != null && Finite(hit.worldPosition);
-            Vector3 target = hasHit ? hit.worldPosition : ray.GetPoint(defaultLength);
-            // Share the camera's exact world-space origin with UI hit detection.
-            Vector3 origin = ray.origin;
-            Vector3 direction = target - origin;
-            float length = direction.magnitude;
-            if (!Finite(target) || length < 0.001f) { Hide(); return; }
-            root.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(direction, camera.transform.up));
-            root.SetActive(true);
-            if (laser != null)
-            {
-                laser.gameObject.SetActive(true);
-                Vector3 position = new(0f, 0f, length * 0.5f);
-                Vector3 scale = new(width, width, length);
-                if (setLaserPosition != null) setLaserPosition(position); else laser.localPosition = position;
-                if (setLaserScale != null) setLaserScale(scale); else laser.localScale = scale;
-                setFadeDistance?.Invoke(hasHit ? Mathf.Epsilon : 1f);
-            }
-            if (cursor != null)
-            {
-                cursor.gameObject.SetActive(hasHit);
-                if (hasHit) cursor.position = target;
-            }
+            if (root == null || camera == null) return;
+            if (canvas.targetDisplay != camera.targetDisplay) canvas.targetDisplay = camera.targetDisplay;
+            Vector2 center = camera.rect.center;
+            if (dot.anchorMin != center || dot.anchorMax != center) dot.anchorMin = dot.anchorMax = center;
+            if (!root.activeSelf) root.SetActive(true);
         }
 
-        private static bool Finite(Vector3 value)
-            => !float.IsNaN(value.x) && !float.IsInfinity(value.x)
-                && !float.IsNaN(value.y) && !float.IsInfinity(value.y)
-                && !float.IsNaN(value.z) && !float.IsInfinity(value.z);
+        internal void Hide() { if (root != null && root.activeSelf) root.SetActive(false); }
 
-        internal void Hide() { if (root != null) root.SetActive(false); }
-        public void Dispose() { if (root != null) Object.Destroy(root); }
+        public void Dispose()
+        {
+            if (root != null) Object.Destroy(root);
+            if (texture != null) Object.Destroy(texture);
+        }
     }
 }

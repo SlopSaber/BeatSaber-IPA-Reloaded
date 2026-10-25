@@ -301,10 +301,11 @@ See Unity's [VR startup device selection](https://docs.unity3d.com/2018.4/Docume
 and [XR loader lifecycle](https://docs.unity3d.com/Packages/com.unity.xr.management@4.4/manual/EndUser.html)
 for the two initialization paths.
 
-Camera binding preserves the game's world spawn pose. An untracked head near
-local floor level receives 1.6 m of standing height in its parent rig's space,
-including when a legacy room offset places it below world zero. Parent rigs
-already supplying standing height are not counted twice.
+Camera binding preserves the game's world spawn pose across native controller
+teardown, then converts it into the camera parent's coordinates. Native origin
+resets therefore retain the standing pose, while later origin movement remains
+inherited. An untracked world pose below one metre receives a 1.6 m standing
+height; an existing standing pose is preserved.
 
 FPFC locks and hides the cursor whenever the game is focused and a camera is
 active. UI clicks require captured input; the pointer always follows the centre
@@ -317,10 +318,12 @@ raycasters. Left click, dragging and scrolling work in menus and pause screens.
 Hit selection uses the native VR input module's comparer when available, so
 nearer UI takes priority over farther overlapping graphics. Earlier games
 without that comparer retain their original Unity hit ordering.
-The laser and hit dot use the running game's native menu prefabs, including their
-materials and newer laser fading. Controller hilts stay hidden during FPFC. The
-beam begins at the camera's exact position and shares the UI input ray; there is
-no controller offset or overlay crosshair. Native/SiraUtil camera controllers,
+The pointer is a six-pixel circular dot with a contrasting edge, centered on the
+camera viewport. Its screen overlay stays visible while the desktop camera is
+ready, including when no UI is hit or input capture is released. It does not
+participate in raycasting. Hit testing still uses the center camera ray, and
+click/drag capture rules are unchanged. Controller hilts stay hidden during FPFC.
+Native/SiraUtil camera controllers,
 tracking and duplicate pointer visuals yield to IPA while active. Their prior
 states are restored when the component shuts down. The input adapter supports
 legacy Unity Input and the new Input System without bundling either engine
