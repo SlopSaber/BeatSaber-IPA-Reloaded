@@ -6,6 +6,8 @@ namespace IPA.Desktop
 {
     internal static class DesktopMode
     {
+        internal static bool VSyncEnabled => !Environment.GetCommandLineArgs().Contains("--vsync-off");
+
         internal static bool Requested
         {
             get

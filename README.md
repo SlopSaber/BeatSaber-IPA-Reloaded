@@ -249,6 +249,16 @@ the cursor. Movement uses unscaled time, so flight also works while paused.
 tune movement and look. Text fields suppress flight and look controls while
 keeping the cursor locked.
 
+Desktop FPFC sessions enable monitor VSync by default, synchronizing rendering
+to one display refresh per frame. This uses the presenting monitor's refresh
+cadence, including monitor or refresh-rate changes, through Unity's
+[VSync setting](https://docs.unity3d.com/ScriptReference/QualitySettings-vSyncCount.html).
+Add `--vsync-off` to disable VSync and remove the software frame limit for that
+FPFC launch. BSIPA reapplies the selected pacing after graphics-settings changes
+and retains it during replays and camera-controller handoffs. The previous frame
+settings are restored when the pacing component is disabled. Normal VR startup
+retains the VR runtime's frame pacing.
+
 SiraUtil builds without FPFC controllers retain IPA flight. Camera2's presence
 alone does not trigger a handoff; a working external FPFC controller must activate.
 Legacy SiraUtil controllers with WASD-only translation gain Q/E descent/ascent

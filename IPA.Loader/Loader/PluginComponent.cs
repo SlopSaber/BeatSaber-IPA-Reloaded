@@ -34,6 +34,7 @@ namespace IPA.Loader
                 UnityGame.EnsureRuntimeGameVersion();
                 LegacyRuntimeCompatibility.Install();
 
+                Desktop.DesktopFramePacing.Install(gameObject);
                 Desktop.DesktopFlight.Install(gameObject);
                 StartupDiagnostics.Install();
 
