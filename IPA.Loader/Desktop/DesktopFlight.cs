@@ -66,11 +66,17 @@ namespace IPA.Desktop
                 return;
             }
             Instance = this;
-            originalLock = Cursor.lockState;
-            originalCursor = Cursor.visible;
-            SceneManager.sceneLoaded += SceneLoaded;
             DesktopGameHooks.Install();
             Logger.Default.Info("IPA FPFC enabled: WASD fly, Q/E down/up at double speed, Shift faster, Ctrl slower, Escape pause. Mouse stays captured while focused.");
+        }
+
+        private void OnEnable()
+        {
+            if (stopping || Input == null) return;
+            originalLock = Cursor.lockState;
+            originalCursor = Cursor.visible;
+            dirty = true;
+            SceneManager.sceneLoaded += SceneLoaded;
         }
 
         private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; }
@@ -313,7 +319,7 @@ namespace IPA.Desktop
         }
 
         private void OnApplicationQuit() { applicationQuitting = true; }
-        private void OnDisable() { Shutdown(); }
+        private void OnDisable() { Suspend(); }
         private void OnDestroy() { Shutdown(); }
 
         internal void YieldToExternal(Behaviour controller)
@@ -346,10 +352,9 @@ namespace IPA.Desktop
             Cursor.visible = originalCursor;
         }
 
-        private void Shutdown()
+        private void Suspend()
         {
             if (stopping || Input == null) return;
-            stopping = true;
             SceneManager.sceneLoaded -= SceneLoaded;
             // At quit, native pointer/controller dependencies may already be destroyed.
             // Restore gameplay ownership only when disabling FPFC during a live session.
@@ -358,6 +363,15 @@ namespace IPA.Desktop
                 if (!applicationQuitting) ReleaseControl();
                 else { Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
             }
+            yielding = false;
+            externalController = null;
+        }
+
+        private void Shutdown()
+        {
+            if (stopping) return;
+            Suspend();
+            stopping = true;
             if (Instance == this) Instance = null;
         }
     }
