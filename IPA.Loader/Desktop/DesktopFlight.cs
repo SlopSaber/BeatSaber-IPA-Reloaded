@@ -26,6 +26,7 @@ namespace IPA.Desktop
         private readonly List<DesktopPointerInput> pointers = new();
         private readonly List<KeyValuePair<Renderer, bool>> hidden = new();
         private readonly List<Action> restoreMembers = new();
+        private readonly DesktopBehaviourDiscovery discovery = new();
         private Vector3 position;
         private Quaternion rotation;
         private bool poseInitializationPending;
@@ -129,7 +130,7 @@ namespace IPA.Desktop
             pauseProperty = null;
             pausedField = null;
             Behaviour visualSource = null;
-            foreach (Behaviour behaviour in Resources.FindObjectsOfTypeAll<Behaviour>())
+            foreach (Behaviour behaviour in discovery.Find())
             {
                 if (behaviour == null || !behaviour.gameObject.scene.IsValid() || !behaviour.gameObject.scene.isLoaded) continue;
                 Type type = behaviour.GetType();
@@ -171,6 +172,7 @@ namespace IPA.Desktop
                     pausedField = type.GetField("_paused", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 }
             }
+            discovery.Clear();
             if (poseInitializationPending && Ready)
             {
                 // Native flight teardown resets the origin before relative pose ownership begins.
@@ -342,6 +344,7 @@ namespace IPA.Desktop
 
         private void ReleaseControl()
         {
+            discovery.Clear();
             CanInteract = false;
             MouseMotion = Vector2.zero;
             focusedLastFrame = false;
