@@ -13,6 +13,8 @@ namespace IPA.Desktop
         private static readonly Harmony Patches = new("BSIPA.DesktopFlight");
         private static readonly HashSet<MethodInfo> PointerGetters = new();
         private static readonly HashSet<MethodInfo> Raycasters = new();
+        private static readonly Dictionary<Type, MethodInfo> PointerGetterMethods = new();
+        private static readonly Dictionary<Type, MethodInfo> RaycastMethods = new();
 
         private struct BlockingState
         {
@@ -23,8 +25,12 @@ namespace IPA.Desktop
         internal static void BindRaycaster(Behaviour raycaster)
         {
             var type = raycaster.GetType();
-            if (type.GetField("_blockingMask", BindingFlags.Instance | BindingFlags.NonPublic)?.FieldType != typeof(LayerMask)) return;
-            var method = type.GetMethod("Raycast", new[] { typeof(PointerEventData), typeof(List<RaycastResult>) });
+            if (!RaycastMethods.TryGetValue(type, out var method))
+            {
+                method = type.GetField("_blockingMask", BindingFlags.Instance | BindingFlags.NonPublic)?.FieldType == typeof(LayerMask)
+                    ? type.GetMethod("Raycast", new[] { typeof(PointerEventData), typeof(List<RaycastResult>) }) : null;
+                RaycastMethods.Add(type, method);
+            }
             if (method == null || Raycasters.Contains(method)) return;
             try
             {
@@ -51,7 +57,12 @@ namespace IPA.Desktop
 
         internal static void BindPointer(Behaviour pointer)
         {
-            var getter = pointer.GetType().GetProperty("cursorPosition", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetGetMethod(true);
+            var type = pointer.GetType();
+            if (!PointerGetterMethods.TryGetValue(type, out var getter))
+            {
+                getter = type.GetProperty("cursorPosition", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetGetMethod(true);
+                PointerGetterMethods.Add(type, getter);
+            }
             if (getter == null || getter.ReturnType != typeof(Vector3) || PointerGetters.Contains(getter)) return;
             try
             {
