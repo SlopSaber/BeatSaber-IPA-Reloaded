@@ -92,7 +92,7 @@ namespace IPA.Injector
                     else File.Move(temporary, target);
                 }
                 File.Delete(source);
-                Logger.Injector.Debug($"Installed pending mod file '{relative}' into Mods.");
+                Logger.Essential(Logger.Injector, $"Installed pending mod file '{relative}' into Mods.");
                 return true;
             }
             catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
