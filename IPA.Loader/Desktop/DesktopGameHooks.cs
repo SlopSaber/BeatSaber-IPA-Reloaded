@@ -78,10 +78,31 @@ namespace IPA.Desktop
             __result = position; return false;
         }
 
+        /// <summary>
+        /// The game blocks UI input during view transitions by disabling its own input module. FPFC keeps that
+        /// module disabled permanently, so the requested state is mirrored here for the desktop pointer.
+        /// </summary>
+        internal static bool NativeInteractionEnabled { get; private set; } = true;
+        private static bool interactionHookInstalled;
+
         internal static void Install()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+                if (!interactionHookInstalled)
+                {
+                    var setter = assembly.GetType("HMUI.FlowCoordinator", false)?.GetMethod("SetGlobalUserInteraction",
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
+                    if (setter != null)
+                    {
+                        try
+                        {
+                            Patches.Patch(setter, prefix: new HarmonyMethod(typeof(DesktopGameHooks), nameof(NativeInteractionChanged)));
+                            interactionHookInstalled = true;
+                        }
+                        catch (Exception error) { Logger.Default.Warn($"FPFC interaction lock hook unavailable: {error.Message}"); }
+                    }
+                }
                 foreach (string name in new[] { "VRPlatformHelper", "UnityXRHelper", "OpenVRHelper", "OculusVRHelper" })
                 {
                     var type = assembly.GetType(name, false);
@@ -92,6 +113,8 @@ namespace IPA.Desktop
                 }
             }
         }
+
+        private static void NativeInteractionChanged(bool __0) => NativeInteractionEnabled = __0;
 
         private static bool DesktopFocus(ref bool __result)
         {

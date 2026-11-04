@@ -110,7 +110,7 @@ namespace IPA.Desktop
 
         public override void Process()
         {
-            if (!ShouldActivateModule() || !Flight.CanInteract) { CancelPointer(); return; }
+            if (!ShouldActivateModule() || !Flight.CanInteract || !DesktopGameHooks.NativeInteractionEnabled) { CancelPointer(); return; }
             ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, GetBaseEventData(), ExecuteEvents.updateSelectedHandler);
             if (pointer == null) GetPointerData(-1, out pointer, true);
             Vector2 previousPosition = pointer.position;
