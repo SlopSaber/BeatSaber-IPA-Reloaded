@@ -26,6 +26,8 @@ namespace IPA.Logging
     public class StandardLogger : Logger
     {
         private static readonly List<LogPrinter> defaultPrinters = new();
+        // Receive every message before loader filtering and repeat compaction (_latest.full.log).
+        private static readonly List<LogPrinter> fullPrinters = new();
         private static readonly ConcurrentDictionary<string, PluginLogFilePrinter> logFilePrinters = new(StringComparer.OrdinalIgnoreCase);
         private static readonly ConcurrentDictionary<string, PluginSubLogPrinter> subLogFilePrinters = new(StringComparer.OrdinalIgnoreCase);
 
@@ -130,6 +132,7 @@ namespace IPA.Logging
             {
                 addedFilePrinter = true;
                 AddDefaultPrinter(new GlobalLogFilePrinter());
+                fullPrinters.Add(new GlobalFullLogFilePrinter());
             }
         }
 
@@ -220,7 +223,9 @@ namespace IPA.Logging
             if (!showTrace && level == Level.Trace) return;
 
             // BSIPA's own progress messages are noise unless diagnosing the loader; problems always show.
-            if (loaderOwned && !essential && ((byte)level & ProblemLevels) == 0 && !SelfConfig.Debug_.ShowLoaderMessages_) return;
+            // Hidden messages still reach the full log.
+            bool hidden = loaderOwned && !essential && ((byte)level & ProblemLevels) == 0 && !SelfConfig.Debug_.ShowLoaderMessages_;
+            if (hidden && fullPrinters.Count == 0) return;
 
             // make sure that the queue isn't being cleared
             logWaitEvent.Wait();
@@ -239,7 +244,8 @@ namespace IPA.Logging
                     Message = message,
                     Logger = this,
                     Time = Utils.CurrentTime(),
-                    Sync = threadSync
+                    Sync = threadSync,
+                    Hidden = hidden
                 });
 
                 if (sync) threadSync!.Wait();
@@ -288,6 +294,7 @@ namespace IPA.Logging
             public string Message;
             public DateTime Time;
             public ManualResetEventSlim? Sync;
+            public bool Hidden;
         }
 
         [ThreadStatic]
@@ -324,6 +331,23 @@ namespace IPA.Logging
         }
 
         private static bool Accepts(LogPrinter printer, Level level) => ((byte)level & (byte)printer.Filter) != 0;
+
+        private static void DispatchFull(LogMessage msg)
+        {
+            foreach (var printer in fullPrinters)
+            {
+                try
+                {
+                    if (!Accepts(printer, msg.Level)) continue;
+                    EnsureStarted(printer);
+                    printer.Print(msg.Level, msg.Time, msg.Logger.logName, msg.Message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"printer errored: {e}");
+                }
+            }
+        }
 
         private static void Dispatch(LogMessage msg)
         {
@@ -521,7 +545,8 @@ namespace IPA.Logging
                     StdoutInterceptor.Intercept(); // only runs once, after the first message is queued
                     do
                     {
-                        if (!RepeatCompactor.Absorb(msg))
+                        DispatchFull(msg);
+                        if (!msg.Hidden && !RepeatCompactor.Absorb(msg))
                             Dispatch(msg);
                         RepeatCompactor.FlushAll(force: false);
 

@@ -44,6 +44,25 @@ namespace IPA.Logging.Printers
 
         private const string latestFormat = "_latest{0}";
 
+        /// <summary>
+        /// Gets the name of the hard link that always points at the current log.
+        /// </summary>
+        protected virtual string GetLatestName(FileInfo target) => string.Format(latestFormat, target.Extension);
+
+        /// <summary>
+        /// Compresses logs left by previous sessions in the target's directory.
+        /// </summary>
+        protected virtual void CompressOldLogs(FileInfo target)
+        {
+            foreach (var file in target.Directory.EnumerateFiles("*.log", SearchOption.TopDirectoryOnly))
+            {
+                if (file.FullName == target.FullName) continue;
+                if (file.Extension == ".gz") continue;
+
+                CompressOldLog(file);
+            }
+        }
+
         [MemberNotNull(nameof(fileInfo))]
         private void InitLog()
         {
@@ -54,7 +73,7 @@ namespace IPA.Logging.Printers
                     var targetFile = GetFileInfo();
                     var ext = targetFile.Extension;
 
-                    var symlink = new FileInfo(Path.Combine(targetFile.DirectoryName ?? throw new InvalidOperationException(), string.Format(latestFormat, ext)));
+                    var symlink = new FileInfo(Path.Combine(targetFile.DirectoryName ?? throw new InvalidOperationException(), GetLatestName(targetFile)));
                     try
                     {
                         if (symlink.Exists) symlink.Delete();
@@ -64,13 +83,7 @@ namespace IPA.Logging.Printers
                         symlink = null;
                     }
 
-                    foreach (var file in targetFile.Directory.EnumerateFiles("*.log", SearchOption.TopDirectoryOnly))
-                    {
-                        if (file.FullName == targetFile.FullName) continue;
-                        if (file.Extension == ".gz") continue;
-
-                        CompressOldLog(file);
-                    }
+                    CompressOldLogs(targetFile);
 
                     targetFile = CreateLogFile(targetFile);
 
@@ -123,7 +136,7 @@ namespace IPA.Logging.Printers
             }
         }
 
-        private static async void CompressOldLog(FileInfo file)
+        internal static async void CompressOldLog(FileInfo file)
         {
             try
             {
