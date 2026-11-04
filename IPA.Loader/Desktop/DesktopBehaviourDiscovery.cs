@@ -18,10 +18,13 @@ namespace IPA.Desktop
         };
 
         private readonly HashSet<Assembly> inspectedAssemblies = new();
-        private readonly List<SceneQuery> queries = new()
+        private readonly List<Type> targetTypes = new()
         {
-            new SceneQuery<Camera>(), new SceneQuery<BaseInputModule>(), new SceneQuery<EventSystem>()
+            typeof(Camera), typeof(BaseInputModule), typeof(EventSystem)
         };
+        private readonly Dictionary<Type, bool> relevantTypes = new();
+        private readonly List<Behaviour> components = new();
+        private readonly List<HierarchyNode> hierarchy = new();
         private readonly List<GameObject> roots = new();
         private readonly List<GameObject> sceneRoots = new();
         private List<Behaviour> results = new();
@@ -31,28 +34,15 @@ namespace IPA.Desktop
         private bool hasSnapshot;
         private bool refreshing;
         private int rootIndex;
-        private int queryIndex;
         private int lastAdvanceFrame = -1;
         private float nextRefresh;
         private static readonly long SliceTicks = Math.Max(1L, Stopwatch.Frequency / 1000);
         internal bool IsRefreshing => refreshing;
 
-        private abstract class SceneQuery
+        private struct HierarchyNode
         {
-            internal abstract void Collect(GameObject root, List<Behaviour> results, HashSet<Behaviour> seen);
-        }
-
-        private sealed class SceneQuery<T> : SceneQuery where T : Behaviour
-        {
-            private readonly List<T> components = new();
-
-            internal override void Collect(GameObject root, List<Behaviour> results, HashSet<Behaviour> seen)
-            {
-                root.GetComponentsInChildren(true, components);
-                foreach (T component in components)
-                    if (!ReferenceEquals(component, null) && seen.Add(component)) results.Add(component);
-                components.Clear();
-            }
+            internal Transform Transform;
+            internal int NextChild;
         }
 
         internal void Clear()
@@ -64,6 +54,8 @@ namespace IPA.Desktop
             pendingResults.Clear();
             roots.Clear();
             sceneRoots.Clear();
+            hierarchy.Clear();
+            components.Clear();
             seen.Clear();
             scenes.Clear();
         }
@@ -83,12 +75,12 @@ namespace IPA.Desktop
         {
             if (!hasSnapshot || lastAdvanceFrame == Time.frameCount) return false;
             lastAdvanceFrame = Time.frameCount;
+            long start = Stopwatch.GetTimestamp();
             if (!refreshing)
             {
                 if (Time.unscaledTime < nextRefresh) return false;
                 BeginRefresh(persistentScene);
             }
-            long start = Stopwatch.GetTimestamp();
             do { CollectNext(); }
             while (refreshing && Stopwatch.GetTimestamp() - start < SliceTicks);
             return !refreshing;
@@ -108,14 +100,16 @@ namespace IPA.Desktop
                     if (type == null || !typeof(Behaviour).IsAssignableFrom(type) || !Names.Contains(type.Name)) continue;
                     if (typeof(Camera).IsAssignableFrom(type) || typeof(BaseInputModule).IsAssignableFrom(type)
                         || typeof(EventSystem).IsAssignableFrom(type)) continue;
-                    queries.Add((SceneQuery)Activator.CreateInstance(typeof(SceneQuery<>).MakeGenericType(type), true));
+                    targetTypes.Add(type);
+                    relevantTypes.Clear();
                 }
             }
             pendingResults.Clear();
             roots.Clear();
+            hierarchy.Clear();
             seen.Clear();
             scenes.Clear();
-            rootIndex = queryIndex = 0;
+            rootIndex = 0;
             refreshing = true;
             nextRefresh = Time.unscaledTime + 0.75f;
             for (int index = 0; index < SceneManager.sceneCount; index++) CollectRoots(SceneManager.GetSceneAt(index));
@@ -134,17 +128,25 @@ namespace IPA.Desktop
 
         private void CollectNext()
         {
-            if (rootIndex < roots.Count)
+            if (hierarchy.Count > 0)
             {
-                GameObject root = roots[rootIndex];
-                if (root != null) queries[queryIndex].Collect(root, pendingResults, seen);
-                if (root == null || ++queryIndex == queries.Count)
+                int index = hierarchy.Count - 1;
+                HierarchyNode node = hierarchy[index];
+                if (node.Transform == null || node.NextChild >= node.Transform.childCount)
+                    hierarchy.RemoveAt(index);
+                else
                 {
-                    queryIndex = 0;
-                    rootIndex++;
+                    Transform child = node.Transform.GetChild(node.NextChild++);
+                    hierarchy[index] = node;
+                    if (child != null) CollectObject(child);
                 }
             }
-            if (rootIndex < roots.Count) return;
+            else if (rootIndex < roots.Count)
+            {
+                GameObject root = roots[rootIndex++];
+                if (root != null) CollectObject(root.transform);
+            }
+            if (hierarchy.Count > 0 || rootIndex < roots.Count) return;
             var previous = results;
             results = pendingResults;
             pendingResults = previous;
@@ -153,6 +155,26 @@ namespace IPA.Desktop
             seen.Clear();
             refreshing = false;
             hasSnapshot = true;
+        }
+
+        private void CollectObject(Transform transform)
+        {
+            // Yield between objects, including siblings under a wide hierarchy.
+            hierarchy.Add(new HierarchyNode { Transform = transform });
+            transform.gameObject.GetComponents(components);
+            foreach (Behaviour component in components)
+            {
+                if (component == null) continue;
+                Type type = component.GetType();
+                if (!relevantTypes.TryGetValue(type, out bool relevant))
+                {
+                    foreach (Type target in targetTypes)
+                        if (target.IsAssignableFrom(type)) { relevant = true; break; }
+                    relevantTypes.Add(type, relevant);
+                }
+                if (relevant && seen.Add(component)) pendingResults.Add(component);
+            }
+            components.Clear();
         }
     }
 }
