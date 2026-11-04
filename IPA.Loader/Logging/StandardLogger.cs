@@ -144,7 +144,7 @@ namespace IPA.Logging
         {
             logName = $"{parent.logName}/{subName}";
             this.parent = parent;
-            loaderOwned = parent.loaderOwned;
+            loaderOwned = parent.loaderOwned || IsLoaderName(logName);
             printers = new List<LogPrinter>();
             if (SelfConfig.Debug_.CreateModLogs_ && !SelfConfig.Debug_.CondenseModLogs_)
                 printers.Add(subLogFilePrinters.GetOrAdd(logName, new PluginSubLogPrinter(parent.logName, subName)));
@@ -168,7 +168,7 @@ namespace IPA.Logging
             }
 
             logName = name;
-            loaderOwned = name == "IPA" || name == "Harmony";
+            loaderOwned = IsLoaderName(name);
             if (SelfConfig.Debug_.CreateModLogs_)
                 printers.Add(logFilePrinters.GetOrAdd(name, new PluginLogFilePrinter(name)));
 
@@ -215,6 +215,23 @@ namespace IPA.Logging
         /// Logs a loader message that is always shown, such as the list of loaded plugins.
         /// </summary>
         internal void LogEssential(Level level, string message) => Enqueue(level, message, essential: true);
+
+        private static bool IsLoaderName(string name)
+            => name == "IPA" || name == "Harmony" || name.StartsWith("IPA/", StringComparison.Ordinal);
+
+        /// <summary>
+        /// Describes whether BSIPA's routine messages are hidden and why, for the startup header.
+        /// </summary>
+        internal static string LoaderMessageStatus
+        {
+            get
+            {
+                bool shown = showLoaderMessages || SelfConfig.CommandLineValues.Debug.ShowLoaderMessages;
+                bool owned = Logger.Default is StandardLogger standard && standard.loaderOwned;
+                return (shown ? "BSIPA routine messages shown" : "BSIPA routine messages hidden (start with -ipa-logging to show)")
+                    + $" [config {showLoaderMessages}, flag {SelfConfig.CommandLineValues.Debug.ShowLoaderMessages}, loader logger {owned}]";
+            }
+        }
 
         private const byte ProblemLevels = (byte)(Level.Warning | Level.Error | Level.Critical);
 
@@ -407,6 +424,13 @@ namespace IPA.Logging
             private static readonly LinkedList<Group> groups = new();
             private static readonly Dictionary<string, LinkedListNode<Group>> index = new();
 
+            private static bool HasText(string message)
+            {
+                foreach (char c in message)
+                    if (char.IsLetterOrDigit(c)) return true;
+                return false;
+            }
+
             private static string KeyOf(LogMessage msg) => msg.Logger.logName + "\u0001" + (byte)msg.Level + "\u0001" + msg.Message;
 
             private static string Field(Group group)
@@ -425,6 +449,8 @@ namespace IPA.Logging
             /// <returns><see langword="true"/> if the message was absorbed as a repeat and must not be printed</returns>
             internal static bool Absorb(LogMessage msg)
             {
+                // Separators and other purely visual lines repeat by design.
+                if (!HasText(msg.Message)) return false;
                 var key = KeyOf(msg);
                 if (index.TryGetValue(key, out var node))
                 {

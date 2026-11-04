@@ -423,6 +423,7 @@ namespace IPA.Loader
             Logger.Essential(exeName);
             Logger.Essential($"Running on Unity {Application.unityVersion}");
             Logger.Essential($"Game version {UnityGame.GameVersion}");
+            Logger.Essential(IPA.Logging.StandardLogger.LoaderMessageStatus);
             Logger.Essential("-----------------------------");
             Logger.Essential($"Loading plugins recursively from Mods and Plugins; found {_bsPlugins.Count + _ipaPlugins.Count}");
             Logger.Essential("-----------------------------");
