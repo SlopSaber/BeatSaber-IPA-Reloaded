@@ -1,3 +1,4 @@
+#define ENABLE_PROFILER
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -5,6 +6,8 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.Profiling;
+using Logger = IPA.Logging.Logger;
 
 namespace IPA.Desktop
 {
@@ -31,6 +34,13 @@ namespace IPA.Desktop
         private List<Behaviour> pendingResults = new();
         private readonly HashSet<Behaviour> seen = new();
         private readonly HashSet<Scene> scenes = new();
+        private readonly List<Behaviour> changes = new();
+        private readonly HashSet<Behaviour> changed = new();
+        private DesktopObjectChanges objectChanges;
+        private bool changesUnavailable;
+        private bool changesRefresh;
+        private int existingIndex;
+        private int changeIndex;
         private bool hasSnapshot;
         private bool refreshing;
         private int rootIndex;
@@ -47,6 +57,7 @@ namespace IPA.Desktop
 
         internal void Clear()
         {
+            DisposeChanges();
             hasSnapshot = false;
             refreshing = false;
             lastAdvanceFrame = -1;
@@ -58,6 +69,8 @@ namespace IPA.Desktop
             components.Clear();
             seen.Clear();
             scenes.Clear();
+            changes.Clear();
+            changed.Clear();
         }
 
         internal List<Behaviour> Find(Scene persistentScene)
@@ -76,18 +89,35 @@ namespace IPA.Desktop
             if (!hasSnapshot || lastAdvanceFrame == Time.frameCount) return false;
             lastAdvanceFrame = Time.frameCount;
             long start = Stopwatch.GetTimestamp();
+            if (objectChanges != null)
+            {
+                Profiler.BeginSample("BSIPA.FPFC.ChangeEvents");
+                try { objectChanges.Poll(); }
+                catch (Exception error)
+                {
+                    DisableChanges(error);
+                    BeginRefresh(persistentScene);
+                }
+                finally { Profiler.EndSample(); }
+            }
             if (!refreshing)
             {
                 if (Time.unscaledTime < nextRefresh) return false;
                 BeginRefresh(persistentScene);
             }
-            do { CollectNext(); }
-            while (refreshing && Stopwatch.GetTimestamp() - start < SliceTicks);
+            Profiler.BeginSample(changesRefresh ? "BSIPA.FPFC.Candidates" : "BSIPA.FPFC.SceneSweep");
+            try
+            {
+                do { CollectNext(); }
+                while (refreshing && Stopwatch.GetTimestamp() - start < SliceTicks);
+            }
+            finally { Profiler.EndSample(); }
             return !refreshing;
         }
 
         private void BeginRefresh(Scene persistentScene)
         {
+            int previousTypeCount = targetTypes.Count;
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (!inspectedAssemblies.Add(assembly)) continue;
@@ -104,14 +134,31 @@ namespace IPA.Desktop
                     relevantTypes.Clear();
                 }
             }
+            if (!changesUnavailable)
+            {
+                try
+                {
+                    if (objectChanges == null)
+                    {
+                        objectChanges = new DesktopObjectChanges(targetTypes, RecordChanges);
+                        Logger.Default.Debug("FPFC discovery uses runtime object changes.");
+                    }
+                    else objectChanges.RegisterTypes();
+                }
+                catch (Exception error) { DisableChanges(error); }
+            }
+            changesRefresh = objectChanges != null && hasSnapshot && targetTypes.Count == previousTypeCount;
             pendingResults.Clear();
             roots.Clear();
             hierarchy.Clear();
             seen.Clear();
             scenes.Clear();
             rootIndex = 0;
+            existingIndex = changeIndex = 0;
             refreshing = true;
             nextRefresh = Time.unscaledTime + 0.75f;
+            // New target types need one full pass to seed already-existing instances.
+            if (changesRefresh) return;
             for (int index = 0; index < SceneManager.sceneCount; index++) CollectRoots(SceneManager.GetSceneAt(index));
             // DontDestroyOnLoad is not included in SceneManager.sceneCount.
             CollectRoots(persistentScene);
@@ -128,7 +175,13 @@ namespace IPA.Desktop
 
         private void CollectNext()
         {
-            if (hierarchy.Count > 0)
+            if (changesRefresh)
+            {
+                if (existingIndex < results.Count) AddCandidate(results[existingIndex++]);
+                else if (changeIndex < changes.Count) AddCandidate(changes[changeIndex++]);
+                if (existingIndex < results.Count || changeIndex < changes.Count) return;
+            }
+            else if (hierarchy.Count > 0)
             {
                 int index = hierarchy.Count - 1;
                 HierarchyNode node = hierarchy[index];
@@ -147,12 +200,19 @@ namespace IPA.Desktop
                 if (root != null) CollectObject(root.transform);
             }
             if (hierarchy.Count > 0 || rootIndex < roots.Count) return;
+            if (changeIndex < changes.Count)
+            {
+                AddCandidate(changes[changeIndex++]);
+                if (changeIndex < changes.Count) return;
+            }
             var previous = results;
             results = pendingResults;
             pendingResults = previous;
             pendingResults.Clear();
             roots.Clear();
             seen.Clear();
+            changes.Clear();
+            changed.Clear();
             refreshing = false;
             hasSnapshot = true;
         }
@@ -164,17 +224,48 @@ namespace IPA.Desktop
             transform.gameObject.GetComponents(components);
             foreach (Behaviour component in components)
             {
-                if (component == null) continue;
-                Type type = component.GetType();
-                if (!relevantTypes.TryGetValue(type, out bool relevant))
-                {
-                    foreach (Type target in targetTypes)
-                        if (target.IsAssignableFrom(type)) { relevant = true; break; }
-                    relevantTypes.Add(type, relevant);
-                }
-                if (relevant && seen.Add(component)) pendingResults.Add(component);
+                if (component != null && IsRelevant(component.GetType()) && seen.Add(component)) pendingResults.Add(component);
             }
             components.Clear();
+        }
+
+        private bool IsRelevant(Type type)
+        {
+            if (!relevantTypes.TryGetValue(type, out bool relevant))
+            {
+                foreach (Type target in targetTypes)
+                    if (target.IsAssignableFrom(type)) { relevant = true; break; }
+                relevantTypes.Add(type, relevant);
+            }
+            return relevant;
+        }
+
+        private void RecordChanges(UnityEngine.Object[] objects)
+        {
+            if (objects == null) return;
+            foreach (UnityEngine.Object value in objects)
+                if (value is Behaviour component && IsRelevant(component.GetType()) && changed.Add(component)) changes.Add(component);
+        }
+
+        private void AddCandidate(Behaviour component)
+        {
+            if (component == null || !component.gameObject.scene.IsValid() || !component.gameObject.scene.isLoaded) return;
+            if (IsRelevant(component.GetType()) && seen.Add(component)) pendingResults.Add(component);
+        }
+
+        private void DisableChanges(Exception error)
+        {
+            changesUnavailable = true;
+            DisposeChanges();
+            Logger.Default.Debug($"FPFC runtime object changes unavailable; using scene discovery: {error.GetBaseException().Message}");
+        }
+
+        private void DisposeChanges()
+        {
+            DesktopObjectChanges previous = objectChanges;
+            objectChanges = null;
+            try { previous?.Dispose(); }
+            catch (Exception error) { Logger.Default.Debug($"FPFC runtime object change cleanup: {error.Message}"); }
         }
     }
 }

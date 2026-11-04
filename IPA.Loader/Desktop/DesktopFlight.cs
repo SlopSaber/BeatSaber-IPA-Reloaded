@@ -263,7 +263,7 @@ namespace IPA.Desktop
                 {
                     externalController = DesktopCameraCompatibility.FindExternalController(GetDiscoveredBehaviours());
                 }
-                if (externalController != null) return;
+                if (externalController != null) { discovery.Clear(); return; }
                 yielding = false;
                 originalLock = Cursor.lockState;
                 originalCursor = Cursor.visible;
@@ -411,7 +411,7 @@ namespace IPA.Desktop
             if (!yielding)
             {
                 if (!applicationQuitting) ReleaseControl();
-                else { Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
+                else { discovery.Clear(); Cursor.lockState = originalLock; Cursor.visible = originalCursor; }
             }
             yielding = false;
             externalController = null;
