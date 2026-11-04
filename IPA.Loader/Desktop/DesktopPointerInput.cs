@@ -17,6 +17,9 @@ namespace IPA.Desktop
         private float nextVisualsAttempt;
         private Type raycastComparerOwner;
         private Comparison<RaycastResult> raycastComparer;
+        private BaseInputModule nativeModule;
+        private FieldInfo nativePressEvent;
+        private FieldInfo nativeClickEvent;
         private static DesktopPointerInput currentPointer;
         private static PointerEventData raycastPointer;
 
@@ -67,9 +70,13 @@ namespace IPA.Desktop
         private void BindRaycastComparer(BaseInputModule module)
         {
             Type type = module.GetType();
-            if (type.Name != "VRInputModule" || type == raycastComparerOwner) return;
+            if (type.Name != "VRInputModule") return;
+            nativeModule = module;
+            if (type == raycastComparerOwner) return;
             raycastComparerOwner = type;
             raycastComparer = null;
+            nativePressEvent = EventField(type, "onProcessMousePressEvent", typeof(Action<GameObject>));
+            nativeClickEvent = EventField(type, "pointerDidClickEvent", typeof(Action<PointerEventData>));
             try
             {
                 MethodInfo comparer = type.GetMethod("RaycastComparer", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
@@ -81,6 +88,24 @@ namespace IPA.Desktop
                 raycastComparer = (Comparison<RaycastResult>)Delegate.CreateDelegate(typeof(Comparison<RaycastResult>), comparer);
             }
             catch (Exception error) { Logger.Default.Warn($"FPFC native UI hit ordering unavailable: {error.Message}"); }
+        }
+
+        private static FieldInfo EventField(Type type, string name, Type delegateType)
+        {
+            for (Type current = type; current != null; current = current.BaseType)
+            {
+                var field = current.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly);
+                if (field != null) return field.FieldType == delegateType ? field : null;
+            }
+            return null;
+        }
+
+        private void RaiseNative<T>(FieldInfo field, T argument)
+        {
+            if (field == null || nativeModule == null) return;
+            if (!(field.GetValue(nativeModule) is Action<T> handler)) return;
+            try { handler(argument); }
+            catch (Exception error) { Logger.Default.Error($"FPFC native {field.Name} handler failed: {error}"); }
         }
 
         public override void Process()
@@ -146,6 +171,8 @@ namespace IPA.Desktop
             pointer.pointerPress = ExecuteEvents.ExecuteHierarchy(current, pointer, ExecuteEvents.pointerDownHandler)
                 ?? ExecuteEvents.GetEventHandler<IPointerClickHandler>(current);
             pointer.rawPointerPress = current;
+            // The game's global keyboard opens from the native module's press event.
+            if (current != null && pointer.pointerPress != null) RaiseNative(nativePressEvent, current);
             pointer.clickCount = pointer.pointerPress == lastClick && Time.unscaledTime - lastClickTime < 0.3f ? pointer.clickCount + 1 : 1;
             pointer.clickTime = lastClickTime = Time.unscaledTime;
             lastClick = pointer.pointerPress;
@@ -159,7 +186,10 @@ namespace IPA.Desktop
             if (pointer == null) return;
             ExecuteEvents.Execute(pointer.pointerPress, pointer, ExecuteEvents.pointerUpHandler);
             if (click && pointer.eligibleForClick && pointer.pointerPress == ExecuteEvents.GetEventHandler<IPointerClickHandler>(current))
+            {
                 ExecuteEvents.Execute(pointer.pointerPress, pointer, ExecuteEvents.pointerClickHandler);
+                RaiseNative(nativeClickEvent, pointer);
+            }
             else if (click && pointer.dragging) ExecuteEvents.ExecuteHierarchy(current, pointer, ExecuteEvents.dropHandler);
             if (pointer.dragging) ExecuteEvents.Execute(pointer.pointerDrag, pointer, ExecuteEvents.endDragHandler);
             pointer.eligibleForClick = false;
