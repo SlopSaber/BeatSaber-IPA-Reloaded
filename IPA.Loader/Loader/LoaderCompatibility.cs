@@ -31,7 +31,7 @@ namespace IPA.Loader
             if (!requirement.Matches(compatibleVersion)) return false;
 
             if (!requirement.Matches(dependency.HVersion))
-                Logger.Loader.Info($"'{plugin.Id}' uses BSIPA {compatibleVersion} API compatibility for '{requirement}' on BSIPA {dependency.HVersion}.");
+                Logger.Loader.Debug($"'{plugin.Id}' uses BSIPA {compatibleVersion} API compatibility for '{requirement}' on BSIPA {dependency.HVersion}.");
             return true;
         }
 
@@ -244,7 +244,7 @@ namespace IPA.Loader
                 }
                 PreparedFiles[key] = prepared;
                 RegisterOriginalPath(prepared, file);
-                Logger.Loader.Info($"Prepared loader references in {Path.GetFileName(file)} with BSIPA profile {profile?.Version.ToString() ?? "binary signatures"}; original unchanged.");
+                Logger.Loader.Debug($"Prepared loader references in {Path.GetFileName(file)} with BSIPA profile {profile?.Version.ToString() ?? "binary signatures"}; original unchanged.");
                 return prepared;
             }
         }
