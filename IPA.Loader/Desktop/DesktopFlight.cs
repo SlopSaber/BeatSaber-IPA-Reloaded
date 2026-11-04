@@ -80,10 +80,20 @@ namespace IPA.Desktop
             originalLock = Cursor.lockState;
             originalCursor = Cursor.visible;
             dirty = true;
+            discovery.Clear();
             SceneManager.sceneLoaded += SceneLoaded;
+            SceneManager.sceneUnloaded += SceneUnloaded;
         }
 
-        private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; }
+        private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; discovery.Clear(); }
+        private void SceneUnloaded(Scene scene) { dirty = true; discovery.Clear(); }
+
+        internal List<Behaviour> GetDiscoveredBehaviours() => discovery.Find(gameObject.scene);
+
+        internal void AdvanceDiscovery()
+        {
+            if (!stopping && !yielding && Input != null && discovery.Advance(gameObject.scene)) dirty = true;
+        }
 
         internal void Disable(Behaviour behaviour)
         {
@@ -95,9 +105,9 @@ namespace IPA.Desktop
         {
             dirty = false;
             nextScan = Time.unscaledTime + 0.75f;
-            var behaviours = discovery.Find(gameObject.scene);
+            var behaviours = GetDiscoveredBehaviours();
             var external = DesktopCameraCompatibility.FindExternalController(behaviours);
-            if (external != null) { discovery.Clear(); YieldToExternal(external); return; }
+            if (external != null) { YieldToExternal(external); return; }
             Camera candidate = UnityEngine.Camera.main;
             if (DesktopCameraCompatibility.IsCamera2Camera(candidate))
                 candidate = behaviours.OfType<Camera>().FirstOrDefault(camera => camera.isActiveAndEnabled
@@ -125,7 +135,7 @@ namespace IPA.Desktop
                     SetAutoTracking(true);
                 }
             }
-            if (!Ready) { discovery.Clear(); return; }
+            if (!Ready) return;
             pauseTarget = null;
             pauseMethod = null;
             pauseProperty = null;
@@ -173,7 +183,6 @@ namespace IPA.Desktop
                     pausedField = type.GetField("_paused", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 }
             }
-            discovery.Clear();
             if (poseInitializationPending && Ready)
             {
                 // Native flight teardown resets the origin before relative pose ownership begins.
@@ -229,8 +238,7 @@ namespace IPA.Desktop
             {
                 if (!DesktopCameraCompatibility.IsExternalActive(externalController))
                 {
-                    externalController = DesktopCameraCompatibility.FindExternalController(discovery.Find(gameObject.scene));
-                    discovery.Clear();
+                    externalController = DesktopCameraCompatibility.FindExternalController(GetDiscoveredBehaviours());
                 }
                 if (externalController != null) return;
                 yielding = false;
@@ -239,6 +247,7 @@ namespace IPA.Desktop
                 dirty = true;
                 Logger.Default.Info("External FPFC released controls; BSIPA FPFC resumed.");
             }
+            AdvanceDiscovery();
             if (dirty || !Ready || Time.unscaledTime >= nextScan) Scan();
             if (yielding) return;
             // Ignore the focus/capture transition click and any cursor-warp look delta.
@@ -372,6 +381,7 @@ namespace IPA.Desktop
         {
             if (stopping || Input == null) return;
             SceneManager.sceneLoaded -= SceneLoaded;
+            SceneManager.sceneUnloaded -= SceneUnloaded;
             // At quit, native pointer/controller dependencies may already be destroyed.
             // Restore gameplay ownership only when disabling FPFC during a live session.
             if (!yielding)
