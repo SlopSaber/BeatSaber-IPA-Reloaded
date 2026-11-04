@@ -37,6 +37,36 @@ namespace IPA.Loader
     {
         internal static string LibraryPath => IPA.Utilities.UnityGame.LibraryPath;
         internal static string NativeLibraryPath => IPA.Utilities.UnityGame.NativeLibraryPath;
+
+        // A PE image without a CLI header is native. Mono reports every native
+        // image passed to GetAssemblyName as an error, so check the header first.
+        private static bool IsNativeImage(string path)
+        {
+            try
+            {
+                using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, 4096);
+                using var reader = new BinaryReader(stream);
+                if (stream.Length < 0x40 || reader.ReadUInt16() != 0x5A4D) return false;
+                stream.Position = 0x3C;
+                uint header = reader.ReadUInt32();
+                if (header > stream.Length - 24) return false;
+                stream.Position = header;
+                if (reader.ReadUInt32() != 0x00004550) return false;
+                stream.Position = header + 24;
+                ushort magic = reader.ReadUInt16();
+                long directories = magic switch { 0x10B => header + 24 + 96, 0x20B => header + 24 + 112, _ => -1 };
+                if (directories < 0) return false;
+                stream.Position = directories - 4;
+                if (reader.ReadUInt32() <= 14) return true;
+                stream.Position = directories + 14 * 8;
+                if (stream.Position + 8 > stream.Length) return false;
+                return reader.ReadUInt32() == 0 || reader.ReadUInt32() == 0;
+            }
+            catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
+            {
+                return false;
+            }
+        }
         internal static Dictionary<string, (string Path, Version Version)> FilenameLocations = null!;
         private sealed class LibraryCandidate
         {
@@ -105,6 +135,7 @@ namespace IPA.Loader
                         {
                             var fileInfo = new FileInfo(file);
                             AssemblyName identity;
+                            if (IsNativeImage(fileInfo.FullName)) { nativeDirectories.Add(fileInfo.DirectoryName!); continue; }
                             try { identity = AssemblyName.GetAssemblyName(fileInfo.FullName); }
                             catch (BadImageFormatException) { nativeDirectories.Add(fileInfo.DirectoryName!); continue; }
                             catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
