@@ -27,7 +27,18 @@ namespace IPA.Logging.Printers
         /// Provides a filter for this specific printer.
         /// </summary>
         /// <value>the filter level for this printer</value>
-        public override Logger.LogLevel Filter { get; set; } = Logger.LogLevel.All;
+        public override Logger.LogLevel Filter
+        {
+            get => FollowsConsoleFilter ? filter & StandardLogger.PrintFilter : filter;
+            set => filter = value;
+        }
+
+        private Logger.LogLevel filter = Logger.LogLevel.All;
+
+        /// <summary>
+        /// Whether this log shows only the levels the console shows (Debug needs --debug or Debug.ShowDebug).
+        /// </summary>
+        protected virtual bool FollowsConsoleFilter => true;
 
         /// <summary>
         /// Prints an entry to the associated file.
@@ -149,6 +160,9 @@ namespace IPA.Logging.Printers
     {
         /// <inheritdoc />
         protected override string FileSuffix => ".full";
+
+        /// <inheritdoc />
+        protected override bool FollowsConsoleFilter => false;
 
         /// <inheritdoc />
         protected override string GetLatestName(FileInfo target) => "_latest.full.log";

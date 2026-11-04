@@ -111,6 +111,9 @@ namespace IPA.Logging
         /// <value>the global filter level</value>
         public static LogLevel PrintFilter { get; internal set; } = LogLevel.All;
         private static bool showTrace;
+        // Cached by Configure: reading the generated config here would re-enter its lock when the
+        // config store itself logs while saving.
+        private static volatile bool showLoaderMessages;
         private static volatile bool syncLogging;
 
         private readonly List<LogPrinter> printers = new();
@@ -126,6 +129,7 @@ namespace IPA.Logging
         {
             showSourceClass = SelfConfig.Debug_.ShowCallSource_;
             PrintFilter = SelfConfig.Debug_.ShowDebug_ ? LogLevel.All : LogLevel.InfoUp;
+            showLoaderMessages = SelfConfig.Debug_.ShowLoaderMessages_;
             showTrace = SelfConfig.Debug_.ShowTrace_;
             syncLogging = SelfConfig.Debug_.SyncLogging_;
             if (SelfConfig.CommandLineValues.WriteLogs && !addedFilePrinter)
@@ -224,7 +228,7 @@ namespace IPA.Logging
 
             // BSIPA's own progress messages are noise unless diagnosing the loader; problems always show.
             // Hidden messages still reach the full log.
-            bool hidden = loaderOwned && !essential && ((byte)level & ProblemLevels) == 0 && !SelfConfig.Debug_.ShowLoaderMessages_;
+            bool hidden = loaderOwned && !essential && ((byte)level & ProblemLevels) == 0 && !showLoaderMessages && !SelfConfig.CommandLineValues.Debug.ShowLoaderMessages;
             if (hidden && fullPrinters.Count == 0) return;
 
             // make sure that the queue isn't being cleared
