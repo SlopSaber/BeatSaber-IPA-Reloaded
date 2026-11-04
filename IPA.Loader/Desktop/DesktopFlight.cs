@@ -95,11 +95,12 @@ namespace IPA.Desktop
         {
             dirty = false;
             nextScan = Time.unscaledTime + 0.75f;
-            var external = DesktopCameraCompatibility.FindExternalController();
-            if (external != null) { YieldToExternal(external); return; }
+            var behaviours = discovery.Find(gameObject.scene);
+            var external = DesktopCameraCompatibility.FindExternalController(behaviours);
+            if (external != null) { discovery.Clear(); YieldToExternal(external); return; }
             Camera candidate = UnityEngine.Camera.main;
             if (DesktopCameraCompatibility.IsCamera2Camera(candidate))
-                candidate = Resources.FindObjectsOfTypeAll<Camera>().FirstOrDefault(camera => camera.isActiveAndEnabled
+                candidate = behaviours.OfType<Camera>().FirstOrDefault(camera => camera.isActiveAndEnabled
                     && camera.gameObject.scene.IsValid() && camera.gameObject.scene.isLoaded
                     && !DesktopCameraCompatibility.IsCamera2Camera(camera) && camera.CompareTag("MainCamera"));
             bool cameraChanged = candidate != Camera;
@@ -124,13 +125,13 @@ namespace IPA.Desktop
                     SetAutoTracking(true);
                 }
             }
-            if (!Ready) return;
+            if (!Ready) { discovery.Clear(); return; }
             pauseTarget = null;
             pauseMethod = null;
             pauseProperty = null;
             pausedField = null;
             Behaviour visualSource = null;
-            foreach (Behaviour behaviour in discovery.Find())
+            foreach (Behaviour behaviour in behaviours)
             {
                 if (behaviour == null || !behaviour.gameObject.scene.IsValid() || !behaviour.gameObject.scene.isLoaded) continue;
                 Type type = behaviour.GetType();
@@ -227,7 +228,10 @@ namespace IPA.Desktop
             if (yielding)
             {
                 if (!DesktopCameraCompatibility.IsExternalActive(externalController))
-                    externalController = DesktopCameraCompatibility.FindExternalController();
+                {
+                    externalController = DesktopCameraCompatibility.FindExternalController(discovery.Find(gameObject.scene));
+                    discovery.Clear();
+                }
                 if (externalController != null) return;
                 yielding = false;
                 originalLock = Cursor.lockState;

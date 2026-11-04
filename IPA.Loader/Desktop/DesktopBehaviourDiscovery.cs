@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 namespace IPA.Desktop
 {
@@ -15,47 +15,53 @@ namespace IPA.Desktop
             "GamePauseManager", "TutorialPauseManager", "SimpleCameraController", "CamerasViewport"
         };
 
-        private readonly HashSet<Assembly> inspectedAssemblies = new();
-        private readonly List<Type> queryTypes = new()
-        {
-            typeof(Camera), typeof(BaseInputModule), typeof(EventSystem)
-        };
+        private readonly Dictionary<Type, bool> relevantTypes = new();
+        private readonly List<GameObject> roots = new();
+        private readonly List<Behaviour> components = new();
         private readonly List<Behaviour> results = new();
-        private readonly HashSet<Behaviour> seen = new();
+        private readonly HashSet<Scene> scenes = new();
 
         internal void Clear()
         {
             results.Clear();
-            seen.Clear();
+            roots.Clear();
+            components.Clear();
+            scenes.Clear();
         }
 
-        internal List<Behaviour> Find()
+        internal List<Behaviour> Find(Scene persistentScene)
         {
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (!inspectedAssemblies.Add(assembly)) continue;
-                Type[] types;
-                try { types = assembly.GetTypes(); }
-                catch (ReflectionTypeLoadException error) { types = error.Types; }
-                catch (NotSupportedException) { continue; }
-                foreach (Type type in types)
-                {
-                    if (type == null || !Names.Contains(type.Name) || !typeof(Behaviour).IsAssignableFrom(type)) continue;
-                    if (typeof(Camera).IsAssignableFrom(type) || typeof(BaseInputModule).IsAssignableFrom(type)
-                        || typeof(EventSystem).IsAssignableFrom(type)) continue;
-                    queryTypes.Add(type);
-                }
-            }
-
             Clear();
-            foreach (Type type in queryTypes)
+            for (int index = 0; index < SceneManager.sceneCount; index++) Collect(SceneManager.GetSceneAt(index));
+            // DontDestroyOnLoad is not included in SceneManager.sceneCount.
+            Collect(persistentScene);
+            return results;
+        }
+
+        private void Collect(Scene scene)
+        {
+            if (!scene.IsValid() || !scene.isLoaded || !scenes.Add(scene)) return;
+            if (roots.Capacity <= scene.rootCount) roots.Capacity = scene.rootCount + 1;
+            scene.GetRootGameObjects(roots);
+            foreach (GameObject root in roots)
             {
-                foreach (UnityEngine.Object instance in Resources.FindObjectsOfTypeAll(type))
+                if (root == null) continue;
+                root.GetComponentsInChildren(true, components);
+                foreach (Behaviour behaviour in components)
                 {
-                    if (instance is Behaviour behaviour && seen.Add(behaviour)) results.Add(behaviour);
+                    if (ReferenceEquals(behaviour, null)) continue;
+                    Type type = behaviour.GetType();
+                    if (!relevantTypes.TryGetValue(type, out bool relevant))
+                    {
+                        relevant = typeof(Camera).IsAssignableFrom(type) || typeof(BaseInputModule).IsAssignableFrom(type)
+                            || typeof(EventSystem).IsAssignableFrom(type) || Names.Contains(type.Name);
+                        relevantTypes.Add(type, relevant);
+                    }
+                    if (relevant) results.Add(behaviour);
                 }
             }
-            return results;
+            roots.Clear();
+            components.Clear();
         }
     }
 }

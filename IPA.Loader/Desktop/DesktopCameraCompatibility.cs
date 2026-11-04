@@ -105,9 +105,9 @@ namespace IPA.Desktop
                 && controller.gameObject.scene.isLoaded && (siraAllowInput?.PropertyType != typeof(bool)
                     || (bool)siraAllowInput.GetValue(controller, null));
 
-        internal static Behaviour FindExternalController()
+        internal static Behaviour FindExternalController(IEnumerable<Behaviour> candidates)
             => PreferBSIPA || siraControllerType == null ? null
-                : Resources.FindObjectsOfTypeAll(siraControllerType).OfType<Behaviour>().FirstOrDefault(IsExternalActive);
+                : candidates.FirstOrDefault(candidate => siraControllerType.IsInstanceOfType(candidate) && IsExternalActive(candidate));
 
         private static bool SiraEnabled(ref bool __result)
         {
