@@ -26,7 +26,10 @@ namespace IPA.Loader.Composite
                 {
                     if (plugin != null)
                     {
-                        callback(plugin).ContinueWith(t =>
+                        Logger.Loader.Debug($"Invoking {plugin.Metadata.Name} {method}.");
+                        var task = callback(plugin);
+                        Logger.Loader.Debug($"Returned from {plugin.Metadata.Name} {method}; task status {task.Status}.");
+                        task.ContinueWith(t =>
                         {
                             Logger.Default.Error($"{plugin.Metadata.Name} {method}: {t.Exception!.InnerException}");
                         }, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Default);

@@ -91,6 +91,9 @@ namespace IPA.Logging
         /// <value>a <see cref="TextWriter"/> for the current primary text output</value>
         public static TextWriter ConsoleWriter { get; internal set; } = Console.Out;
 
+        /// <summary>Gets or sets the directory for global and per-plugin logs before printers start.</summary>
+        public static string LogDirectory { get; set; } = "Logs";
+
         /// <summary>
         /// Adds to the default printer pool that all printers inherit from. Printers added this way will be passed every message from every logger.
         /// </summary>
@@ -115,6 +118,13 @@ namespace IPA.Logging
         // config store itself logs while saving.
         private static volatile bool showLoaderMessages;
         private static volatile bool syncLogging;
+        private static volatile bool createModLogs;
+        private static volatile bool condenseModLogs;
+        private static volatile bool hideMessagesForPerformance = true;
+        private static volatile int hideLogThreshold = 512;
+        private static volatile bool darkenMessages;
+
+        internal static bool DarkenMessages => darkenMessages;
 
         private readonly List<LogPrinter> printers = new();
         private readonly StandardLogger? parent;
@@ -132,6 +142,11 @@ namespace IPA.Logging
             showLoaderMessages = SelfConfig.Debug_.ShowLoaderMessages_;
             showTrace = SelfConfig.Debug_.ShowTrace_;
             syncLogging = SelfConfig.Debug_.SyncLogging_;
+            createModLogs = SelfConfig.Debug_.CreateModLogs_;
+            condenseModLogs = SelfConfig.Debug_.CondenseModLogs_;
+            hideMessagesForPerformance = SelfConfig.Debug_.HideMessagesForPerformance_;
+            hideLogThreshold = SelfConfig.Debug_.HideLogThreshold_;
+            darkenMessages = SelfConfig.Debug_.DarkenMessages_;
             if (SelfConfig.CommandLineValues.WriteLogs && !addedFilePrinter)
             {
                 addedFilePrinter = true;
@@ -146,7 +161,7 @@ namespace IPA.Logging
             this.parent = parent;
             loaderOwned = parent.loaderOwned || IsLoaderName(logName);
             printers = new List<LogPrinter>();
-            if (SelfConfig.Debug_.CreateModLogs_ && !SelfConfig.Debug_.CondenseModLogs_)
+            if (createModLogs && !condenseModLogs)
                 printers.Add(subLogFilePrinters.GetOrAdd(logName, new PluginSubLogPrinter(parent.logName, subName)));
 
             if (logThread == null || !logThread.IsAlive)
@@ -169,7 +184,7 @@ namespace IPA.Logging
 
             logName = name;
             loaderOwned = IsLoaderName(name);
-            if (SelfConfig.Debug_.CreateModLogs_)
+            if (createModLogs)
                 printers.Add(logFilePrinters.GetOrAdd(name, new PluginLogFilePrinter(name)));
 
             if (logThread == null || !logThread.IsAlive)
@@ -249,7 +264,7 @@ namespace IPA.Logging
             if (hidden && fullPrinters.Count == 0) return;
 
             // make sure that the queue isn't being cleared
-            logWaitEvent.Wait();
+            if (!IsOnLoggerThread) logWaitEvent.Wait();
             try
             {
                 var sync = syncLogging && !IsOnLoggerThread;
@@ -338,9 +353,19 @@ namespace IPA.Logging
 
         private static void EnsureStarted(LogPrinter printer)
         {
-            if (startedPrinters.Add(printer))
+            if (!startedPrinters.Contains(printer))
+            {
                 printer.StartPrint();
+                startedPrinters.Add(printer);
+            }
             printer.LastUse = Utils.CurrentTime();
+        }
+
+        private static void ReportPrinterError(Exception error)
+        {
+            // Console.Out is intercepted and would feed a failing printer back into itself.
+            try { ConsoleWriter.WriteLine($"printer errored: {error}"); }
+            catch (Exception) { }
         }
 
         private static IEnumerable<LogPrinter> PrintersFor(StandardLogger logger)
@@ -365,7 +390,7 @@ namespace IPA.Logging
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"printer errored: {e}");
+                    ReportPrinterError(e);
                 }
             }
         }
@@ -382,7 +407,7 @@ namespace IPA.Logging
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"printer errored: {e}");
+                    ReportPrinterError(e);
                 }
             }
         }
@@ -426,8 +451,16 @@ namespace IPA.Logging
 
             private static bool HasText(string message)
             {
-                foreach (char c in message)
-                    if (char.IsLetterOrDigit(c)) return true;
+                for (int i = 0; i < message.Length; i++)
+                {
+                    if (message[i] == '\x1b' && i + 1 < message.Length && message[i + 1] == '[')
+                    {
+                        i += 2;
+                        while (i < message.Length && (message[i] < '@' || message[i] > '~')) i++;
+                        continue;
+                    }
+                    if (char.IsLetterOrDigit(message[i])) return true;
+                }
                 return false;
             }
 
@@ -494,7 +527,7 @@ namespace IPA.Logging
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"printer errored: {e}");
+                        ReportPrinterError(e);
                     }
                 }
             }
@@ -523,7 +556,7 @@ namespace IPA.Logging
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine($"printer errored: {e}");
+                            ReportPrinterError(e);
                         }
                     }
                     group.Dirty = false;
@@ -541,7 +574,7 @@ namespace IPA.Logging
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"printer errored: {e}");
+                        ReportPrinterError(e);
                     }
                 }
             }
@@ -582,45 +615,48 @@ namespace IPA.Logging
 
                         msg.Sync?.Set();
 
-                        var debugConfig = SelfConfig.Instance?.Debug;
-
-                        if (debugConfig != null && debugConfig.HideMessagesForPerformance
-                            && logQueue.Count > debugConfig.HideLogThreshold)
+                        if (hideMessagesForPerformance && logQueue.Count > hideLogThreshold)
                         { // spam filtering (if queue has more than HideLogThreshold elements)
                             logWaitEvent.Reset(); // pause incoming log requests
 
-                            // clear loggers for this instance, to print the message to all affected logs
-                            loggerLogger.printers.Clear();
-                            var prints = new HashSet<LogPrinter>();
-                            // clear the queue
-                            while (logQueue.TryTake(out var message))
-                            { // aggregate loggers in the process
-                                var messageLogger = message.Logger;
-                                foreach (var print in messageLogger.printers)
-                                    _ = prints.Add(print);
-                                do
-                                {
-                                    messageLogger = messageLogger.parent;
-                                    if (messageLogger != null)
-                                        foreach (var print in messageLogger.printers)
-                                            _ = prints.Add(print);
-                                } while (messageLogger != null);
+                            try
+                            {
+                                // clear loggers for this instance, to print the message to all affected logs
+                                loggerLogger.printers.Clear();
+                                var prints = new HashSet<LogPrinter>();
+                                // clear the queue
+                                while (logQueue.TryTake(out var message))
+                                { // aggregate loggers in the process
+                                    DispatchFull(message);
+                                    var messageLogger = message.Logger;
+                                    foreach (var print in messageLogger.printers)
+                                        _ = prints.Add(print);
+                                    do
+                                    {
+                                        messageLogger = messageLogger.parent;
+                                        if (messageLogger != null)
+                                            foreach (var print in messageLogger.printers)
+                                                _ = prints.Add(print);
+                                    } while (messageLogger != null);
 
-                                message.Sync?.Set();
+                                    message.Sync?.Set();
+                                }
+
+                                // print using logging subsystem to all logger printers
+                                loggerLogger.printers.AddRange(prints);
+                                logQueue.Add(new LogMessage
+                                { // manually adding to the queue instead of using Warn() because calls to the logger are suspended here
+                                    Level = Level.Warning,
+                                    Logger = loggerLogger,
+                                    Message = $"{loggerLogger.logName.ToUpperInvariant()}: Messages omitted to improve performance",
+                                    Time = Utils.CurrentTime()
+                                });
+
                             }
-
-                            // print using logging subsystem to all logger printers
-                            loggerLogger.printers.AddRange(prints);
-                            logQueue.Add(new LogMessage
-                            { // manually adding to the queue instead of using Warn() because calls to the logger are suspended here
-                                Level = Level.Warning,
-                                Logger = loggerLogger,
-                                Message = $"{loggerLogger.logName.ToUpperInvariant()}: Messages omitted to improve performance",
-                                Time = Utils.CurrentTime()
-                            });
-
-                            // resume log calls
-                            logWaitEvent.Set();
+                            finally
+                            {
+                                logWaitEvent.Set();
+                            }
                         }
 
                         var now = Utils.CurrentTime();
@@ -659,7 +695,7 @@ namespace IPA.Logging
             }
             catch (Exception e)
             {
-                Console.WriteLine($"printer errored: {e}");
+                ReportPrinterError(e);
             }
             _ = startedPrinters.Remove(printer);
         }

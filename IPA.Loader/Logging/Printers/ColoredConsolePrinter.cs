@@ -42,7 +42,7 @@ namespace IPA.Logging.Printers
 
 
         /// <summary>Creates a printer using the configured message-darkening preference.</summary>
-        public ColoredConsolePrinter() : this(Config.SelfConfig.Debug_.DarkenMessages_)
+        public ColoredConsolePrinter() : this(StandardLogger.DarkenMessages)
         {
             darkenSetManually = false;
         }
@@ -69,7 +69,7 @@ namespace IPA.Logging.Printers
 
             var prefixStr = "";
             var suffixStr = "";
-            if ((darkenSetManually && darkenMessages) || (!darkenSetManually && Config.SelfConfig.Debug_.DarkenMessages_))
+            if ((darkenSetManually && darkenMessages) || (!darkenSetManually && StandardLogger.DarkenMessages))
             {
                 var darkened = GetDarkenedColor(Color);
                 if (darkened != Color)

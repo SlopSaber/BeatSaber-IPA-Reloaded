@@ -66,7 +66,7 @@ namespace IPA.Logging.Printers
 
         private static DirectoryInfo LogsDirectory()
         {
-            var logsDir = new DirectoryInfo("Logs");
+            var logsDir = new DirectoryInfo(StandardLogger.LogDirectory);
             logsDir.Create();
             return logsDir;
         }

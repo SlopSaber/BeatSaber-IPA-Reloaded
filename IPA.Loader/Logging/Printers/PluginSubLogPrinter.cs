@@ -24,7 +24,7 @@ namespace IPA.Logging.Printers
         /// <returns>the file to write to</returns>
         protected override FileInfo GetFileInfo()
         {
-            var logsDir = new DirectoryInfo(Path.Combine("Logs", mainName, name));
+            var logsDir = new DirectoryInfo(Path.Combine(StandardLogger.LogDirectory, mainName, name));
             logsDir.Create();
             var finfo = new FileInfo(Path.Combine(logsDir.FullName, $"{Utils.CurrentTime():yyyy.MM.dd.HH.mm.ss}.log"));
             return finfo;
