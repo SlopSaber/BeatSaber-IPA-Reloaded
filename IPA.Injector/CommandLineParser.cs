@@ -43,6 +43,10 @@ namespace IPA.Injector
                     case "--trace":
                         SelfConfig.CommandLineValues.Debug.ShowTrace = true;
                         break;
+                    case "-ipa-logging":
+                    case "--ipa-logging":
+                        SelfConfig.CommandLineValues.Debug.ShowLoaderMessages = true;
+                        break;
                     case "-vrmode":
                         if (i + 1 >= args.Length) continue;
                         OpenXRHelper.SetOpenXRRuntime(args[i + 1]);

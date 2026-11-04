@@ -35,6 +35,21 @@ namespace IPA.Logging
         /// </summary>
         public virtual void EndPrint() { }
 
+        /// <summary>
+        /// Prints a single-line message whose trailing <paramref name="field"/> may later be rewritten in place.
+        /// </summary>
+        /// <returns>a handle for <see cref="UpdateField"/>, or <see langword="null"/> if this printer cannot rewrite lines</returns>
+        internal virtual object? PrintUpdatable(Logger.Level level, DateTime time, string logName, string message, string field)
+        {
+            Print(level, time, logName, message + field);
+            return null;
+        }
+
+        /// <summary>
+        /// Rewrites a field printed by <see cref="PrintUpdatable"/>. The new field must have the same length.
+        /// </summary>
+        internal virtual void UpdateField(object handle, string field) { }
+
         internal DateTime LastUse { get; set; }
     }
 }

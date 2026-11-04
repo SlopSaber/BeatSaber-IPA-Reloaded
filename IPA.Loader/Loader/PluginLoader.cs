@@ -690,7 +690,7 @@ namespace IPA.Loader
                 }
                 else
                 {
-                    Logger.Loader.Warn($"Found duplicates of {meta.Id}, using newest");
+                    Logger.Loader.Debug($"Found duplicates of {meta.Id}, using newest");
                     ignoredPlugins.Add(meta, new(Reason.Duplicate)
                     {
                         ReasonText = $"Duplicate entry of same ID ({meta.Id})",

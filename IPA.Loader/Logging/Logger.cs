@@ -44,6 +44,17 @@ namespace IPA.Logging
         internal static bool LogCreated => _log != null;
 
         /// <summary>
+        /// Logs a loader message that stays visible when BSIPA's routine messages are hidden.
+        /// </summary>
+        internal static void Essential(string message)
+        {
+            if (Default is StandardLogger standard)
+                standard.LogEssential(Level.Info, message);
+            else
+                Default.Info(message);
+        }
+
+        /// <summary>
         /// The standard format for log messages.
         /// </summary>
         /// <value>the format for the standard loggers to print in</value>

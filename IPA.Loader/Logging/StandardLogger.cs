@@ -99,6 +99,8 @@ namespace IPA.Logging
         }
 
         private readonly string logName;
+        // Loggers owned by BSIPA itself; their routine messages are hidden unless requested.
+        private readonly bool loaderOwned;
         private static bool showSourceClass;
 
         /// <summary>
@@ -135,6 +137,7 @@ namespace IPA.Logging
         {
             logName = $"{parent.logName}/{subName}";
             this.parent = parent;
+            loaderOwned = parent.loaderOwned;
             printers = new List<LogPrinter>();
             if (SelfConfig.Debug_.CreateModLogs_ && !SelfConfig.Debug_.CondenseModLogs_)
                 printers.Add(subLogFilePrinters.GetOrAdd(logName, new PluginSubLogPrinter(parent.logName, subName)));
@@ -158,6 +161,7 @@ namespace IPA.Logging
             }
 
             logName = name;
+            loaderOwned = name == "IPA" || name == "Harmony";
             if (SelfConfig.Debug_.CreateModLogs_)
                 printers.Add(logFilePrinters.GetOrAdd(name, new PluginLogFilePrinter(name)));
 
@@ -198,13 +202,25 @@ namespace IPA.Logging
         /// </summary>
         /// <param name="level">the message level</param>
         /// <param name="message">the message to log</param>
-        public override void Log(Level level, string message)
+        public override void Log(Level level, string message) => Enqueue(level, message, essential: false);
+
+        /// <summary>
+        /// Logs a loader message that is always shown, such as the list of loaded plugins.
+        /// </summary>
+        internal void LogEssential(Level level, string message) => Enqueue(level, message, essential: true);
+
+        private const byte ProblemLevels = (byte)(Level.Warning | Level.Error | Level.Critical);
+
+        private void Enqueue(Level level, string message, bool essential)
         {
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
 
             // FIXME: trace doesn't seem to ever actually appear
             if (!showTrace && level == Level.Trace) return;
+
+            // BSIPA's own progress messages are noise unless diagnosing the loader; problems always show.
+            if (loaderOwned && !essential && ((byte)level & ProblemLevels) == 0 && !SelfConfig.Debug_.ShowLoaderMessages_) return;
 
             // make sure that the queue isn't being cleared
             logWaitEvent.Wait();
@@ -290,6 +306,199 @@ namespace IPA.Logging
 
         private const int LogCloseTimeout = 250;
 
+        private static readonly HashSet<LogPrinter> startedPrinters = new();
+
+        private static void EnsureStarted(LogPrinter printer)
+        {
+            if (startedPrinters.Add(printer))
+                printer.StartPrint();
+            printer.LastUse = Utils.CurrentTime();
+        }
+
+        private static IEnumerable<LogPrinter> PrintersFor(StandardLogger logger)
+        {
+            IEnumerable<LogPrinter> printers = logger.printers;
+            for (var parent = logger.parent; parent != null; parent = parent.parent)
+                printers = printers.Concat(parent.printers);
+            return printers.Concat(defaultPrinters);
+        }
+
+        private static bool Accepts(LogPrinter printer, Level level) => ((byte)level & (byte)printer.Filter) != 0;
+
+        private static void Dispatch(LogMessage msg)
+        {
+            foreach (var printer in PrintersFor(msg.Logger))
+            {
+                try
+                {
+                    if (!Accepts(printer, msg.Level)) continue;
+                    EnsureStarted(printer);
+                    printer.Print(msg.Level, msg.Time, msg.Logger.logName, msg.Message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"printer errored: {e}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Collapses repeated messages. A message identical (logger, level and text) to one of the
+        /// last <see cref="RepeatWindow"/> distinct messages is not printed again; instead one
+        /// summary line is written after its first repeat, and file printers rewrite that line's
+        /// counter in place. Printers that cannot rewrite get the final count as a new line when
+        /// the log goes idle or the message leaves the window.
+        /// </summary>
+        private static class RepeatCompactor
+        {
+            private const int RepeatWindow = 32;
+            private const int SnippetLength = 100;
+            private static readonly TimeSpan UpdateInterval = TimeSpan.FromMilliseconds(250);
+
+            private sealed class Target
+            {
+                internal LogPrinter Printer = null!;
+                internal object? Handle;
+                internal int Reported;
+            }
+
+            private sealed class Group
+            {
+                internal string Key = "";
+                internal Level Level;
+                internal string LogName = "";
+                internal string Prefix = "";
+                internal int Count = 1;
+                internal DateTime Last;
+                internal bool Summarized;
+                internal bool Dirty;
+                internal DateTime LastWrite;
+                internal readonly List<Target> Targets = new();
+            }
+
+            private static readonly LinkedList<Group> groups = new();
+            private static readonly Dictionary<string, LinkedListNode<Group>> index = new();
+
+            private static string KeyOf(LogMessage msg) => msg.Logger.logName + "\u0001" + (byte)msg.Level + "\u0001" + msg.Message;
+
+            private static string Field(Group group)
+                => ("x" + group.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)).PadRight(11) + " (last " + group.Last.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + ")";
+
+            private static string PrefixOf(string message)
+            {
+                var line = message;
+                int newline = line.IndexOfAny(new[] { '\r', '\n' });
+                if (newline >= 0) line = line.Substring(0, newline);
+                line = GZFilePrinter.removeControlCodes.Replace(line, "");
+                if (line.Length > SnippetLength) line = line.Substring(0, SnippetLength) + "...";
+                return $"Compacted to avoid clutter, previous log \"{line}\" ";
+            }
+
+            /// <returns><see langword="true"/> if the message was absorbed as a repeat and must not be printed</returns>
+            internal static bool Absorb(LogMessage msg)
+            {
+                var key = KeyOf(msg);
+                if (index.TryGetValue(key, out var node))
+                {
+                    var group = node.Value;
+                    group.Count++;
+                    group.Last = msg.Time;
+                    groups.Remove(node);
+                    groups.AddFirst(node);
+                    if (!group.Summarized)
+                        WriteSummary(group, msg.Logger);
+                    else
+                        group.Dirty = true;
+                    return true;
+                }
+
+                var added = groups.AddFirst(new Group { Key = key, Level = msg.Level, LogName = msg.Logger.logName, Last = msg.Time });
+                index[key] = added;
+                while (groups.Count > RepeatWindow)
+                {
+                    var oldest = groups.Last!;
+                    Flush(oldest.Value, force: true);
+                    index.Remove(oldest.Value.Key);
+                    groups.RemoveLast();
+                }
+                return false;
+            }
+
+            private static void WriteSummary(Group group, StandardLogger logger)
+            {
+                group.Prefix = PrefixOf(KeyMessage(group));
+                group.Summarized = true;
+                group.LastWrite = Utils.CurrentTime();
+                foreach (var printer in PrintersFor(logger))
+                {
+                    try
+                    {
+                        if (!Accepts(printer, group.Level)) continue;
+                        EnsureStarted(printer);
+                        var handle = printer.PrintUpdatable(group.Level, group.Last, group.LogName, group.Prefix, Field(group));
+                        group.Targets.Add(new Target { Printer = printer, Handle = handle, Reported = group.Count });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"printer errored: {e}");
+                    }
+                }
+            }
+
+            private static string KeyMessage(Group group)
+            {
+                int first = group.Key.IndexOf('\u0001');
+                int second = group.Key.IndexOf('\u0001', first + 1);
+                return group.Key.Substring(second + 1);
+            }
+
+            private static void Flush(Group group, bool force)
+            {
+                if (!group.Summarized) return;
+                var now = Utils.CurrentTime();
+                if (group.Dirty && (force || now - group.LastWrite >= UpdateInterval))
+                {
+                    foreach (var target in group.Targets)
+                    {
+                        if (target.Handle == null) continue;
+                        try
+                        {
+                            EnsureStarted(target.Printer);
+                            target.Printer.UpdateField(target.Handle, Field(group));
+                            target.Reported = group.Count;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"printer errored: {e}");
+                        }
+                    }
+                    group.Dirty = false;
+                    group.LastWrite = now;
+                }
+                if (!force) return;
+                foreach (var target in group.Targets)
+                {
+                    if (target.Handle != null || target.Reported >= group.Count) continue;
+                    try
+                    {
+                        EnsureStarted(target.Printer);
+                        target.Printer.Print(group.Level, group.Last, group.LogName, group.Prefix + Field(group));
+                        target.Reported = group.Count;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"printer errored: {e}");
+                    }
+                }
+            }
+
+            internal static void FlushAll(bool force)
+            {
+                foreach (var group in groups)
+                    Flush(group, force);
+            }
+        }
+
         /// <summary>
         /// The log printer thread for <see cref="StandardLogger"/>.
         /// </summary>
@@ -307,44 +516,14 @@ namespace IPA.Logging
 
             try
             {
-                var started = new HashSet<LogPrinter>();
                 while (logQueue.TryTake(out var msg, Timeout.Infinite))
                 {
                     StdoutInterceptor.Intercept(); // only runs once, after the first message is queued
                     do
                     {
-                        var logger = msg.Logger;
-                        IEnumerable<LogPrinter> printers = logger.printers;
-                        do
-                        { // aggregate all printers in the inheritance chain
-                            logger = logger.parent;
-                            if (logger != null)
-                                printers = printers.Concat(logger.printers);
-                        } while (logger != null);
-
-                        foreach (var printer in printers.Concat(defaultPrinters))
-                        {
-                            try
-                            { // print to them all
-                                if (((byte)msg.Level & (byte)printer.Filter) != 0)
-                                {
-                                    if (!started.Contains(printer))
-                                    { // start printer if not started
-                                        printer.StartPrint();
-                                        _ = started.Add(printer);
-                                    }
-
-                                    // update last use time and print
-                                    printer.LastUse = Utils.CurrentTime();
-                                    printer.Print(msg.Level, msg.Time, msg.Logger.logName, msg.Message);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                // do something sane in the face of an error
-                                Console.WriteLine($"printer errored: {e}");
-                            }
-                        }
+                        if (!RepeatCompactor.Absorb(msg))
+                            Dispatch(msg);
+                        RepeatCompactor.FlushAll(force: false);
 
                         msg.Sync?.Set();
 
@@ -390,48 +569,44 @@ namespace IPA.Logging
                         }
 
                         var now = Utils.CurrentTime();
-                        var copy = new List<LogPrinter>(started);
-                        foreach (var printer in copy)
+                        foreach (var printer in new List<LogPrinter>(startedPrinters))
                         {
                             // close printer after 500ms from its last use
                             if (now - printer.LastUse > timeout)
-                            {
-                                try
-                                {
-                                    printer.EndPrint();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine($"printer errored: {e}");
-                                }
-
-                                _ = started.Remove(printer);
-                            }
+                                EndPrinter(printer);
                         }
                     }
                     // wait for messages for 500ms before ending the prints
                     while (logQueue.TryTake(out msg, timeout));
 
                     if (logQueue.Count == 0)
-                    { // when the queue has been empty for 500ms, end all prints
-                        foreach (var printer in started)
-                        {
-                            try
-                            {
-                                printer.EndPrint();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine($"printer errored: {e}");
-                            }
-                        }
-                        started.Clear();
+                    { // when the queue has been empty for 500ms, publish pending counts and end all prints
+                        RepeatCompactor.FlushAll(force: true);
+                        foreach (var printer in new List<LogPrinter>(startedPrinters))
+                            EndPrinter(printer);
                     }
                 }
             }
             catch (InvalidOperationException)
             {
             }
+
+            RepeatCompactor.FlushAll(force: true);
+            foreach (var printer in new List<LogPrinter>(startedPrinters))
+                EndPrinter(printer);
+        }
+
+        private static void EndPrinter(LogPrinter printer)
+        {
+            try
+            {
+                printer.EndPrint();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"printer errored: {e}");
+            }
+            _ = startedPrinters.Remove(printer);
         }
 
         /// <summary>

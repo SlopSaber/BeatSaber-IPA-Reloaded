@@ -104,6 +104,12 @@ namespace IPA.Config
             // LINE: ignore
             public static bool SyncLogging_ => Instance?.Debug?.SyncLogging ?? false;
 
+            // BSIPA's own messages below Warning are hidden unless this or -ipa-logging is set.
+            public virtual bool ShowLoaderMessages { get; set; } = false;
+            // LINE: ignore 2
+            public static bool ShowLoaderMessages_ => (Instance?.Debug?.ShowLoaderMessages ?? false)
+                                                   || CommandLineValues.Debug.ShowLoaderMessages;
+
             public virtual bool DarkenMessages { get; set; } = false;
             // LINE: ignore 2
             public static bool DarkenMessages_ => (Instance?.Debug?.DarkenMessages ?? false)

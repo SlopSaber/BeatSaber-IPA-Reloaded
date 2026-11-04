@@ -420,24 +420,24 @@ namespace IPA.Loader
 
             sw.Stop();
 
-            Logger.Default.Info(exeName);
-            Logger.Default.Info($"Running on Unity {Application.unityVersion}");
-            Logger.Default.Info($"Game version {UnityGame.GameVersion}");
-            Logger.Default.Info("-----------------------------");
-            Logger.Default.Info($"Loading plugins recursively from Mods and Plugins; found {_bsPlugins.Count + _ipaPlugins.Count}");
-            Logger.Default.Info("-----------------------------");
+            Logger.Essential(exeName);
+            Logger.Essential($"Running on Unity {Application.unityVersion}");
+            Logger.Essential($"Game version {UnityGame.GameVersion}");
+            Logger.Essential("-----------------------------");
+            Logger.Essential($"Loading plugins recursively from Mods and Plugins; found {_bsPlugins.Count + _ipaPlugins.Count}");
+            Logger.Essential("-----------------------------");
             foreach (var plugin in _bsPlugins)
             {
-                Logger.Default.Info($"{plugin.Metadata.Name} ({plugin.Metadata.Id}): {plugin.Metadata.Version}");
+                Logger.Essential($"{plugin.Metadata.Name} ({plugin.Metadata.Id}): {plugin.Metadata.Version}");
             }
-            Logger.Default.Info("-----------------------------");
+            Logger.Essential("-----------------------------");
             if (_ipaPlugins.Count > 0)
             {
                 foreach (var plugin in _ipaPlugins)
                 {
-                    Logger.Default.Info($"{plugin.Name}: {plugin.Version}");
+                    Logger.Essential($"{plugin.Name}: {plugin.Version}");
                 }
-                Logger.Default.Info("-----------------------------");
+                Logger.Essential("-----------------------------");
             }
             Logger.Default.Info($"Initializing plugins took {sw.Elapsed}");
         }

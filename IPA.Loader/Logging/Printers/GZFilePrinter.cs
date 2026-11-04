@@ -152,7 +152,9 @@ namespace IPA.Logging.Printers
         {
             InitLog();
 
-            fstream = fileInfo.Open(FileMode.Append, FileAccess.Write);
+            // Seekable so repeat counters can be rewritten in place; new text still goes to the end.
+            fstream = fileInfo.Open(FileMode.OpenOrCreate, FileAccess.Write);
+            fstream.Seek(0, SeekOrigin.End);
             FileWriter = new StreamWriter(fstream, new UTF8Encoding(false));
         }
 
@@ -167,6 +169,45 @@ namespace IPA.Logging.Printers
             fstream?.Dispose();
             FileWriter = null;
             fstream = null;
+        }
+
+        private sealed class FieldHandle
+        {
+            internal readonly long Offset;
+            internal readonly int Length;
+
+            internal FieldHandle(long offset, int length)
+            {
+                Offset = offset;
+                Length = length;
+            }
+        }
+
+        internal override object? PrintUpdatable(Logger.Level level, DateTime time, string logName, string message, string field)
+        {
+            if (FileWriter == null || fstream == null)
+            {
+                Print(level, time, logName, message + field);
+                return null;
+            }
+
+            // The field is ASCII and ends the line, so its offset is known once the line is flushed.
+            Print(level, time, logName, message + field);
+            FileWriter.Flush();
+            long offset = fstream.Position - FileWriter.Encoding.GetByteCount(FileWriter.NewLine) - field.Length;
+            return offset >= 0 ? new FieldHandle(offset, field.Length) : null;
+        }
+
+        internal override void UpdateField(object handle, string field)
+        {
+            if (handle is not FieldHandle target || field.Length != target.Length || FileWriter == null || fstream == null)
+                return;
+            FileWriter.Flush();
+            long end = fstream.Position;
+            byte[] bytes = Encoding.ASCII.GetBytes(field);
+            fstream.Seek(target.Offset, SeekOrigin.Begin);
+            fstream.Write(bytes, 0, bytes.Length);
+            fstream.Seek(end, SeekOrigin.Begin);
         }
 
         /// <inheritdoc />
