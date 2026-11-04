@@ -34,7 +34,8 @@ namespace IPA.Desktop
         private int queryIndex;
         private int lastAdvanceFrame = -1;
         private float nextRefresh;
-        private static readonly long SliceTicks = Math.Max(1L, Stopwatch.Frequency / 500);
+        private static readonly long SliceTicks = Math.Max(1L, Stopwatch.Frequency / 1000);
+        internal bool IsRefreshing => refreshing;
 
         private abstract class SceneQuery
         {

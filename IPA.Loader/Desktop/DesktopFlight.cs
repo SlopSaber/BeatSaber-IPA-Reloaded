@@ -1,3 +1,4 @@
+#define ENABLE_PROFILER
 using IPA.Config;
 using Logger = IPA.Logging.Logger;
 using System;
@@ -7,6 +8,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.Profiling;
 
 namespace IPA.Desktop
 {
@@ -18,6 +20,7 @@ namespace IPA.Desktop
         internal Camera Camera { get; private set; }
         internal bool OwnsCamera => !stopping && !yielding && isActiveAndEnabled && Input != null;
         internal bool Ready => OwnsCamera && Camera != null && Camera.isActiveAndEnabled;
+        internal bool CanScan => !Ready || (!discovery.IsRefreshing && publishedDiscoveryFrame != Time.frameCount);
         internal bool Captured => Ready && Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
         internal bool CanInteract { get; private set; }
         internal Vector2 MouseMotion { get; private set; }
@@ -38,6 +41,7 @@ namespace IPA.Desktop
         private float yaw;
         private float pitch;
         private float nextScan;
+        private int publishedDiscoveryFrame = -1;
         private bool dirty = true;
         private CursorLockMode originalLock;
         private bool originalCursor;
@@ -81,18 +85,29 @@ namespace IPA.Desktop
             originalCursor = Cursor.visible;
             dirty = true;
             discovery.Clear();
+            publishedDiscoveryFrame = -1;
             SceneManager.sceneLoaded += SceneLoaded;
             SceneManager.sceneUnloaded += SceneUnloaded;
         }
 
-        private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; discovery.Clear(); }
-        private void SceneUnloaded(Scene scene) { dirty = true; discovery.Clear(); }
+        private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; discovery.Clear(); publishedDiscoveryFrame = -1; }
+        private void SceneUnloaded(Scene scene) { dirty = true; discovery.Clear(); publishedDiscoveryFrame = -1; }
 
         internal List<Behaviour> GetDiscoveredBehaviours() => discovery.Find(gameObject.scene);
 
         internal void AdvanceDiscovery()
         {
-            if (!stopping && !yielding && Input != null && discovery.Advance(gameObject.scene)) dirty = true;
+            if (stopping || yielding || Input == null || (dirty && !discovery.IsRefreshing)) return;
+            Profiler.BeginSample("BSIPA.FPFC.Discovery");
+            try
+            {
+                if (discovery.Advance(gameObject.scene))
+                {
+                    dirty = true;
+                    publishedDiscoveryFrame = Time.frameCount;
+                }
+            }
+            finally { Profiler.EndSample(); }
         }
 
         internal void Disable(Behaviour behaviour)
@@ -102,6 +117,14 @@ namespace IPA.Desktop
         }
 
         private void Scan()
+        {
+            if (!CanScan) return;
+            Profiler.BeginSample("BSIPA.FPFC.ApplyControls");
+            try { ApplyScan(); }
+            finally { Profiler.EndSample(); }
+        }
+
+        private void ApplyScan()
         {
             dirty = false;
             nextScan = Time.unscaledTime + 0.75f;
@@ -358,6 +381,7 @@ namespace IPA.Desktop
         private void ReleaseControl()
         {
             discovery.Clear();
+            publishedDiscoveryFrame = -1;
             CanInteract = false;
             MouseMotion = Vector2.zero;
             focusedLastFrame = false;
