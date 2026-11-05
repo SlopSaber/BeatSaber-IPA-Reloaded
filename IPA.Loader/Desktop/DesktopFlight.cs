@@ -27,7 +27,7 @@ namespace IPA.Desktop
         internal Vector2 PointerPosition => Camera.pixelRect.center;
         private readonly Dictionary<Behaviour, bool> disabled = new();
         private readonly List<DesktopPointerInput> pointers = new();
-        private readonly List<KeyValuePair<Renderer, bool>> hidden = new();
+        private readonly List<HiddenRenderer> hidden = new();
         private readonly List<Action> restoreMembers = new();
         private readonly DesktopBehaviourDiscovery discovery = new();
         private Vector3 position;
@@ -183,14 +183,14 @@ namespace IPA.Desktop
                     pointer.enabled = true;
                 }
                 if (name == "VRController")
-                    foreach (Renderer renderer in behaviour.GetComponentsInChildren<Renderer>(true)) Hide(renderer);
+                    foreach (Renderer renderer in behaviour.GetComponentsInChildren<Renderer>(true)) Hide(renderer, behaviour.transform);
                 if (name == "VRPointer")
                 {
                     if (visualSource == null || (!visualSource.gameObject.activeInHierarchy && behaviour.gameObject.activeInHierarchy)) visualSource = behaviour;
                     foreach (string member in PointerVisuals)
                     {
                         if (type.GetField(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(behaviour) is Component visual && visual)
-                            foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>(true)) Hide(renderer);
+                            foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>(true)) Hide(renderer, visual.transform);
                     }
                 }
                 if (name == "PlayerController")
@@ -234,11 +234,43 @@ namespace IPA.Desktop
             restoreMembers.Add(() => { if (owner != null) property.SetValue(owner, previous, null); });
         }
 
-        private void Hide(Renderer renderer)
+        private void Hide(Renderer renderer, Transform owner)
         {
-            if (hidden.Any(saved => saved.Key == renderer)) return;
-            hidden.Add(new KeyValuePair<Renderer, bool>(renderer, renderer.enabled));
+            if (hidden.Any(saved => saved.Renderer == renderer)) return;
+            hidden.Add(new HiddenRenderer(renderer, renderer.enabled, owner));
             renderer.enabled = false;
+        }
+
+        // Objects that mods parent to a controller only temporarily (held previews) are hidden with it,
+        // and must be drawn again once they leave it.
+        private void ReleaseDetachedRenderers()
+        {
+            for (int i = hidden.Count - 1; i >= 0; i--)
+            {
+                var saved = hidden[i];
+                if (saved.Renderer == null || saved.Owner == null)
+                {
+                    hidden.RemoveAt(i);
+                    continue;
+                }
+                if (saved.Renderer.transform.IsChildOf(saved.Owner)) continue;
+                saved.Renderer.enabled = saved.Enabled;
+                hidden.RemoveAt(i);
+            }
+        }
+
+        private readonly struct HiddenRenderer
+        {
+            internal readonly Renderer Renderer;
+            internal readonly bool Enabled;
+            internal readonly Transform Owner;
+
+            internal HiddenRenderer(Renderer renderer, bool enabled, Transform owner)
+            {
+                Renderer = renderer;
+                Enabled = enabled;
+                Owner = owner;
+            }
         }
 
         private static bool EditingText()
@@ -273,6 +305,7 @@ namespace IPA.Desktop
             AdvanceDiscovery();
             if (dirty || !Ready || Time.unscaledTime >= nextScan) Scan();
             if (yielding) return;
+            ReleaseDetachedRenderers();
             // Ignore the focus/capture transition click and any cursor-warp look delta.
             CanInteract = focusedLastFrame && Captured;
             ApplyCapture();
@@ -393,7 +426,7 @@ namespace IPA.Desktop
             pointers.Clear();
             foreach (var saved in disabled) if (saved.Key != null) saved.Key.enabled = saved.Value;
             disabled.Clear();
-            foreach (var saved in hidden) if (saved.Key != null) saved.Key.enabled = saved.Value;
+            foreach (var saved in hidden) if (saved.Renderer != null) saved.Renderer.enabled = saved.Enabled;
             hidden.Clear();
             foreach (var restore in restoreMembers) restore();
             restoreMembers.Clear();
