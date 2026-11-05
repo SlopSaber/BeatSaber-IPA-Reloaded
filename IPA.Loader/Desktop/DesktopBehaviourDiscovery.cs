@@ -43,10 +43,15 @@ namespace IPA.Desktop
         private int changeIndex;
         private bool hasSnapshot;
         private bool refreshing;
+        private bool fullRefreshRequested;
+        private bool sceneRefresh;
         private int rootIndex;
         private int lastAdvanceFrame = -1;
         private float nextRefresh;
         private static readonly long SliceTicks = Math.Max(1L, Stopwatch.Frequency / 1000);
+        // A sweep after a scene change gets a larger slice so the new scene's cameras and pointers
+        // are owned within a few frames.
+        private static readonly long SceneSliceTicks = SliceTicks * 3;
         internal bool IsRefreshing => refreshing;
 
         private struct HierarchyNode
@@ -60,6 +65,8 @@ namespace IPA.Desktop
             DisposeChanges();
             hasSnapshot = false;
             refreshing = false;
+            fullRefreshRequested = false;
+            sceneRefresh = false;
             lastAdvanceFrame = -1;
             results.Clear();
             pendingResults.Clear();
@@ -81,6 +88,7 @@ namespace IPA.Desktop
                 // Initial ownership must be established before applying flight input.
                 while (refreshing) CollectNext();
             }
+            else if (refreshing) results.RemoveAll(Destroyed);
             return results;
         }
 
@@ -109,11 +117,27 @@ namespace IPA.Desktop
             try
             {
                 do { CollectNext(); }
-                while (refreshing && Stopwatch.GetTimestamp() - start < SliceTicks);
+                while (refreshing && Stopwatch.GetTimestamp() - start < (sceneRefresh ? SceneSliceTicks : SliceTicks));
             }
             finally { Profiler.EndSample(); }
             return !refreshing;
         }
+
+        // Scene loads and unloads keep the previous snapshot and rebuild it in frame slices, so a
+        // level transition does not stall on a full sweep for every scene event. Only the first
+        // snapshot is built in one pass.
+        internal void Invalidate(Scene persistentScene)
+        {
+            if (!hasSnapshot)
+            {
+                Clear();
+                return;
+            }
+            fullRefreshRequested = true;
+            BeginRefresh(persistentScene);
+        }
+
+        private static readonly Predicate<Behaviour> Destroyed = behaviour => behaviour == null;
 
         private void BeginRefresh(Scene persistentScene)
         {
@@ -147,7 +171,9 @@ namespace IPA.Desktop
                 }
                 catch (Exception error) { DisableChanges(error); }
             }
-            changesRefresh = objectChanges != null && hasSnapshot && targetTypes.Count == previousTypeCount;
+            changesRefresh = !fullRefreshRequested && objectChanges != null && hasSnapshot && targetTypes.Count == previousTypeCount;
+            sceneRefresh = fullRefreshRequested;
+            fullRefreshRequested = false;
             pendingResults.Clear();
             roots.Clear();
             hierarchy.Clear();
@@ -214,6 +240,7 @@ namespace IPA.Desktop
             changes.Clear();
             changed.Clear();
             refreshing = false;
+            sceneRefresh = false;
             hasSnapshot = true;
         }
 

@@ -90,8 +90,8 @@ namespace IPA.Desktop
             SceneManager.sceneUnloaded += SceneUnloaded;
         }
 
-        private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; discovery.Clear(); publishedDiscoveryFrame = -1; }
-        private void SceneUnloaded(Scene scene) { dirty = true; discovery.Clear(); publishedDiscoveryFrame = -1; }
+        private void SceneLoaded(Scene scene, LoadSceneMode mode) { dirty = true; discovery.Invalidate(gameObject.scene); publishedDiscoveryFrame = -1; }
+        private void SceneUnloaded(Scene scene) { dirty = true; discovery.Invalidate(gameObject.scene); publishedDiscoveryFrame = -1; }
 
         internal List<Behaviour> GetDiscoveredBehaviours() => discovery.Find(gameObject.scene);
 
