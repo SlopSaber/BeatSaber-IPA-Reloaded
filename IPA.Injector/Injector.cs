@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
@@ -230,6 +231,7 @@ namespace IPA.Injector
         }
 
         private static bool bootstrapped;
+        private static int reportedGrabPass;
 
         private static void CreateBootstrapper()
         {
@@ -239,6 +241,11 @@ namespace IPA.Injector
             Application.logMessageReceivedThreaded += delegate (string condition, string stackTrace, LogType type)
             {
                 var level = UnityLogRedirector.LogTypeToLevel(type);
+                // URP cannot run GrabPass; Unity reports it on every draw of such a shader.
+                if (type == LogType.Error && condition.StartsWith("ShaderLab::GrabPasses::", StringComparison.Ordinal))
+                {
+                    level = Interlocked.Exchange(ref reportedGrabPass, 1) == 0 ? Logging.Logger.Level.Warning : Logging.Logger.Level.Debug;
+                }
                 UnityLogProvider.UnityLogger.Log(level, $"{condition}");
                 UnityLogProvider.UnityLogger.Log(level, $"{stackTrace}");
             };
