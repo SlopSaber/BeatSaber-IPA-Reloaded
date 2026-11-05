@@ -18,7 +18,10 @@ namespace IPA.Data
         private static readonly object Gate = new();
         private static readonly Dictionary<string, JObject> Baselines = new(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<string, JToken> ScoreBaselines = new(StringComparer.OrdinalIgnoreCase);
-        private static readonly HashSet<string> Characteristics = new(StringComparer.Ordinal) { "Standard", "OneSaber", "NoArrows", "90Degree", "360Degree" };
+        // Read from game getters on any thread, so it never waits for save processing under Gate.
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> Characteristics = new(
+            new[] { "Standard", "OneSaber", "NoArrows", "90Degree", "360Degree" }.Select(name => new KeyValuePair<string, byte>(name, 0)), StringComparer.Ordinal);
+        private static readonly Dictionary<string, string> RecordedDigests = new(StringComparer.OrdinalIgnoreCase);
         private static SaveDataProfile profile;
         private static string root;
         private static string native;
@@ -26,8 +29,8 @@ namespace IPA.Data
         private static readonly string[] KnownFiles = { "PlayerData.dat", "GameDynamicData.dat", "settings.cfg", "settings.ini", "MainSettings.json", "GraphicsSettings.json", "ControllerProfiles.dat", "AvatarData.dat", "LocalLeaderboards.dat", "LocalDailyLeaderboards.dat" };
 
         public static string GetPersistentDataPath() => native ?? throw new InvalidOperationException("BSIPA save routing was not initialized; refusing to use global AppData.");
-        public static string ObserveCharacteristic(string name) { if (name != null) lock (Gate) Characteristics.Add(name); return name; }
-        internal static bool SupportsCharacteristic(string name) { lock (Gate) return Characteristics.Contains(name); }
+        public static string ObserveCharacteristic(string name) { if (name != null && !Characteristics.ContainsKey(name)) Characteristics.TryAdd(name, 0); return name; }
+        internal static bool SupportsCharacteristic(string name) => name != null && Characteristics.ContainsKey(name);
 
         internal static void Initialize(string appData, string userData, string original, SaveDataProfile current)
         {
@@ -202,6 +205,7 @@ namespace IPA.Data
                 Preserve(name, preserved);
                 Baselines[name] = SharedSettings.Extract(name, result, profile);
                 ScoreBaselines[name] = result.DeepClone();
+                RecordedDigests.Remove(name);
                 return name == "settings.ini" ? SharedSettings.WriteIni((JObject)result) : result.ToString(Formatting.None);
             }
         }
@@ -214,34 +218,80 @@ namespace IPA.Data
             lock (Gate)
             {
                 string text = File.ReadAllText(path);
+                byte[] bytes = Encoding.UTF8.GetBytes(text);
+                string digest;
+                using (var hash = SHA256.Create()) digest = BitConverter.ToString(hash.ComputeHash(bytes));
+                if (RecordedDigests.TryGetValue(name, out var recorded) && recorded == digest) return;
                 JToken raw = name == "settings.ini" ? SharedSettings.ParseIni(text) : Parse(text);
                 if (raw == null) { Logger.Default.Warn($"Invalid native save '{name}' retained in the version view; shared data was not replaced."); return; }
-                Archive(name, Encoding.UTF8.GetBytes(text));
+                Archive(name, bytes);
                 JObject values = SharedSettings.Extract(name, raw, profile);
                 Baselines.TryGetValue(name, out var baseline);
-                Transaction("Settings.json", settings =>
-                {
-                    foreach (var property in values.Properties())
-                        if (baseline == null ? settings[property.Name] == null : !JToken.DeepEquals(baseline[property.Name], property.Value))
-                            settings[property.Name] = MergeDelta(settings[property.Name], baseline?[property.Name], property.Value);
-                    return 0;
-                });
+                var changed = values.Properties().Where(property => baseline == null || !JToken.DeepEquals(baseline[property.Name], property.Value)).ToArray();
+                if (changed.Length > 0)
+                    Transaction("Settings.json", settings =>
+                    {
+                        foreach (var property in changed)
+                            if (baseline != null || settings[property.Name] == null)
+                                settings[property.Name] = MergeDelta(settings[property.Name], baseline?[property.Name], property.Value);
+                        return 0;
+                    });
                 Baselines[name] = values;
                 if (name.EndsWith(".dat", StringComparison.OrdinalIgnoreCase))
                 {
                     ScoreBaselines.TryGetValue(name, out var scoreBaseline);
-                    Transaction(Path.Combine("Scores", profile.Era, name + ".json"), saved =>
+                    JToken incoming = scoreBaseline == null ? raw : ScoreDelta(scoreBaseline, raw);
+                    if (incoming != null)
                     {
-                        var merged = Merge(saved, raw, true, baseline: scoreBaseline) as JObject;
-                        if (merged != null) { saved.RemoveAll(); foreach (var p in merged.Properties().ToArray()) saved[p.Name] = p.Value.DeepClone(); }
-                        return 0;
-                    });
-                    ScoreBaselines[name] = raw.DeepClone();
+                        Transaction(Path.Combine("Scores", profile.Era, name + ".json"), saved =>
+                        {
+                            var merged = Merge(saved, incoming, true, baseline: scoreBaseline) as JObject;
+                            if (merged != null) { saved.RemoveAll(); foreach (var p in merged.Properties().ToArray()) saved[p.Name] = p.Value.DeepClone(); }
+                            return 0;
+                        });
+                        ScoreBaselines[name] = raw.DeepClone();
+                    }
                 }
                 var extras = new JObject();
                 if (profile.Files.TryGetValue(name, out var shape)) shape.Project(raw, (key, value) => extras[key] = value.DeepClone());
                 Preserve(name, extras);
+                RecordedDigests[name] = digest;
             }
+        }
+
+        // The parts of a save that differ from its baseline; null when nothing differs. Unchanged values and
+        // records merge to what the store already holds, so leaving them out keeps the merge result.
+        private static JToken ScoreDelta(JToken baseline, JToken current)
+        {
+            if (JToken.DeepEquals(baseline, current)) return null;
+            if (!(baseline is JObject previous) || !(current is JObject next)) return current;
+            var delta = new JObject();
+            foreach (var property in next.Properties())
+            {
+                JToken prior = previous[property.Name];
+                if (JToken.DeepEquals(prior, property.Value)) continue;
+                delta[property.Name] = prior is JArray priorArray && property.Value is JArray array ? ChangedRecords(priorArray, array) : property.Value;
+            }
+            return delta.HasValues ? delta : null;
+        }
+
+        private static JArray ChangedRecords(JArray baseline, JArray current)
+        {
+            var prior = new Dictionary<string, JToken>(StringComparer.Ordinal);
+            foreach (var item in baseline)
+            {
+                string identity = Identity(item);
+                if (identity == null) return current;
+                if (!prior.ContainsKey(identity)) prior.Add(identity, item);
+            }
+            var changed = new JArray();
+            foreach (var item in current)
+            {
+                string identity = Identity(item);
+                if (identity == null) return current;
+                if (!prior.TryGetValue(identity, out var previous) || !JToken.DeepEquals(previous, item)) changed.Add(item);
+            }
+            return changed;
         }
 
         private static JToken MergeDelta(JToken master, JToken baseline, JToken incoming)
