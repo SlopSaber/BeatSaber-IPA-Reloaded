@@ -425,8 +425,8 @@ namespace IPA.Loader
             Logger.Essential($"Game version {UnityGame.GameVersion}");
             Logger.Essential(IPA.Logging.StandardLogger.LoaderMessageStatus);
             Logger.Essential("-----------------------------");
-            var mods = _bsPlugins.Where(p => !p.Metadata.IsBare).ToList();
-            var libraries = _bsPlugins.Where(p => p.Metadata.IsBare).ToList();
+            var mods = _bsPlugins.Where(p => !p.Metadata.IsBare).OrderBy(p => p.Metadata.Name, StringComparer.OrdinalIgnoreCase).ToList();
+            var libraries = _bsPlugins.Where(p => p.Metadata.IsBare).OrderBy(p => p.Metadata.Name, StringComparer.OrdinalIgnoreCase).ToList();
             Logger.Essential($"Loading mods from Mods and Plugins; found {mods.Count + _ipaPlugins.Count}");
             Logger.Essential("-----------------------------");
             foreach (var plugin in mods)
@@ -436,7 +436,7 @@ namespace IPA.Loader
             Logger.Essential("-----------------------------");
             if (_ipaPlugins.Count > 0)
             {
-                foreach (var plugin in _ipaPlugins)
+                foreach (var plugin in _ipaPlugins.OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase))
                 {
                     Logger.Essential($"{plugin.Name}: {plugin.Version}");
                 }
