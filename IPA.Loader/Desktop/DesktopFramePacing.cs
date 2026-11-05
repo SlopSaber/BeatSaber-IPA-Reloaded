@@ -87,7 +87,7 @@ namespace IPA.Desktop
                     if (brokenVSync)
                     {
                         softwareFallback = true;
-                        Logger.Default.Warn($"FPFC VSync is ineffective; using {monitorRefreshRate} FPS software pacing on {monitorDevice}. --vsync-off also disables this fallback.");
+                        Logger.Default.Info($"FPFC VSync is ineffective; using {monitorRefreshRate} FPS software pacing on {monitorDevice}. --vsync-off also disables this fallback.");
                     }
                 }
             }
