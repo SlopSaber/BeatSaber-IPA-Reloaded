@@ -241,10 +241,12 @@ namespace IPA.Injector
             Application.logMessageReceivedThreaded += delegate (string condition, string stackTrace, LogType type)
             {
                 var level = UnityLogRedirector.LogTypeToLevel(type);
-                // URP cannot run GrabPass; Unity reports it on every draw of such a shader.
+                // URP cannot run GrabPass; Unity reports it on every draw of such a shader. Asset loaders
+                // substitute _GrabTexture and report that themselves, so only the first report is kept.
                 if (type == LogType.Error && condition.StartsWith("ShaderLab::GrabPasses::", StringComparison.Ordinal))
                 {
-                    level = Interlocked.Exchange(ref reportedGrabPass, 1) == 0 ? Logging.Logger.Level.Warning : Logging.Logger.Level.Debug;
+                    if (Interlocked.Exchange(ref reportedGrabPass, 1) != 0) return;
+                    level = Logging.Logger.Level.Debug;
                 }
                 UnityLogProvider.UnityLogger.Log(level, $"{condition}");
                 UnityLogProvider.UnityLogger.Log(level, $"{stackTrace}");
