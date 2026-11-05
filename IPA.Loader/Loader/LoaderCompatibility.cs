@@ -18,6 +18,99 @@ namespace IPA.Loader
         private static readonly Dictionary<string, string> PreparedFiles = new(StringComparer.OrdinalIgnoreCase);
         private static readonly object PreparationLock = new();
         private static readonly ConcurrentDictionary<string, string> OriginalPaths = new(StringComparer.OrdinalIgnoreCase);
+        private static Dictionary<string, PreparedEntry> preparedIndex;
+
+        // Preparation output depends only on the file contents, its path, the selected profile and this loader
+        // build, so a file whose size and write time are unchanged can reuse the earlier result without being
+        // read through Cecil again.
+        private sealed class PreparedEntry
+        {
+            public long Length;
+            public long WriteTicks;
+            public string Profile;
+            public string Prepared;
+            public string Registered;
+        }
+
+        private static string PreparedIndexPath => Path.Combine(IPA.Utilities.UnityGame.CompatibilityCachePath,
+            typeof(LoaderCompatibility).Module.ModuleVersionId.ToString("N"), "prepared-index.txt");
+
+        private static Dictionary<string, PreparedEntry> PreparedIndex
+        {
+            get
+            {
+                if (preparedIndex != null) return preparedIndex;
+                preparedIndex = new Dictionary<string, PreparedEntry>(StringComparer.OrdinalIgnoreCase);
+                try
+                {
+                    if (File.Exists(PreparedIndexPath))
+                        foreach (string line in File.ReadAllLines(PreparedIndexPath))
+                        {
+                            string[] fields = line.Split('\t');
+                            if (fields.Length != 6 || !long.TryParse(fields[1], out long length) || !long.TryParse(fields[2], out long ticks))
+                                continue;
+                            preparedIndex[fields[0]] = new PreparedEntry
+                                { Length = length, WriteTicks = ticks, Profile = fields[3], Prepared = fields[4], Registered = fields[5] };
+                        }
+                }
+                catch (Exception e)
+                {
+                    Logger.Loader.Debug($"Ignoring the prepared assembly index: {e.Message}");
+                }
+                return preparedIndex;
+            }
+        }
+
+        private static bool TryReusePrepared(string file, string indexKey, FileInfo info, out string result)
+        {
+            result = null;
+            if (!PreparedIndex.TryGetValue(indexKey, out var entry) || entry.Length != info.Length || entry.WriteTicks != info.LastWriteTimeUtc.Ticks)
+                return false;
+            if (entry.Registered.Length != 0 && !ProfilesByPath.ContainsKey(file))
+            {
+                var registered = FindProfile(entry.Registered);
+                if (registered == null) return false;
+                ProfilesByPath[file] = registered;
+            }
+            string key = file + "|" + entry.Profile;
+            if (entry.Prepared.Length == 0)
+            {
+                PreparedFiles[key] = file;
+                result = file;
+                return true;
+            }
+            if (!File.Exists(entry.Prepared)) return false;
+            PreparedFiles[key] = entry.Prepared;
+            RegisterOriginalPath(entry.Prepared, file);
+            Logger.Loader.Debug($"Reused prepared loader references for {Path.GetFileName(file)}.");
+            result = entry.Prepared;
+            return true;
+        }
+
+        private static string RegisteredProfile(string file, bool wasRegistered)
+            => !wasRegistered && ProfilesByPath.TryGetValue(file, out var registered) ? registered.Version.ToString() : "";
+
+        private static Compatibility.CompatibilityProfile FindProfile(string version)
+            => Compatibility.CompatibilityProfiles.Current.Version.ToString() == version
+                ? Compatibility.CompatibilityProfiles.Current
+                : Compatibility.CompatibilityProfiles.Releases.FirstOrDefault(profile => profile.Version.ToString() == version);
+
+        private static void RecordPrepared(string indexKey, FileInfo info, string profile, string prepared, string registered)
+        {
+            var entry = new PreparedEntry
+                { Length = info.Length, WriteTicks = info.LastWriteTimeUtc.Ticks, Profile = profile, Prepared = prepared, Registered = registered };
+            PreparedIndex[indexKey] = entry;
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(PreparedIndexPath));
+                File.AppendAllText(PreparedIndexPath,
+                    $"{indexKey}\t{entry.Length}\t{entry.WriteTicks}\t{profile}\t{prepared}\t{registered}\n");
+            }
+            catch (Exception e)
+            {
+                Logger.Loader.Debug($"Could not record prepared assembly {Path.GetFileName(prepared)}: {e.Message}");
+            }
+        }
 
         internal static string OriginalPath(string path) => OriginalPaths.TryGetValue(path, out var original) ? original : path;
         internal static void RegisterOriginalPath(string prepared, string original) => OriginalPaths[prepared] = original;
@@ -200,6 +293,10 @@ namespace IPA.Loader
                 var profile = ProfileForPath(file) ?? inheritedProfile;
                 string key = file + "|" + profile?.Version;
                 if (PreparedFiles.TryGetValue(key, out string prepared)) return prepared;
+                string indexKey = key;
+                var info = new FileInfo(file);
+                if (TryReusePrepared(file, indexKey, info, out prepared)) return prepared;
+                bool wasRegistered = ProfilesByPath.ContainsKey(file);
                 byte[] bytes = File.ReadAllBytes(file);
                 using var input = new MemoryStream(bytes, false);
                 using var resolver = new CecilLibLoader();
@@ -216,7 +313,11 @@ namespace IPA.Loader
                     profile = ResolveAssemblyProfile(file, module, profile);
                 else profile = null;
                 key = file + "|" + profile?.Version;
-                if (PreparedFiles.TryGetValue(key, out prepared)) return prepared;
+                if (PreparedFiles.TryGetValue(key, out prepared))
+                {
+                    RecordPrepared(indexKey, info, profile?.Version.ToString() ?? "", prepared == file ? "" : prepared, RegisteredProfile(file, wasRegistered));
+                    return prepared;
+                }
                 using var hash = SHA256.Create();
                 string digest = BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "");
                 // A single full-length hash keeps source/content isolation without deep cache paths.
@@ -234,6 +335,7 @@ namespace IPA.Loader
                     if (!compatibilityChanged && !dataRoutingChanged)
                     {
                         PreparedFiles[key] = file;
+                        RecordPrepared(indexKey, info, profile?.Version.ToString() ?? "", "", RegisteredProfile(file, wasRegistered));
                         return file;
                     }
 
@@ -244,6 +346,7 @@ namespace IPA.Loader
                 }
                 PreparedFiles[key] = prepared;
                 RegisterOriginalPath(prepared, file);
+                RecordPrepared(indexKey, info, profile?.Version.ToString() ?? "", prepared, RegisteredProfile(file, wasRegistered));
                 Logger.Loader.Info($"Prepared loader references in {Path.GetFileName(file)} with BSIPA profile {profile?.Version.ToString() ?? "binary signatures"}; original unchanged.");
                 return prepared;
             }
