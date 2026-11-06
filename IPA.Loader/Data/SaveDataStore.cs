@@ -245,8 +245,9 @@ namespace IPA.Data
                     {
                         Transaction(Path.Combine("Scores", profile.Era, name + ".json"), saved =>
                         {
-                            var merged = Merge(saved, incoming, true, baseline: scoreBaseline) as JObject;
-                            if (merged != null) { saved.RemoveAll(); foreach (var p in merged.Properties().ToArray()) saved[p.Name] = p.Value.DeepClone(); }
+                            // Transaction owns this freshly parsed tree; merge without cloning it at every depth.
+                            var merged = Merge(saved, incoming, true, baseline: scoreBaseline, inPlace: true) as JObject;
+                            if (merged != null && !ReferenceEquals(merged, saved)) { saved.RemoveAll(); foreach (var p in merged.Properties().ToArray()) saved[p.Name] = p.Value.DeepClone(); }
                             return 0;
                         });
                         ScoreBaselines[name] = raw.DeepClone();
@@ -361,17 +362,17 @@ namespace IPA.Data
             matches.Add(index);
         }
 
-        private static JToken Merge(JToken old, JToken incoming, bool scores, string key = "", JToken baseline = null)
+        private static JToken Merge(JToken old, JToken incoming, bool scores, string key = "", JToken baseline = null, bool inPlace = false)
         {
             if (old is JObject previous && incoming is JObject next)
             {
-                var result = (JObject)previous.DeepClone();
-                foreach (var property in next.Properties()) result[property.Name] = Merge(result[property.Name], property.Value, scores, property.Name, (baseline as JObject)?[property.Name]);
+                var result = inPlace ? previous : (JObject)previous.DeepClone();
+                foreach (var property in next.Properties()) result[property.Name] = Merge(result[property.Name], property.Value, scores, property.Name, (baseline as JObject)?[property.Name], inPlace);
                 return result;
             }
             if (scores && old is JArray oldArray && incoming is JArray newArray)
             {
-                var result = (JArray)oldArray.DeepClone();
+                var result = inPlace ? oldArray : (JArray)oldArray.DeepClone();
                 var positions = new Dictionary<string, SortedSet<int>>(StringComparer.Ordinal);
                 var identities = new List<string>(result.Count);
                 for (int index = 0; index < result.Count; index++)
@@ -398,7 +399,7 @@ namespace IPA.Data
                     if (found >= 0)
                     {
                         string previousIdentity = identities[found];
-                        result[found] = Merge(result[found], value, true, baseline: priorItem);
+                        result[found] = Merge(result[found], value, true, baseline: priorItem, inPlace: inPlace);
                         string updatedIdentity = Identity(result[found]);
                         if (!string.Equals(previousIdentity, updatedIdentity, StringComparison.Ordinal))
                         {
