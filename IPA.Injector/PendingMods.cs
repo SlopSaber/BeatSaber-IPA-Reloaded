@@ -11,15 +11,40 @@ namespace IPA.Injector
 {
     internal static class PendingMods
     {
+        private sealed class InstallSummary
+        {
+            internal int Installed, Queued, InstallErrors, StagingErrors, EarlierClaims, ScanErrors, LinkedDirectories;
+            internal bool Incomplete;
+
+            internal void Write()
+            {
+                if (Installed == 0 && Queued == 0 && !Incomplete) return;
+                try
+                {
+                    string coverage = Incomplete ? "Queued count is incomplete; unscanned files may remain."
+                        : "Counts cover files observed during this pass.";
+                    Logger.Essential(Logger.Injector, $"Pending mods: {Installed} installed; {Queued} observed files still queued "
+                        + $"(install/retry errors: {InstallErrors}, staging errors: {StagingErrors}, earlier claims: {EarlierClaims}). "
+                        + $"Scan failures: {ScanErrors}; linked directories skipped: {LinkedDirectories}. {coverage} "
+                        + "Remaining/new files retry next launch; replacements are backed up under IPA/Backups/Pending.");
+                }
+                catch { }
+            }
+        }
+
         internal static void Apply()
         {
             string pending = Path.GetFullPath(Path.Combine(UnityGame.InstallPath, "IPA", "Pending"));
             string mods = Path.GetFullPath(UnityGame.ModsPath);
             string claimed = Path.Combine(pending, ".installing");
+            var summary = new InstallSummary();
+            bool completed = false;
             try
             {
                 if (Linked(pending, pending) || Linked(mods, mods) || Linked(claimed, pending))
                 {
+                    summary.Incomplete = true;
+                    ++summary.LinkedDirectories;
                     Logger.Injector.Warn("Pending mod installation skipped: a queue or destination directory is linked.");
                     return;
                 }
@@ -29,12 +54,14 @@ namespace IPA.Injector
                     FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                 var backup = new BackupUnit(Path.Combine(UnityGame.InstallPath, "IPA", "Backups", "Pending"),
                     Utils.CurrentTime().ToString("yyyy-MM-dd_HH-mm-ss") + "-" + Guid.NewGuid().ToString("N"));
-                int installed = 0;
                 // Finish interrupted installs first. New copies at the public queue
                 // path stay separate from the file this launch is installing.
-                foreach (string file in Files(claimed))
-                    if (Install(file, claimed, mods, backup)) installed++;
-                foreach (string file in Files(pending, claimed))
+                foreach (string file in Files(claimed, summary: summary))
+                {
+                    if (Install(file, claimed, mods, backup)) ++summary.Installed;
+                    else { ++summary.Queued; ++summary.InstallErrors; }
+                }
+                foreach (string file in Files(pending, claimed, summary))
                 {
                     string relative = Utils.GetRelativePath(file, pending);
                     string claim = Path.GetFullPath(Path.Combine(claimed, relative));
@@ -42,23 +69,37 @@ namespace IPA.Injector
                     {
                         if (Linked(file, pending)) throw new IOException("Linked staging file.");
                         if (!Inside(claim, claimed) || Linked(claim, pending)) throw new IOException("Linked or invalid staging path.");
-                        if (File.Exists(claim)) continue; // Its previous attempt still needs retrying.
+                        if (File.Exists(claim))
+                        {
+                            ++summary.Queued;
+                            ++summary.EarlierClaims;
+                            continue; // Its previous attempt still needs retrying.
+                        }
                         Directory.CreateDirectory(Path.GetDirectoryName(claim));
                         File.Move(file, claim);
                     }
                     catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
                     {
+                        ++summary.Queued;
+                        ++summary.StagingErrors;
                         Logger.Injector.Warn($"Pending mod file '{relative}' remains queued: {error.Message}");
                         continue;
                     }
-                    if (Install(claim, claimed, mods, backup)) installed++;
+                    if (Install(claim, claimed, mods, backup)) ++summary.Installed;
+                    else { ++summary.Queued; ++summary.InstallErrors; }
                 }
                 RemoveEmptyDirectories(pending);
-                if (installed > 0) Logger.Injector.Info($"Installed {installed} pending mod files into Mods before discovery; replaced files backed up under IPA/Backups/Pending.");
+                completed = true;
             }
             catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
             {
+                summary.Incomplete = true;
                 Logger.Injector.Warn($"Pending mod installation could not finish; remaining files will retry next launch: {error.Message}");
+            }
+            finally
+            {
+                summary.Incomplete |= !completed;
+                summary.Write();
             }
         }
 
@@ -118,7 +159,7 @@ namespace IPA.Injector
             return false;
         }
 
-        private static IEnumerable<string> Directories(string root, string except = null)
+        private static IEnumerable<string> Directories(string root, string except = null, InstallSummary summary = null)
         {
             var directories = new Stack<string>();
             directories.Push(root);
@@ -128,11 +169,17 @@ namespace IPA.Injector
                 string[] children;
                 try
                 {
-                    if (!Directory.Exists(directory) || Linked(directory, root)) continue;
+                    if (!Directory.Exists(directory)) continue;
+                    if (Linked(directory, root))
+                    {
+                        if (summary != null) { ++summary.LinkedDirectories; summary.Incomplete = true; }
+                        continue;
+                    }
                     children = Directory.GetDirectories(directory);
                 }
                 catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
                 {
+                    if (summary != null) { ++summary.ScanErrors; summary.Incomplete = true; }
                     Logger.Injector.Warn($"Cannot scan pending mod directory '{directory}': {error.Message}");
                     continue;
                 }
@@ -142,14 +189,15 @@ namespace IPA.Injector
             }
         }
 
-        private static IEnumerable<string> Files(string root, string except = null)
+        private static IEnumerable<string> Files(string root, string except = null, InstallSummary summary = null)
         {
-            foreach (string directory in Directories(root, except))
+            foreach (string directory in Directories(root, except, summary))
             {
                 string[] files;
                 try { files = Directory.GetFiles(directory); }
                 catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
                 {
+                    if (summary != null) { ++summary.ScanErrors; summary.Incomplete = true; }
                     Logger.Injector.Warn($"Cannot scan pending mod files in '{directory}': {error.Message}");
                     continue;
                 }
