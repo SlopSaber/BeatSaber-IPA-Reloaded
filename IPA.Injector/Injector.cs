@@ -91,6 +91,7 @@ namespace IPA.Injector
 
                 // updates backup
                 InstallBootstrapPatch();
+                SceneContextBootstrap.Apply();
 
                 AntiMalwareEngine.Initialize();
 
@@ -262,16 +263,31 @@ namespace IPA.Injector
         }
 
         private static bool loadingDone;
+        private static bool pluginsInitializing;
+        private static bool pluginsInitialized;
+
+        internal static void InitializeBeforeSceneContext()
+        {
+            CreateBootstrapper();
+            Bootstrapper_Destroyed();
+        }
 
         private static void Bootstrapper_Destroyed()
         {
-            // wait for plugins to finish loading
-            pluginAsyncLoadTask?.Wait();
-            permissionFixTask?.Wait();
+            if (pluginsInitialized || pluginsInitializing) return;
+            pluginsInitializing = true;
+            try
+            {
+                // Wait for metadata before creating the plugin manager on Unity's main thread.
+                pluginAsyncLoadTask?.Wait();
+                permissionFixTask?.Wait();
 
-            Default.Debug("Plugins loaded");
-            Default.Debug(string.Join(", ", PluginLoader.PluginsMetadata.ToString()));
-            _ = PluginComponent.Create();
+                Default.Debug("Plugins loaded");
+                Default.Debug(string.Join(", ", PluginLoader.PluginsMetadata.ToString()));
+                _ = PluginComponent.Create();
+                pluginsInitialized = true;
+            }
+            finally { pluginsInitializing = false; }
         }
     }
 }
