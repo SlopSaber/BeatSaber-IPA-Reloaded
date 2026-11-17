@@ -17,8 +17,14 @@ namespace IPA.Data
                 var settings = SaveDataStore.Transaction("Settings.json", data => (JObject)data.DeepClone(), readOnly: true);
                 var mode = settings["window.fullscreen"];
                 if (mode?.Type != JTokenType.Boolean) return;
-                int width = Dimension(settings["window.resolution.x"], Screen.width);
-                int height = Dimension(settings["window.resolution.y"], Screen.height);
+                if (!SharedSettings.IsValid("window.resolution.x", settings["window.resolution.x"])
+                    || !SharedSettings.IsValid("window.resolution.y", settings["window.resolution.y"]))
+                {
+                    Logging.Logger.Default.Warn("Shared startup window dimensions are invalid or incomplete; retaining native display settings.");
+                    return;
+                }
+                int width = (int)settings["window.resolution.x"];
+                int height = (int)settings["window.resolution.y"];
                 bool fullscreen = (bool)mode;
                 Screen.SetResolution(width, height, fullscreen);
                 Logging.Logger.Default.Info($"Applied shared startup window settings: {width}x{height}, {(fullscreen ? "fullscreen" : "windowed")}.");
@@ -28,8 +34,5 @@ namespace IPA.Data
                 Logging.Logger.Default.Warn($"Shared startup window settings unavailable: {error.Message}");
             }
         }
-
-        private static int Dimension(JToken value, int fallback)
-            => value?.Type == JTokenType.Integer && (long)value > 0 && (long)value <= int.MaxValue ? (int)value : fallback;
     }
 }

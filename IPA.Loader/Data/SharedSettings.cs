@@ -43,7 +43,8 @@ namespace IPA.Data
             var result = new JObject();
             if (file == "settings.ini")
             {
-                foreach (var property in ((JObject)data).Properties()) result[property.Name] = property.Value.DeepClone();
+                foreach (var property in ((JObject)data).Properties())
+                    if (IsValid(property.Name, property.Value)) result[property.Name] = property.Value.DeepClone();
                 return result;
             }
             if (file == "PlayerData.dat")
@@ -84,7 +85,7 @@ namespace IPA.Data
                 if (alias.Value == "quality.smoke_graphics" && token.Type == JTokenType.Integer) token = new JValue((long)token == 1);
                 // Preset indices refer to version-specific ScriptableObject arrays, not INI enums.
                 string canonical = IsPreset(alias.Value) && token.Type == JTokenType.Integer ? "preset." + profile.Version + "." + alias.Value : alias.Value;
-                result[canonical] = token.DeepClone();
+                if (IsValid(canonical, token)) result[canonical] = token.DeepClone();
             }
             return result;
         }
@@ -96,7 +97,7 @@ namespace IPA.Data
             {
                 var ini = (JObject)result;
                 foreach (var entry in values.Properties().Where(p => !p.Name.StartsWith("player.", StringComparison.Ordinal) && !p.Name.StartsWith("preset.", StringComparison.Ordinal)))
-                    if (ini[entry.Name] != null || Aliases.Values.Contains(entry.Name) || profile.IniFields.ContainsKey(entry.Name)) ini[entry.Name] = entry.Value.DeepClone();
+                    if (IsValid(entry.Name, entry.Value) && (ini[entry.Name] != null || Aliases.Values.Contains(entry.Name) || profile.IniFields.ContainsKey(entry.Name))) ini[entry.Name] = entry.Value.DeepClone();
             }
             else if (file == "PlayerData.dat")
             {
@@ -118,13 +119,27 @@ namespace IPA.Data
                 foreach (var alias in Aliases)
                 {
                     var value = IsPreset(alias.Value) ? values["preset." + profile.Version + "." + alias.Value] : values[alias.Value];
-                    if (value == null || (result.SelectToken(alias.Key, false) == null && Member(shape, alias.Key) == null)) continue;
+                    if (value == null || !IsValid(alias.Value, value) || (result.SelectToken(alias.Key, false) == null && Member(shape, alias.Key) == null)) continue;
                     if (alias.Value == "window.fullscreen" && value.Type == JTokenType.Boolean) value = new JValue((bool)value ? 1 : 0);
                     if (alias.Value == "quality.smoke_graphics" && value.Type == JTokenType.Boolean) value = new JValue((bool)value ? 1 : 0);
                     Set((JObject)result, alias.Key, value);
                 }
             }
             return result;
+        }
+
+        internal static bool IsValid(string key, JToken value)
+        {
+            // A one-pixel window can produce zero-sized half-resolution render targets.
+            if (key == "window.resolution.x" || key == "window.resolution.y")
+                return value?.Type == JTokenType.Integer && (double)value > 1 && (double)value <= int.MaxValue;
+            if (key == "quality.vr_resolution_scale" || key == "quality.menu_vr_resolution_scale_multiplier" || key == "quality.render_viewport_scale")
+            {
+                if (value?.Type != JTokenType.Integer && value?.Type != JTokenType.Float) return false;
+                double number = (double)value;
+                return (float)number > 0 && number <= float.MaxValue;
+            }
+            return true;
         }
 
         private static bool IsPreset(string key) => key == "quality.mirror" || key == "quality.main_fx" || key == "quality.bloom";
