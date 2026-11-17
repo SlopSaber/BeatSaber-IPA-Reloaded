@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using UnityEngine;
 
@@ -13,8 +14,8 @@ namespace IPA.Desktop
     // Resolve it at runtime so one loader binary works with both input backends.
     internal sealed class DesktopInput
     {
-        private readonly Type mouseType;
-        private readonly Type keyboardType;
+        private readonly Func<object> currentMouse;
+        private readonly Func<object> currentKeyboard;
         private readonly Func<string, bool> key;
         private readonly Func<string, bool> keyDown;
         private readonly Func<int, bool> mouse;
@@ -22,8 +23,9 @@ namespace IPA.Desktop
         private readonly Func<int, bool> mouseUp;
         private readonly Func<string, float> axis;
         private readonly Func<Vector2> scroll;
-        private readonly Dictionary<string, PropertyInfo> properties = new();
-        private readonly Dictionary<Type, MethodInfo> readers = new();
+        private readonly Dictionary<(Type, string), Func<object, object>> controls = new();
+        private readonly Dictionary<(Type, string), Func<object, bool>> buttons = new();
+        private readonly Dictionary<Type, Func<object, Vector2>> readers = new();
         private readonly Dictionary<string, string> keyboardNames = new()
         {
             ["left shift"] = "leftShiftKey", ["right shift"] = "rightShiftKey",
@@ -32,8 +34,10 @@ namespace IPA.Desktop
 
         internal DesktopInput()
         {
-            mouseType = FindType("UnityEngine.InputSystem.Mouse");
-            keyboardType = FindType("UnityEngine.InputSystem.Keyboard");
+            Type mouseType = FindType("UnityEngine.InputSystem.Mouse");
+            Type keyboardType = FindType("UnityEngine.InputSystem.Keyboard");
+            currentMouse = BindCurrentDevice(mouseType);
+            currentKeyboard = BindCurrentDevice(keyboardType);
             Type legacy = FindType("UnityEngine.Input");
             if (legacy == null)
             {
@@ -78,45 +82,66 @@ namespace IPA.Desktop
             return null;
         }
 
-        private object Property(object instance, string name)
+        private static Func<object> BindCurrentDevice(Type type)
         {
-            string id = instance.GetType().AssemblyQualifiedName + ":" + name;
-            if (!properties.TryGetValue(id, out var property)) properties[id] = property = instance.GetType().GetProperty(name);
-            return property?.GetValue(instance, null);
+            var getter = type?.GetProperty("current", BindingFlags.Public | BindingFlags.Static)?.GetGetMethod();
+            return getter == null ? null : (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), getter);
         }
 
-        private static object Current(Type type) => type?.GetProperty("current", BindingFlags.Public | BindingFlags.Static)?.GetValue(null, null);
-        private bool Button(object control, string state) => control != null && Property(control, state) is bool value && value;
+        // Input System types are optional at runtime. Bind their getters once
+        // while keeping button and vector reads unboxed.
+        private static Func<object, TResult> BindReader<TResult>(MethodInfo method)
+        {
+            if (method == null || !typeof(TResult).IsAssignableFrom(method.ReturnType)) return null;
+            var instance = Expression.Parameter(typeof(object));
+            var call = Expression.Call(Expression.Convert(instance, method.DeclaringType), method);
+            return Expression.Lambda<Func<object, TResult>>(call, instance).Compile();
+        }
+
+        private static TResult ReadProperty<TResult>(Dictionary<(Type, string), Func<object, TResult>> cache,
+            object instance, string name)
+        {
+            var key = (instance.GetType(), name);
+            if (!cache.TryGetValue(key, out var read))
+                cache[key] = read = BindReader<TResult>(key.Item1.GetProperty(name)?.GetGetMethod());
+            return read == null ? default : read(instance);
+        }
+
+        private object Control(object device, string name) => ReadProperty(controls, device, name);
+        private bool Button(object control, string state) => control != null && ReadProperty(buttons, control, state);
+
         private Vector2 Vector(object control)
         {
             if (control == null) return Vector2.zero;
-            if (!readers.TryGetValue(control.GetType(), out var reader))
-                readers[control.GetType()] = reader = control.GetType().GetMethod("ReadValue", Type.EmptyTypes);
-            return reader?.Invoke(control, null) is Vector2 value ? value : Vector2.zero;
+            Type type = control.GetType();
+            if (!readers.TryGetValue(type, out var read))
+                readers[type] = read = BindReader<Vector2>(type.GetMethod("ReadValue", Type.EmptyTypes));
+            return read == null ? Vector2.zero : read(control);
         }
 
         internal bool Key(string name, bool down = false)
         {
-            object keyboard = Current(keyboardType);
+            object keyboard = currentKeyboard?.Invoke();
             if (keyboard != null)
             {
-                string property = keyboardNames.TryGetValue(name, out var mapped) ? mapped : name + "Key";
-                return Button(Property(keyboard, property), down ? "wasPressedThisFrame" : "isPressed");
+                if (!keyboardNames.TryGetValue(name, out var property))
+                    keyboardNames[name] = property = name + "Key";
+                return Button(Control(keyboard, property), down ? "wasPressedThisFrame" : "isPressed");
             }
             return (down ? keyDown : key)?.Invoke(name) ?? false;
         }
 
         internal bool Mouse(int button, int edge = 0)
         {
-            object device = Current(mouseType);
+            object device = currentMouse?.Invoke();
             if (device != null)
-                return Button(Property(device, button == 0 ? "leftButton" : "rightButton"),
+                return Button(Control(device, button == 0 ? "leftButton" : "rightButton"),
                     edge == 1 ? "wasPressedThisFrame" : edge == -1 ? "wasReleasedThisFrame" : "isPressed");
             return (edge == 1 ? mouseDown : edge == -1 ? mouseUp : mouse)?.Invoke(button) ?? false;
         }
 
-        internal Vector2 Scroll => Current(mouseType) is object device ? Vector(Property(device, "scroll")) / 120f : scroll?.Invoke() ?? Vector2.zero;
-        internal Vector2 Look => Current(mouseType) is object device ? Vector(Property(device, "delta"))
+        internal Vector2 Scroll => currentMouse?.Invoke() is object device ? Vector(Control(device, "scroll")) / 120f : scroll?.Invoke() ?? Vector2.zero;
+        internal Vector2 Look => currentMouse?.Invoke() is object device ? Vector(Control(device, "delta"))
             : new Vector2(axis?.Invoke("MouseX") ?? 0f, axis?.Invoke("MouseY") ?? 0f);
     }
 }
