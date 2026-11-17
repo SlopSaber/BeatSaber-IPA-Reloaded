@@ -2,10 +2,6 @@
 
 using IPA.Config;
 using IPA.Logging;
-using Microsoft.Win32;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace IPA.Injector
 {
@@ -13,13 +9,19 @@ namespace IPA.Injector
     {
         public static void ParseArguments(string[] args)
         {
+            bool legacyConsole = false;
+            int? consoleProcessId = null;
             for (int i = 0; i < args.Length; i++)
             {
                 var arg = args[i];
                 switch (arg)
                 {
                     case "--verbose":
-                        WinConsole.Initialize(i + 1 < args.Length && int.TryParse(args[i + 1], out var processId) ? processId : WinConsole.AttachParent);
+                        consoleProcessId ??= i + 1 < args.Length && int.TryParse(args[i + 1], out var processId) ? processId : WinConsole.AttachParent;
+                        break;
+                    case "--legacyconsole":
+                    case "--legacy-console":
+                        legacyConsole = true;
                         break;
                     case "--debug":
                         SelfConfig.CommandLineValues.Debug.ShowDebug = true;
@@ -53,6 +55,8 @@ namespace IPA.Injector
                         break;
                 }
             }
+            if (legacyConsole || consoleProcessId.HasValue)
+                WinConsole.Initialize(consoleProcessId ?? WinConsole.AttachParent, alwaysCreateNewConsole: legacyConsole);
         }
     }
 }

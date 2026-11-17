@@ -10,7 +10,7 @@ Here's a quick list of what they are and what they do.
 
 - `--verbose`
 
-  > Makes a console appear with log information at startup.
+  > Opens the default terminal for live startup logs. Long lines stay on one row.
   >
   > Optionally, an explicit process ID can be specified to start the game with an external console. This allows it to be
   > launched via Steam without being interrupted by its "Allow game launch?" if launched directly from the `.exe`.
@@ -22,6 +22,10 @@ Here's a quick list of what they are and what they do.
   >   ```
   >
   > Do note that this isn't going to work from an elevated terminal.
+
+- `--legacyconsole` (also `--legacy-console`)
+
+  > Opens the original Windows console window owned by the game, with mouse selection. This option also enables console logging on its own.
 
 - `--debug`
 

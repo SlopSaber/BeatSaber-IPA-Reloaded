@@ -159,6 +159,14 @@ namespace IPA.Desktop
                 }
             }
             if (!Ready) return;
+            bool nativeFlightStopped = StopNativeFlight(behaviours);
+            if (!Ready) return;
+            if (cameraChanged || nativeFlightStopped)
+            {
+                // Scene discovery can still be rebuilding when the main camera changes.
+                foreach (Behaviour behaviour in Camera.GetComponentsInParent<Behaviour>(true))
+                    if (behaviour != null && behaviour.GetType().Name == "TrackedPoseDriver") Disable(behaviour);
+            }
             pauseTarget = null;
             pauseMethod = null;
             pauseProperty = null;
@@ -171,7 +179,7 @@ namespace IPA.Desktop
                 DesktopCameraCompatibility.Suppress(behaviour);
                 string name = type.Name;
                 if (name == "VRGraphicRaycaster") DesktopGameHooks.BindRaycaster(behaviour);
-                if (name == "FirstPersonFlyingController" || name == "VRController" || name == "VRPointer"
+                if (name == "VRController" || name == "VRPointer"
                     || (name == "TrackedPoseDriver" && (Camera.transform.IsChildOf(behaviour.transform) || behaviour.transform.IsChildOf(Camera.transform)))
                     || (name == "SmoothCamera" && behaviour.gameObject == Camera.gameObject)) Disable(behaviour);
                 if (behaviour is BaseInputModule module && !(module is DesktopPointerInput)) Disable(module);
@@ -206,7 +214,7 @@ namespace IPA.Desktop
                     pausedField = type.GetField("_paused", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 }
             }
-            if (poseInitializationPending && Ready)
+            if ((poseInitializationPending || nativeFlightStopped) && Ready)
             {
                 // Native flight teardown resets the origin before relative pose ownership begins.
                 Transform parent = Camera.transform.parent;
@@ -222,6 +230,26 @@ namespace IPA.Desktop
             foreach (var dead in disabled.Keys.Where(behaviour => behaviour == null).ToArray()) disabled.Remove(dead);
             pointers.RemoveAll(pointer => pointer == null);
             if (visualSource != null) foreach (var pointer in pointers) pointer.BindVisuals(visualSource);
+        }
+
+        private bool StopNativeFlight(IEnumerable<Behaviour> behaviours)
+        {
+            bool stopped = false;
+            foreach (Behaviour behaviour in behaviours)
+            {
+                if (behaviour == null || !behaviour.isActiveAndEnabled || !behaviour.gameObject.scene.isLoaded
+                    || behaviour.GetType().Name != "FirstPersonFlyingController") continue;
+                if (!stopped && !poseInitializationPending)
+                {
+                    Transform parent = Camera.transform.parent;
+                    initialWorldPosition = parent != null ? parent.TransformPoint(position) : position;
+                    initialWorldRotation = parent != null ? parent.rotation * rotation : rotation;
+                }
+                // Native flight teardown resets the origin and re-enables tracking and VR controllers.
+                Disable(behaviour);
+                stopped = true;
+            }
+            return stopped;
         }
 
         private void SetBoolean(Behaviour owner, string name, bool value)
@@ -424,12 +452,15 @@ namespace IPA.Desktop
             autoTracking = null;
             foreach (var pointer in pointers) if (pointer != null) { pointer.enabled = false; Destroy(pointer); }
             pointers.Clear();
-            foreach (var saved in disabled) if (saved.Key != null) saved.Key.enabled = saved.Value;
-            disabled.Clear();
+            foreach (var saved in disabled)
+                if (saved.Key != null && saved.Key.GetType().Name != "FirstPersonFlyingController") saved.Key.enabled = saved.Value;
             foreach (var saved in hidden) if (saved.Renderer != null) saved.Renderer.enabled = saved.Enabled;
             hidden.Clear();
             foreach (var restore in restoreMembers) restore();
             restoreMembers.Clear();
+            foreach (var saved in disabled)
+                if (saved.Key != null && saved.Key.GetType().Name == "FirstPersonFlyingController") saved.Key.enabled = saved.Value;
+            disabled.Clear();
             Cursor.lockState = originalLock;
             Cursor.visible = originalCursor;
         }

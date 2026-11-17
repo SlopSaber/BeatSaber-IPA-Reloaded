@@ -208,9 +208,12 @@ application and attaches the game to that console. Logs use the normal console
 printers directly, including when `--no-logs` disables file logging. No PowerShell
 or file-following viewer is used. The console host exits when the game does.
 Because the console is shared with the game, closing its window can also close
-the game. `--legacy-console` uses the original console allocation path, with mouse
-selection enabled. `--verbose <processId>` still attaches to the specified
-process's console. If the host cannot start or attach, IPA uses the original path.
+the game. Logs stay on one row per line. Text beyond the right edge is clipped.
+File logs retain the full text. Launch with `--legacyconsole` for the original
+game-owned console window with mouse selection. `--legacy-console` is an alias.
+`--verbose <processId>` attaches to the specified process's console and uses its
+existing wrap setting. If the terminal host cannot start or attach, IPA falls
+back to the original console path.
 
 Legacy SiraUtil Affinity callbacks targeting inherited methods without explicit signatures
 are prepared against the method's declaring type. Void prefixes and postfixes

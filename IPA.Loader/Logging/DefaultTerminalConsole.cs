@@ -33,7 +33,7 @@ namespace IPA.Logging
                     FailureReason = "Console host did not become ready within five seconds.";
                     return false;
                 }
-                if (!FreeConsole())
+                if (!WinConsole.FreeConsole())
                 {
                     FailureReason = "FreeConsole failed with Win32 error " + Marshal.GetLastWin32Error();
                     return false;
@@ -65,9 +65,5 @@ namespace IPA.Logging
         [DllImport("kernel32.dll", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool AttachConsole(int processId);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool FreeConsole();
     }
 }

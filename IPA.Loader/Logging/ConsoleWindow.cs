@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Linq;
 using Microsoft.Win32.SafeHandles;
 
 namespace IPA.Logging
@@ -27,11 +26,14 @@ namespace IPA.Logging
         public static void Initialize(int processId, bool alwaysCreateNewConsole = false)
         {
             if (IsInitialized) return;
-            var args = Environment.GetCommandLineArgs();
-            if (!alwaysCreateNewConsole && processId == AttachParent && !args.Contains("--legacy-console")
-                && DefaultTerminalConsole.TryAttach())
+            if (alwaysCreateNewConsole)
+            {
+                _ = FreeConsole();
+                ownsConsole = AllocConsole();
+            }
+            else if (processId == AttachParent && DefaultTerminalConsole.TryAttach())
                 ownsConsole = true;
-            else if (alwaysCreateNewConsole || !AttachConsole(processId))
+            else if (!AttachConsole(processId))
                 ownsConsole |= AllocConsole();
 
             // An already attached process can fail both AttachConsole and AllocConsole.
@@ -63,12 +65,15 @@ namespace IPA.Logging
                 var handle = OutHandle;
                 if (GetConsoleMode(handle, out var mode))
                 {
-                    mode |= EnableProcessedOutput | EnableVTProcessing;
-                    UseVTEscapes = SetConsoleMode(handle, mode);
+                    mode |= EnableProcessedOutput;
+                    if (ownsConsole) mode &= ~EnableWrapAtEolOutput;
+                    UseVTEscapes = SetConsoleMode(handle, mode | EnableVTProcessing);
                     if (!UseVTEscapes)
                     {
+                        int error = Marshal.GetLastWin32Error();
+                        if (ownsConsole) _ = SetConsoleMode(handle, mode);
                         Console.Error.WriteLine("VT console output unavailable; using plain output: " +
-                            new Win32Exception(Marshal.GetLastWin32Error()).Message);
+                            new Win32Exception(error).Message);
                     }
                 }
                 else
@@ -117,6 +122,10 @@ namespace IPA.Logging
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool AllocConsole();
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static extern bool FreeConsole();
+
         [DllImport("kernel32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool AttachConsole(int dwProcessId);
@@ -139,6 +148,7 @@ namespace IPA.Logging
         private static extern bool SetStdHandle(int standardHandle, IntPtr handle);
 
         private const uint EnableProcessedOutput = 0x0001;
+        private const uint EnableWrapAtEolOutput = 0x0002;
         private const uint EnableVTProcessing = 0x0004;
         private const uint EnableQuickEdit = 0x0040;
         private const uint EnableExtendedFlags = 0x0080;
