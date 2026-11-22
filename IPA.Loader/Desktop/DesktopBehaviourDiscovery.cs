@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -151,9 +152,17 @@ namespace IPA.Desktop
                 catch (NotSupportedException) { continue; }
                 foreach (Type type in types)
                 {
-                    if (type == null || !typeof(Behaviour).IsAssignableFrom(type) || !Names.Contains(type.Name)) continue;
-                    if (typeof(Camera).IsAssignableFrom(type) || typeof(BaseInputModule).IsAssignableFrom(type)
-                        || typeof(EventSystem).IsAssignableFrom(type)) continue;
+                    if (type == null || !Names.Contains(type.Name)) continue;
+                    try
+                    {
+                        if (!typeof(Behaviour).IsAssignableFrom(type) || typeof(Camera).IsAssignableFrom(type)
+                            || typeof(BaseInputModule).IsAssignableFrom(type) || typeof(EventSystem).IsAssignableFrom(type)) continue;
+                    }
+                    catch (Exception error) when (error is TypeLoadException or FileNotFoundException or FileLoadException or BadImageFormatException)
+                    {
+                        Logger.Default.Debug($"FPFC discovery skipped '{type.FullName}': {error.Message}");
+                        continue;
+                    }
                     targetTypes.Add(type);
                     relevantTypes.Clear();
                 }

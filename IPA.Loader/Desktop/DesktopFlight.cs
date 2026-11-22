@@ -32,6 +32,9 @@ namespace IPA.Desktop
         private readonly DesktopBehaviourDiscovery discovery = new();
         private Vector3 position;
         private Quaternion rotation;
+        private Transform poseParent;
+        private Vector3 lastWorldPosition;
+        private Quaternion lastWorldRotation;
         private bool poseInitializationPending;
         private Vector3 initialWorldPosition;
         private Quaternion initialWorldRotation;
@@ -217,15 +220,9 @@ namespace IPA.Desktop
             if ((poseInitializationPending || nativeFlightStopped) && Ready)
             {
                 // Native flight teardown resets the origin before relative pose ownership begins.
-                Transform parent = Camera.transform.parent;
-                position = parent != null ? parent.InverseTransformPoint(initialWorldPosition) : initialWorldPosition;
-                Quaternion localRotation = parent != null ? Quaternion.Inverse(parent.rotation) * initialWorldRotation : initialWorldRotation;
-                Vector3 angles = localRotation.eulerAngles;
-                yaw = angles.y;
-                pitch = Mathf.DeltaAngle(0f, angles.x);
-                rotation = Quaternion.Euler(pitch, yaw, 0f);
+                SetRelativePose(initialWorldPosition, initialWorldRotation);
                 poseInitializationPending = false;
-                Logger.Default.Debug($"FPFC initial pose: camera={Camera.name}, parent={(parent != null ? parent.name : "none")}, world={initialWorldPosition}, local={position}.");
+                Logger.Default.Debug($"FPFC initial pose: camera={Camera.name}, parent={(poseParent != null ? poseParent.name : "none")}, world={initialWorldPosition}, local={position}.");
             }
             foreach (var dead in disabled.Keys.Where(behaviour => behaviour == null).ToArray()) disabled.Remove(dead);
             pointers.RemoveAll(pointer => pointer == null);
@@ -241,9 +238,8 @@ namespace IPA.Desktop
                     || behaviour.GetType().Name != "FirstPersonFlyingController") continue;
                 if (!stopped && !poseInitializationPending)
                 {
-                    Transform parent = Camera.transform.parent;
-                    initialWorldPosition = parent != null ? parent.TransformPoint(position) : position;
-                    initialWorldRotation = parent != null ? parent.rotation * rotation : rotation;
+                    initialWorldPosition = lastWorldPosition;
+                    initialWorldRotation = lastWorldRotation;
                 }
                 // Native flight teardown resets the origin and re-enables tracking and VR controllers.
                 Disable(behaviour);
@@ -333,6 +329,7 @@ namespace IPA.Desktop
             AdvanceDiscovery();
             if (dirty || !Ready || Time.unscaledTime >= nextScan) Scan();
             if (yielding) return;
+            if (Ready && !poseInitializationPending) RebasePose();
             ReleaseDetachedRenderers();
             // Ignore the focus/capture transition click and any cursor-warp look delta.
             CanInteract = focusedLastFrame && Captured;
@@ -378,10 +375,34 @@ namespace IPA.Desktop
         }
         private void ApplyPose()
         {
-            if (!Ready) return;
+            if (!Ready || poseInitializationPending) return;
+            RebasePose();
             Camera.stereoTargetEye = StereoTargetEyeMask.None;
-            Camera.transform.localPosition = position;
-            Camera.transform.localRotation = rotation;
+            Transform camera = Camera.transform;
+            camera.localPosition = position;
+            camera.localRotation = rotation;
+            lastWorldPosition = camera.position;
+            lastWorldRotation = camera.rotation;
+        }
+
+        private void RebasePose()
+        {
+            // Unity can reparent the same camera as menu or gameplay services come online.
+            if (!ReferenceEquals(Camera.transform.parent, poseParent))
+                SetRelativePose(lastWorldPosition, lastWorldRotation);
+        }
+
+        private void SetRelativePose(Vector3 worldPosition, Quaternion worldRotation)
+        {
+            poseParent = Camera.transform.parent;
+            position = poseParent != null ? poseParent.InverseTransformPoint(worldPosition) : worldPosition;
+            Quaternion localRotation = poseParent != null ? Quaternion.Inverse(poseParent.rotation) * worldRotation : worldRotation;
+            Vector3 angles = localRotation.eulerAngles;
+            yaw = angles.y;
+            pitch = Mathf.DeltaAngle(0f, angles.x);
+            rotation = Quaternion.Euler(pitch, yaw, 0f);
+            lastWorldPosition = worldPosition;
+            lastWorldRotation = worldRotation;
         }
         private void OnApplicationFocus(bool focused)
         {
@@ -448,6 +469,7 @@ namespace IPA.Desktop
             focusedLastFrame = false;
             RestoreCamera();
             Camera = null;
+            poseParent = null;
             poseInitializationPending = false;
             autoTracking = null;
             foreach (var pointer in pointers) if (pointer != null) { pointer.enabled = false; Destroy(pointer); }
