@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace IPA.Loader
 {
@@ -288,7 +289,16 @@ namespace IPA.Loader
 
             if (AntiMalwareEngine.IsInitialized)
             {
-                var result = AntiMalwareEngine.Engine.ScanFile(new FileInfo(path));
+                ScanResult result;
+                try
+                {
+                    result = AntiMalwareEngine.Engine.ScanFile(new FileInfo(path));
+                }
+                catch (Exception error) when (error is ExternalException or IOException or UnauthorizedAccessException)
+                {
+                    Log(Logger.Level.Error, $"Cannot scan library '{path}': {error.Message} (0x{error.HResult:X8}).");
+                    return null;
+                }
                 if (result is ScanResult.Detected)
                 {
                     Log(Logger.Level.Error, $"Scan of '{path}' found malware; not loading");

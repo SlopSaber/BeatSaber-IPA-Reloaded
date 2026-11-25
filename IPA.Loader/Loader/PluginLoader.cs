@@ -122,11 +122,13 @@ namespace IPA.Loader
 
         internal static List<PluginMetadata> PluginsMetadata = new();
         internal static List<PluginMetadata> DisabledPlugins = new();
+        internal static readonly HashSet<string> ScannedPluginPaths = new(StringComparer.OrdinalIgnoreCase);
 
         private static readonly Regex embeddedTextDescriptionPattern = new(@"#!\[(.+)\]", RegexOptions.Compiled | RegexOptions.Singleline);
 
         internal static void LoadMetadata()
         {
+            ScannedPluginPaths.Clear();
             string[] plugins = ModFiles.PluginFiles.ToArray();
             var scanWait = new Stopwatch();
             var scanTime = TimeSpan.Zero;
@@ -211,6 +213,7 @@ namespace IPA.Loader
                         ReadWrite = false,
                         AssemblyResolver = resolver
                     }).MainModule;
+                    ScannedPluginPaths.Add(plugin);
                     metadata.IsInterface3 = IPA.Compat3.Runtime.IsInterfacePlugin(pluginModule);
                     metadata.TargetLoaderVersion = LoaderCompatibility.GetTargetVersion(pluginModule);
 
@@ -1055,6 +1058,7 @@ namespace IPA.Loader
             }
             PluginsMetadata = new List<PluginMetadata>();
             DisabledPlugins = new List<PluginMetadata>();
+            ScannedPluginPaths.Clear();
             Feature.Reset();
             GC.Collect();
             GC.WaitForPendingFinalizers();

@@ -334,8 +334,6 @@ namespace IPA.Loader
 
         internal static void Load()
         {
-            string pluginDirectory = UnityGame.PluginsPath;
-
             // Process.GetCurrentProcess().MainModule crashes the game and Assembly.GetEntryAssembly() is NULL,
             // so we need to resort to P/Invoke
             string exeName = Path.GetFileNameWithoutExtension(AppInfo.StartupPath);
@@ -354,6 +352,9 @@ namespace IPA.Loader
 
             // Keep prepared legacy plugins outside mod discovery.
             string[] originalPlugins = ModFiles.PluginFiles.ToArray();
+            using var resolver = new CecilLibLoader();
+            resolver.AddSearchDirectory(UnityGame.LibraryPath);
+            foreach (string directory in ModFiles.Directories(ModFiles.Roots)) resolver.AddSearchDirectory(directory);
 
             string cacheDir = Path.Combine(UnityGame.CompatibilityCachePath, "Legacy", typeof(PluginManager).Module.ModuleVersionId.ToString("N"));
             var copiedPlugins = new List<string>();
@@ -367,6 +368,7 @@ namespace IPA.Loader
 
             foreach (string s in originalPlugins)
             {
+                if (!PluginLoader.ScannedPluginPaths.Contains(s)) continue;
                 if (metadataPaths.Contains(s)) continue;
                 if (ignoredPaths.Contains(s)) continue;
                 if (disabledPaths.Contains(s)) continue;
@@ -386,24 +388,21 @@ namespace IPA.Loader
                 Directory.CreateDirectory(sourceDirectory);
                 string pluginCopy = Path.Combine(sourceDirectory, Path.GetFileName(s));
 
-                #region Fix assemblies for refactor
-
-                using var module = ModuleDefinition.ReadModule(Path.Combine(pluginDirectory, s));
-                LegacyPluginRewriter.Rewrite(module);
                 try
                 {
+                    using var module = ModuleDefinition.ReadModule(s, new ReaderParameters { AssemblyResolver = resolver });
+                    LegacyPluginRewriter.Rewrite(module);
                     IPA.Compat3.Runtime.Rewrite(module);
                     IPA.Data.SaveDataRewriter.Rewrite(module);
                     module.Write(pluginCopy);
                     LoaderCompatibility.RegisterOriginalPath(pluginCopy, s);
                     copiedPlugins.Add(pluginCopy);
                 }
-                catch (NotSupportedException error)
+                catch (Exception error) when (error is AssemblyResolutionException or ResolutionException
+                    or NotSupportedException or BadImageFormatException or IOException or UnauthorizedAccessException)
                 {
-                    Logger.Loader.Warn($"Skipping unsupported plugin {Path.GetFileName(s)}: {error.Message}");
+                    Logger.Loader.Warn($"Skipping legacy plugin {Path.GetFileName(s)}: {error.Message}");
                 }
-
-                #endregion
             }
 
             //Load copied plugins
